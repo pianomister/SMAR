@@ -1,15 +1,17 @@
 package de.dhbw.smar;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+
 import android.app.Activity;
-import android.app.ActionBar;
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Build;
 
 
 
@@ -24,6 +26,7 @@ public class MainActivity extends Activity {
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
         }
+        writeFile();
     }
 
     //Das ist ein Testkommentar.s
@@ -60,5 +63,37 @@ public class MainActivity extends Activity {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
             return rootView;
         }
+    }
+    
+    public void writeFile() {
+    	
+        String filename = "test.txt";
+        String string = "Schreib mal rein hier :)";
+        FileOutputStream outputStream;
+
+        try {
+          outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
+          outputStream.write(string.getBytes());
+          outputStream.close();	
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+
+        try {
+        	FileInputStream fis = openFileInput(filename);
+        	
+        	StringBuilder builder = new StringBuilder();
+        	int ch;
+        	while((ch = fis.read()) != -1){
+        	    builder.append((char)ch);
+        	}
+
+        	System.out.println(builder.toString());
+
+        } catch (Exception e) {
+        	e.printStackTrace();
+        }
+        
+        
     }
 }
