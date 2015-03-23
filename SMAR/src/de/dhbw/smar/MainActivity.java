@@ -1,11 +1,9 @@
 package de.dhbw.smar;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.File;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -67,33 +65,18 @@ public class MainActivity extends Activity {
     
     public void writeFile() {
     	
-        String filename = "test.txt";
-        String string = "Schreib mal rein hier :)";
-        FileOutputStream outputStream;
-
-        try {
-          outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
-          outputStream.write(string.getBytes());
-          outputStream.close();	
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-
-        try {
-        	FileInputStream fis = openFileInput(filename);
-        	
-        	StringBuilder builder = new StringBuilder();
-        	int ch;
-        	while((ch = fis.read()) != -1){
-        	    builder.append((char)ch);
-        	}
-
-        	System.out.println(builder.toString());
-
-        } catch (Exception e) {
-        	e.printStackTrace();
-        }
+        String sFilename = "test.txt";
+        String sFilename2 = "test.txt";
+        String sString = "Schreib mal rein hier :)";
+        String sString2 = "Versuch zwei";
         
+        FileHelper.writeFile(this, sFilename, sString);
+        File result = FileHelper.readFile(this, sFilename);
+        System.out.println("TEST1: " + FileHelper.getFileContents(result));
+        
+        FileHelper.writeFile(this, sFilename2, sString2);
+        File result2 = FileHelper.readFile(this, sFilename2);
+        System.out.println("TEST2: " + FileHelper.getFileContents(result2));
         
     }
 }
