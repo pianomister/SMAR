@@ -23,4 +23,5 @@
         <item>New Zealand</item>
         <item>India</item>
     </string-array>
+    <string name="prefname_use_internal_storage">bUseInternalStorage</string>
 </resources>

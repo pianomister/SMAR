@@ -11,6 +11,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Scanner;
 
+import de.dhbw.smar.R;
 import android.app.Activity;
 import android.os.Environment;
 import android.util.Log;
@@ -33,7 +34,7 @@ public class FileHelper {
 	 * @author Stephan
 	 */
 	public static File readFile(Activity activity, String sFilename) {
-		
+
 		File targetDir = getStorageDir(activity, false);
 		
 		if(targetDir != null) {
@@ -93,7 +94,9 @@ public class FileHelper {
 				ObjectInputStream obj_in = new ObjectInputStream(f_in);
 	
 				// Read an object
-				return obj_in.readObject();
+				Object obj = obj_in.readObject();
+				obj_in.close();
+				return obj;
 				
 				/* TODO leave comment for reference
 				if (obj instanceof Vector)
@@ -135,6 +138,7 @@ public class FileHelper {
 				
 				// Write object out to disk
 				obj_out.writeObject(object);
+				obj_out.close();
 				
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -157,7 +161,7 @@ public class FileHelper {
 		bCheckWritable = bCheckWritable ? isExternalStorageWritable() : isExternalStorageReadable();
 		
 		// check preference for storage usage
-		boolean bUseInternalStorage = (PreferencesHelper.getPreferenceInt(activity, "bUseInternalStorage") == 1) ? true : false; 
+		boolean bUseInternalStorage = (PreferencesHelper.getPreferenceInt(activity, activity.getString(R.string.prefname_use_internal_storage)) == 1) ? true : false; 
 		
 		// internal storage
 		if(bUseInternalStorage) {

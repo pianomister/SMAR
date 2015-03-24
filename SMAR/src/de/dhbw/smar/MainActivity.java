@@ -41,8 +41,8 @@ public class MainActivity extends Activity {
 	        } */
 	        
 	        // set initial preference
-	        if(PreferencesHelper.getPreferenceInt(this, "bUseInternalStorage") == -1) {
-	        	PreferencesHelper.setPreferenceInt(this, "bUseInternalStorage", 1);
+	        if(PreferencesHelper.getPreferenceInt(this, getString(R.string.prefname_use_internal_storage)) == -1) {
+	        	PreferencesHelper.setPreferenceInt(this, getString(R.string.prefname_use_internal_storage), 1);
 	        }
 	        
 	        writeFile();
