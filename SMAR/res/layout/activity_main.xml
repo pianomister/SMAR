@@ -37,7 +37,8 @@
             android:id="@+id/bt_main_logout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/bt_main_logout" />
+            android:text="@string/bt_main_logout" 
+            android:onClick="onLogoutClicked"/>
 
     </LinearLayout>
 

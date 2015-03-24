@@ -87,4 +87,8 @@ public class MainActivity extends Activity {
         System.out.println("TEST2: " + FileHelper.getFileContents(result2));
         
     }
+    
+    public void onLogoutClicked(View view) {
+    	System.exit(0);
+    }
 }
