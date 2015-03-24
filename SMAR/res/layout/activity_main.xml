@@ -1,16 +1,45 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/container"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="de.dhbw.smar.MainActivity"
-    tools:ignore="MergeRootFrame" >
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
 
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Button" />
+    <!-- tools:context="de.dhbw.smar.MainActivity"
+    tools:ignore="MergeRootFrame"  -->
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical" >
 
-</FrameLayout>
+        <Button
+            android:id="@+id/bt_main_search_product"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/bt_main_search_product" />
+
+        <Button
+            android:id="@+id/bt_main_load_product"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/bt_main_load_product" />
+
+        <Button
+            android:id="@+id/bt_main_receive_product"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/bt_main_receive_product" />
+
+        <Button
+            android:id="@+id/bt_main_settings"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/bt_main_settings" />
+
+        <Button
+            android:id="@+id/bt_main_logout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/bt_main_logout" />
+
+    </LinearLayout>
+
+</ScrollView>
 
