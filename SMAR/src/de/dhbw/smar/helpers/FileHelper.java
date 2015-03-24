@@ -1,4 +1,4 @@
-package de.dhbw.smar;
+package de.dhbw.smar.helpers;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,9 +24,7 @@ import android.util.Log;
  */
 public class FileHelper {
 	
-	private static boolean bUseInternalStorage = false;
-	private static String sLogTag = "FileHelper";
-	
+	private static String sLogTag = "FileHelper";	
 	
 	/**
 	 * Read a file from configured disk location
@@ -157,6 +155,9 @@ public class FileHelper {
 		
 		// check for read resp. read+write capability of external device
 		bCheckWritable = bCheckWritable ? isExternalStorageWritable() : isExternalStorageReadable();
+		
+		// check preference for storage usage
+		boolean bUseInternalStorage = (PreferencesHelper.getPreferenceInt(activity, "bUseInternalStorage") == 1) ? true : false; 
 		
 		// internal storage
 		if(bUseInternalStorage) {

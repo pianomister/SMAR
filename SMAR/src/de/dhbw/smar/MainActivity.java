@@ -10,6 +10,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import de.dhbw.smar.helpers.FileHelper;
+import de.dhbw.smar.helpers.PreferencesHelper;
 
 
 
@@ -24,6 +26,12 @@ public class MainActivity extends Activity {
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
         }
+        
+        // set initial preference
+        if(PreferencesHelper.getPreferenceInt(this, "bUseInternalStorage") == -1) {
+        	PreferencesHelper.setPreferenceInt(this, "bUseInternalStorage", 1);
+        }
+        
         writeFile();
     }
 
