@@ -9,5 +9,18 @@
     <string name="bt_main_receive_product">Warenannahme</string>
     <string name="bt_main_settings">Settings</string>
     <string name="bt_main_logout">Logout</string>
+    <string name="login_descr">Bitte wählen Sie Ihren Benutzernamen aus und scannen Sie anschließend Ihren Code:</string>
 
+    <string name="country_prompt">Choose a country</string>
+ 
+    <string-array name="country_arrays">
+        <item>Malaysia</item>
+        <item>United States</item>
+        <item>Indonesia</item>
+        <item>France</item>
+        <item>Italy</item>
+        <item>Singapore</item>
+        <item>New Zealand</item>
+        <item>India</item>
+    </string-array>
 </resources>
