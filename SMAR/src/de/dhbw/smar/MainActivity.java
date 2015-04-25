@@ -11,10 +11,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.zxing.integration.IntentIntegrator;
+import com.google.zxing.integration.IntentResult;
+
 import de.dhbw.smar.helper.LoginHelper;
 import de.dhbw.smar.helpers.FileHelper;
 import de.dhbw.smar.helpers.PreferencesHelper;
-
 
 
 public class MainActivity extends Activity {
@@ -105,4 +110,30 @@ public class MainActivity extends Activity {
     public void onLogoutClicked(View view) {
     	System.exit(0);
     }
+    
+    public void onScanClicked(View view) {
+    	
+    	TextView test = (TextView)findViewById(R.id.scan_content);
+    	test.setText("Yolooo");
+    	IntentIntegrator scanIntegrator = new IntentIntegrator(this);
+    	scanIntegrator.initiateScan();
+    }
+    
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+    	IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+    	if (scanningResult != null) {
+    		String scanContent = scanningResult.getContents();
+    		String scanFormat = scanningResult.getFormatName();
+    		TextView result = (TextView)findViewById(R.id.scan_content);
+    		TextView format = (TextView)findViewById(R.id.scan_format);
+    		
+    		result.setText("Result: " + scanContent);
+    		format.setText("Format: " + scanFormat);
+    	}
+    	else {
+    		Toast toast = Toast.makeText(getApplicationContext(), "No Scanning Data received", Toast.LENGTH_SHORT);
+    		toast.show();
+    	}
+    }
+    
 }
