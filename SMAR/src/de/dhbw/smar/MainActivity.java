@@ -107,17 +107,17 @@ public class MainActivity extends Activity {
         
     }
     
+    public void onScanClicked(View view) {
+    	Intent myIntent = new Intent(this, QR_Result.class);
+    	startActivity(myIntent);
+    	
+    }
+    
     public void onLogoutClicked(View view) {
     	System.exit(0);
     }
     
-    public void onScanClicked(View view) {
-    	
-    	TextView test = (TextView)findViewById(R.id.scan_content);
-    	test.setText("Yolooo");
-    	IntentIntegrator scanIntegrator = new IntentIntegrator(this);
-    	scanIntegrator.initiateScan();
-    }
+
     
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
     	IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
