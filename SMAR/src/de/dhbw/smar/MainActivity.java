@@ -119,21 +119,6 @@ public class MainActivity extends Activity {
     
 
     
-    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-    	IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
-    	if (scanningResult != null) {
-    		String scanContent = scanningResult.getContents();
-    		String scanFormat = scanningResult.getFormatName();
-    		TextView result = (TextView)findViewById(R.id.scan_content);
-    		TextView format = (TextView)findViewById(R.id.scan_format);
-    		
-    		result.setText("Result: " + scanContent);
-    		format.setText("Format: " + scanFormat);
-    	}
-    	else {
-    		Toast toast = Toast.makeText(getApplicationContext(), "No Scanning Data received", Toast.LENGTH_SHORT);
-    		toast.show();
-    	}
-    }
+
     
 }
