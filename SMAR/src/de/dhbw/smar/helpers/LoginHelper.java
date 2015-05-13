@@ -1,5 +1,9 @@
-package de.dhbw.smar.helper;
+package de.dhbw.smar.helpers;
 
+import java.util.ArrayList;
+import java.util.List;
+
+// @author Sebastian Kowalski
 public class LoginHelper {
 	// Make this class a singleton
 	private static final LoginHelper lh = new LoginHelper();
@@ -29,5 +33,17 @@ public class LoginHelper {
 	
 	public boolean isLoggedIn() {
 		return this.loggedIn;
+	}
+	
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	
+	public List<String> getUserList() {
+		List<String> userList = new ArrayList<String>();
+		userList.add("Sebastian");
+		userList.add("Stephan");
+		userList.add("Raffael");
+		return userList;
 	}
 }

@@ -3,7 +3,11 @@ package de.dhbw.smar;
 import java.io.File;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,27 +15,32 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import de.dhbw.smar.helper.LoginHelper;
 import de.dhbw.smar.helpers.FileHelper;
+import de.dhbw.smar.helpers.LoginHelper;
 import de.dhbw.smar.helpers.PreferencesHelper;
 
 
 
 public class MainActivity extends Activity {
+	
+	final Context context = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
         // Debug: Einloggen!
-        LoginHelper.getInstance().setLogin("test", "test"); // Logge ein
+        // LoginHelper.getInstance().setLogin("test", "test"); // Logge ein
         // Debug Ende
         
         if(!LoginHelper.getInstance().isLoggedIn()) {
+        	ProgressDialog pDialog = ProgressDialog.show(this, "Downloading Data..", "Please wait", true, false);
         	// Set LogIn Activity
-        	Intent startNewActivityOpen = new Intent(MainActivity.this, LoginActivity.class);
+        	Intent startNewActivityOpen = new Intent(this, LoginActivity.class);
         	startActivityForResult(startNewActivityOpen, 0);
-        } else {
+        	
+        	pDialog.dismiss();
+        }
         
 	        setContentView(R.layout.activity_main);
 	        /* if (savedInstanceState == null) {
@@ -46,7 +55,6 @@ public class MainActivity extends Activity {
 	        }
 	        
 	        writeFile();
-        }
     }
 
     //Das ist ein Testkommentar.s
@@ -102,7 +110,48 @@ public class MainActivity extends Activity {
         
     }
     
+    private void showNoActionDialog() {
+    	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+				context);
+ 
+			// set title
+			alertDialogBuilder.setTitle("No Action...");
+ 
+			// set dialog message
+			alertDialogBuilder
+				.setMessage("There is no action here...\nPlease stand by!")
+				.setCancelable(false)
+				.setNeutralButton("Okay",new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog,int id) {
+						// if this button is clicked, just close
+						// the dialog box and do nothing
+						dialog.cancel();
+					}
+				});
+ 
+				// create alert dialog and show it
+				alertDialogBuilder.create().show();
+    }
+    
+    public void onProductSearchClicked(View view) {
+    	showNoActionDialog();
+    }
+    
+    public void onProductLoadClicked(View view) {
+    	showNoActionDialog();
+    }
+    
+    public void onProductStockClicked(View view) {
+    	showNoActionDialog();
+    }
+    
+    public void onSettingsClicked(View view) {
+    	Intent startNewActivityOpen = new Intent(this, SettingsActivity.class);
+    	startActivityForResult(startNewActivityOpen, 0);
+    }
+    
     public void onLogoutClicked(View view) {
+    	LoginHelper.getInstance().setLogout();
     	System.exit(0);
     }
 }

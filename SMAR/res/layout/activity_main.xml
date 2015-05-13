@@ -13,25 +13,29 @@
             android:id="@+id/bt_main_search_product"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/bt_main_search_product" />
+            android:text="@string/bt_main_search_product"
+			android:onClick="onProductSearchClicked"/>
 
         <Button
             android:id="@+id/bt_main_load_product"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/bt_main_load_product" />
+            android:text="@string/bt_main_load_product"
+			android:onClick="onProductLoadClicked"/>
 
         <Button
             android:id="@+id/bt_main_receive_product"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/bt_main_receive_product" />
+            android:text="@string/bt_main_receive_product"
+			android:onClick="onProductStockClicked"/>
 
         <Button
             android:id="@+id/bt_main_settings"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/bt_main_settings" />
+            android:text="@string/bt_main_settings"
+			android:onClick="onSettingsClicked"/>
 
         <Button
             android:id="@+id/bt_main_logout"
