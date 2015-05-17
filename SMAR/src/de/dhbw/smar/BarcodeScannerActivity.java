@@ -7,6 +7,7 @@ import net.sourceforge.zbar.ImageScanner;
 import net.sourceforge.zbar.Symbol;  
 import net.sourceforge.zbar.SymbolSet;  
 import android.app.Activity;  
+import android.app.ProgressDialog;
 import android.content.Intent;  
 import android.content.pm.ActivityInfo;  
 import android.hardware.Camera;  
@@ -16,6 +17,7 @@ import android.hardware.Camera.Size;
 import android.os.Bundle;  
 import android.os.Handler;  
 import android.widget.FrameLayout;  
+import android.widget.TextView;
   
 public class BarcodeScannerActivity extends Activity{  
   
@@ -34,21 +36,26 @@ public class BarcodeScannerActivity extends Activity{
     public void onCreate(Bundle savedInstanceState)   
     {  
         setContentView(R.layout.activity_barcode_scanner);  
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);  
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);  
           
         //getActionBar().hide();  
     
         autoFocusHandler = new Handler();  
         mCamera = getCameraInstance();  
-        // Instance barcode scanner  
+        /* Instance barcode scanner */
+        scanner = new ImageScanner();
+        scanner.setConfig(0, Config.X_DENSITY, 3);
+        scanner.setConfig(0, Config.Y_DENSITY, 3);
+        /*// Instance barcode scanner  
         scanner = new ImageScanner();  
         scanner.setConfig(0, Config.X_DENSITY, 400);  
         scanner.setConfig(0, Config.Y_DENSITY, 400);  
-        scanner.setConfig(0, Config.ENABLE, 0);  
+        scanner.setConfig(0, Config.ENABLE, 1);  
         scanner.setConfig(Symbol.EAN13, Config.ENABLE,1);  
         scanner.setConfig(Symbol.EAN8, Config.ENABLE,1);  
         scanner.setConfig(Symbol.UPCA, Config.ENABLE,1);  
-        scanner.setConfig(Symbol.UPCE, Config.ENABLE,1);  
+        scanner.setConfig(Symbol.UPCE, Config.ENABLE,1);
+        scanner.setConfig(Symbol.QRCODE, Config.ENABLE,1); */
           
         mPreview = new CameraPreview(this, mCamera, previewCb, autoFocusCB);  
         FrameLayout preview = (FrameLayout)findViewById(R.id.cameraPreview);  
@@ -67,7 +74,7 @@ public class BarcodeScannerActivity extends Activity{
             c = Camera.open();  
         } catch (Exception e)  
         {  
-         //nada  
+          e.printStackTrace();
         }  
         return c;  
     }  
@@ -107,8 +114,10 @@ public class BarcodeScannerActivity extends Activity{
                     Intent returnIntent = new Intent();  
                     returnIntent.putExtra("BARCODE", sym.getData());  
                     setResult(1,returnIntent);  
-                    releaseCamera();  
-                    finish();  
+                    releaseCamera();
+                    final TextView mTextView = (TextView) findViewById(R.id.textView1);
+                    mTextView.setText(sym.getData());
+                    // finish();  
                 }  
             }  
         }  
