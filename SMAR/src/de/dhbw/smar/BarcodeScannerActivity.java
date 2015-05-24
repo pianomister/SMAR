@@ -115,7 +115,7 @@ public class BarcodeScannerActivity extends Activity{
                     returnIntent.putExtra("BARCODE", sym.getData());  
                     setResult(1,returnIntent);  
                     releaseCamera();
-                    final TextView mTextView = (TextView) findViewById(R.id.textView1);
+                    final TextView mTextView = (TextView) findViewById(R.id.tv_product);
                     mTextView.setText(sym.getData());
                     // finish();  
                 }  

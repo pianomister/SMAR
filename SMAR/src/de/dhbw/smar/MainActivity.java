@@ -140,7 +140,8 @@ public class MainActivity extends Activity {
     }
     
     public void onProductSearchClicked(View view) {
-    	showNoActionDialog();
+    	//showNoActionDialog();
+    	Intent searchProduct = new Intent(this, SearchProduct.class);
     }
     
     public void onProductLoadClicked(View view) {

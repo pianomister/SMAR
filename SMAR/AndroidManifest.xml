@@ -49,6 +49,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="de.dhbw.smar.MainActivity" />
         </activity>
+        <activity
+            android:name=".SearchProduct"
+            android:label="@string/title_activity_search_product" >
+        </activity>
+        <activity
+            android:name=".InsertProduct"
+            android:label="@string/title_activity_insert_product" >
+        </activity>
     </application>
 
 </manifest>

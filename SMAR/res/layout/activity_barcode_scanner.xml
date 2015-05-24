@@ -9,7 +9,7 @@
     tools:context="de.dhbw.smar.BarcodeScannerActivity" >
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/tv_product"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/hello_world" />
@@ -18,8 +18,8 @@
         android:id="@+id/cameraPreview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView1"
-        android:layout_below="@+id/textView1"
+        android:layout_alignLeft="@+id/tv_product"
+        android:layout_below="@+id/tv_product"
         android:layout_marginTop="16dp" >
 
     </FrameLayout>
