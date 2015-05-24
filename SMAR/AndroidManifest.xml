@@ -57,6 +57,10 @@
             android:name=".InsertProduct"
             android:label="@string/title_activity_insert_product" >
         </activity>
+        <activity
+            android:name=".ProductStock"
+            android:label="@string/title_activity_product_stock" >
+        </activity>
     </application>
 
 </manifest>
