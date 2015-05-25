@@ -4,6 +4,9 @@ import java.io.File;
 
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.app.Activity;
@@ -105,6 +108,20 @@ public class MainActivity extends Activity {
     	}
     	
     	Log.d(logTag, "checking server connection");
+    	HttpClient client = new DefaultHttpClient();
+		try {
+			String url = "http://" + PreferencesHelper.getInstance().getServer() + "/checkConnection";
+			String SetServerString = "";
+			// Create Request to server and get response
+			HttpGet httpget = new HttpGet(url);
+			ResponseHandler<String> responseHandler = new BasicResponseHandler();
+			SetServerString = client.execute(httpget, responseHandler);
+			
+			// Show response on activity
+			// content.setText(SetServerString);
+		} catch(Exception ex) {
+			// content.setText("Fail!");
+		} 
     }
     
     @Override
@@ -218,10 +235,12 @@ public class MainActivity extends Activity {
     public void onProductSearchClicked(View view) {
     	//showNoActionDialog();
     	Intent searchProduct = new Intent(this, SearchProduct.class);
+    	startActivity(searchProduct);
     }
     
     public void onProductLoadClicked(View view) {
-    	showNoActionDialog();
+    	Intent insertProduct = new Intent(this, InsertProduct.class);
+    	startActivity(insertProduct);
     }
     
     public void onProductStockClicked(View view) {
