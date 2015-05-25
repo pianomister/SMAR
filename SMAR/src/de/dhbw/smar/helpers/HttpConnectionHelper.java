@@ -1,6 +1,7 @@
 package de.dhbw.smar.helpers;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.apache.http.HttpRequest;
@@ -10,6 +11,7 @@ import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.NameValuePair;
 
 public class HttpConnectionHelper{
 	
@@ -21,7 +23,16 @@ public class HttpConnectionHelper{
 	private int responseCode;
 	private String responseMessage;
 	private boolean error = false;
+	private List<NameValuePair> postPair;
 	
+	public List<NameValuePair> getPostPair() {
+		return postPair;
+	}
+
+	public void setPostPair(List<NameValuePair> postPair) {
+		this.postPair = postPair;
+	}
+
 	public HttpConnectionHelper(String url) {
 		this.url = url;
 	}

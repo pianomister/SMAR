@@ -3,6 +3,7 @@ package de.dhbw.smar.asynctasks;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -37,6 +38,7 @@ public class ASyncHttpConnection extends AsyncTask<HttpConnectionHelper, Void, S
 			HttpClient httpclient = new DefaultHttpClient(httpParameters);
 			if(hch[0].getRequestType() == HttpConnectionHelper.REQUEST_TYPE_POST) {
 				HttpPost request = new HttpPost(hch[0].getUrl());
+		        request.setEntity(new UrlEncodedFormEntity(hch[0].getPostPair()));
 				response = httpclient.execute(request);
 			} else {
 				HttpGet request = new HttpGet(hch[0].getUrl());

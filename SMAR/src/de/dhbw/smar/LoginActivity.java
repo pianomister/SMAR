@@ -19,6 +19,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -49,15 +50,16 @@ public class LoginActivity extends Activity {
 	private ProgressDialog pDialog;
 	private HttpConnectionHelper hch;
 	
+	private static int ERROR_SERVER = 0;
+	private static int ERROR_CAMERA = 0;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		startingFlag = true;
-		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
 
 		Log.d(logTag, "receiving device users");
-    	pDialog = ProgressDialog.show(context, "Please wait", "Checking server connection...", true, false);
+    	pDialog = ProgressDialog.show(context, "Please wait", "Receiving user list...", true, false);
 		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/listDeviceUsers";
 		Log.d(logTag, "server url: " + url);
 		hch = new HttpConnectionHelper(url);
@@ -65,45 +67,33 @@ public class LoginActivity extends Activity {
 			@Override
 			public void onPostExecute(String result) {
 				pDialog.dismiss();
-				/* if(!hch.getError())
-					initializeSMAR();
-				else {
-					AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-							context);
-			 
-					// set title
-					alertDialogBuilder.setTitle("Could not establish server connection...");
-		 
-					// set dialog message
-					alertDialogBuilder
-						.setMessage("Is this device connected?\n"
-								+ "Are the settings correct?\n"
-								+ "Is the server online and ready?\n\n"
-								+ "Please choose an action...")
-						.setCancelable(false)
-						.setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog,int id) {
-								onBackPressed();
-							}
-						})
-						.setPositiveButton("Initial Configuration", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog,int id) {
-								Intent startNewActivityOpen = new Intent(context, InitConfActivity.class);
-					        	startActivityForResult(startNewActivityOpen, ActivityCodeHelper.ACTIVITY_INITCONFIG_REQUEST);
-							}
-						});
-		 
-						// create alert dialog and show it
-						alertDialogBuilder.create().show();
-				} */
+				if(!hch.getError() && hch.getResponseCode() == 200) {
+					Log.d(logTag, "Response (" + hch.getResponseCode() + "): " + hch.getResponseMessage());
+					List<String> spinnerArray = new ArrayList<String>(); 
+					spinnerArray.add("Choose user...");
+					try {
+						JSONArray jArray = new JSONArray(hch.getResponseMessage());
+						for(int i = 0; i < jArray.length(); i++) {
+							JSONObject json = jArray.getJSONObject(i);
+							Log.d(logTag, "Got following username: "+ json.getString("username"));
+							spinnerArray.add(json.getString("username"));
+						}
+						initializeLogin(spinnerArray);
+					} catch (JSONException e) {
+						Log.e(logTag, e.getMessage());
+						createError(ERROR_SERVER);
+					}
+					// initializeSMAR();
+				} else {
+					Log.d(logTag, "Error (" + hch.getResponseCode() + "): " + result);
+					createError(ERROR_SERVER);
+				}
 			}
 			
 		}.execute(hch);
-		
-		List<String> spinnerArray = new ArrayList<String>(); 
-		spinnerArray.add("Choose user...");
-		spinnerArray.addAll(LoginHelper.getInstance().getUserList());
-		
+	}
+	
+	public void initializeLogin(List<String> spinnerArray) {
 		Spinner spinner = (Spinner) findViewById(R.id.spinner_unit);
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(
 			    this, android.R.layout.simple_spinner_item, spinnerArray); 		
@@ -114,23 +104,56 @@ public class LoginActivity extends Activity {
 		spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 		    @Override
 		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-		    	Toast.makeText(parentView.getContext(), 
-		    	        "OnItemSelectedListener : " + parentView.getItemAtPosition(position).toString(),
-		    	        Toast.LENGTH_SHORT).show();
-		        if(!startingFlag) {
+		        if(position != 0) {
+		        	LoginHelper.getInstance().setUsername(parentView.getItemAtPosition(position).toString());
 		        	Intent startNewActivityOpen = new Intent(getBaseContext(), BarcodeScannerActivity.class);
-		        	startActivityForResult(startNewActivityOpen, 0);
-		        } else {
-		        	startingFlag = false;
+		        	startActivityForResult(startNewActivityOpen, ActivityCodeHelper.ACTIVITY_BARCODE_REQUEST);
 		        }
 		    }
 
 		    @Override
 		    public void onNothingSelected(AdapterView<?> parentView) {
-		        // your code here
+		        // Nothing to do...
 		    }
-
 		});
+	}
+	
+	public void createError(int error) {
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+		context);
+
+		if(error == ERROR_CAMERA) {
+			// set title
+			alertDialogBuilder.setTitle("Could not load camera...");
+			
+			// set dialog message
+			alertDialogBuilder
+				.setMessage("Camera error...\n\n"
+						+ "Please restart your device and try again.")
+				.setCancelable(false)
+				.setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog,int id) {
+						onBackPressed();
+					}
+				});
+		} else {
+			// set title
+			alertDialogBuilder.setTitle("Could not load users...");
+			
+			// set dialog message
+			alertDialogBuilder
+				.setMessage("Unknown error...\n\n"
+						+ "Please try again later or contact system administrator...")
+				.setCancelable(false)
+				.setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog,int id) {
+						onBackPressed();
+					}
+				});
+		}
+		
+		// create alert dialog and show it
+		alertDialogBuilder.create().show();
 	}
 	
 	public void cancelLogin() {
@@ -167,5 +190,60 @@ public class LoginActivity extends Activity {
  
 				// create alert dialog and show it
 			alertDialogBuilder.create().show();
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data)
+	{    
+	    if (resultCode == RESULT_OK) 
+	    {
+	    	String resultBarcode = data.getStringExtra("BARCODE");
+	    	// TODO: resultBarcode == null ist nicht korrekt!
+	    	if(resultBarcode == null)
+	    		Toast.makeText(this, "No barcode/QR-code scanned", Toast.LENGTH_SHORT).show();
+	    	else {
+	    		LoginHelper.getInstance().setPassword(resultBarcode);
+	    		pDialog = ProgressDialog.show(context, "Please wait", "Logging in...", true, false);
+	    		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/authenticate";
+	    		Log.d(logTag, "server url: " + url);
+	    		hch = new HttpConnectionHelper(url, HttpConnectionHelper.REQUEST_TYPE_POST);
+	    		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(3);
+	            nameValuePairs.add(new BasicNameValuePair("hwaddress", LoginHelper.getInstance().getHwaddress()));
+	            nameValuePairs.add(new BasicNameValuePair("user", LoginHelper.getInstance().getUsername()));
+	            nameValuePairs.add(new BasicNameValuePair("password", LoginHelper.getInstance().getPassword()));
+	            hch.setPostPair(nameValuePairs);
+	    		new ASyncHttpConnection() {
+	    			@Override
+	    			public void onPostExecute(String result) {
+	    				pDialog.dismiss();
+	    				// TODO!!!
+	    				/* if(!hch.getError() && hch.getResponseCode() == 200) {
+	    					Log.d(logTag, "Response (" + hch.getResponseCode() + "): " + hch.getResponseMessage());
+	    					List<String> spinnerArray = new ArrayList<String>(); 
+	    					spinnerArray.add("Choose user...");
+	    					try {
+	    						JSONArray jArray = new JSONArray(hch.getResponseMessage());
+	    						for(int i = 0; i < jArray.length(); i++) {
+	    							JSONObject json = jArray.getJSONObject(i);
+	    							Log.d(logTag, "Got following username: "+ json.getString("username"));
+	    							spinnerArray.add(json.getString("username"));
+	    						}
+	    						initializeLogin(spinnerArray);
+	    					} catch (JSONException e) {
+	    						Log.e(logTag, e.getMessage());
+	    						createError(ERROR_SERVER);
+	    					}
+	    					// initializeSMAR();
+	    				} else { */
+	    					Log.d(logTag, "Error (" + hch.getResponseCode() + "): " + result);
+	    					/* createError(ERROR_SERVER);
+	    				} */
+	    			}
+	    			
+	    		}.execute(hch);
+	    	}
+	    } else if(resultCode == RESULT_CANCELED) {
+	        createError(ERROR_CAMERA);
+	    }
 	}
 }

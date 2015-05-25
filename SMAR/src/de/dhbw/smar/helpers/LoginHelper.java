@@ -8,7 +8,25 @@ public class LoginHelper {
 	// Make this class a singleton
 	private static final LoginHelper lh = new LoginHelper();
 	private String username = null;
+	public String getUsername() {
+		return username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
 	private String password = null;
+	private String hwaddress = null;
+	
+	public String getHwaddress() {
+		return hwaddress;
+	}
+
+	public void setHwaddress(String hwaddress) {
+		this.hwaddress = hwaddress;
+	}
+
 	private boolean loggedIn = false;
 	
 	private LoginHelper() {
@@ -37,6 +55,10 @@ public class LoginHelper {
 	
 	public void setUsername(String username) {
 		this.username = username;
+	}
+	
+	public void setPassword(String password) {
+		this.password = password;
 	}
 	
 	public List<String> getUserList() {

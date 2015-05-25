@@ -19,6 +19,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
@@ -49,6 +51,14 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
     	Log.d(logTag, "Start onCreate");
     	super.onCreate(savedInstanceState);
+    	
+    	WifiManager manager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+    	WifiInfo info = manager.getConnectionInfo();
+    	String hwaddress = info.getMacAddress();
+    	if(hwaddress == null)
+    		hwaddress = "0";
+    	Log.d(logTag, "Saving hwaddress (" + hwaddress + ") in LoginHelper.");
+    	LoginHelper.getInstance().setHwaddress(hwaddress);
         
         Log.d(logTag, "Check for initial configuration");
         // check for initial configuration, if not set start activity
@@ -114,7 +124,7 @@ public class MainActivity extends Activity {
     		Log.e(logTag, "could not load initial configuration");
     		Toast.makeText(context, 
 	    	        "Could not load initial configuration!",
-	    	        Toast.LENGTH_SHORT).show();
+	    	        Toast.LENGTH_LONG).show();
     	}
     	
     	if(initConfigLoaded) {
@@ -127,7 +137,7 @@ public class MainActivity extends Activity {
 				@Override
 				public void onPostExecute(String result) {
 					pDialog.dismiss();
-					if(!hch.getError())
+					if(!hch.getError() && hch.getResponseCode() == 200)
 						initializeSMAR();
 					else {
 						AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
@@ -165,12 +175,12 @@ public class MainActivity extends Activity {
     }
     
     protected void initializeSMAR() {
-		// if(LoginHelper.getInstance().isLoggedIn()) {
+		if(LoginHelper.getInstance().isLoggedIn()) {
 			setContentView(R.layout.activity_main);
-		// } else {
-		//	Intent startNewActivityOpen = new Intent(this, LoginActivity.class);
-        //	startActivityForResult(startNewActivityOpen, ActivityCodeHelper.ACTIVITY_LOGIN_REQUEST);
-		// }
+		} else {
+			Intent startNewActivityOpen = new Intent(this, LoginActivity.class);
+        	startActivityForResult(startNewActivityOpen, ActivityCodeHelper.ACTIVITY_LOGIN_REQUEST);
+		}
 	}
 
 	@Override
