@@ -6,6 +6,9 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
@@ -22,7 +25,16 @@ public class ASyncHttpConnection extends AsyncTask<HttpConnectionHelper, Void, S
 		String responseString;
 		try {
 			HttpResponse response;
-			HttpClient httpclient = new DefaultHttpClient();
+			HttpParams httpParameters = new BasicHttpParams();
+			// Set the timeout in milliseconds until a connection is established.
+			// The default value is zero, that means the timeout is not used. 
+			int timeoutConnection = 10000;
+			HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+			// Set the default socket timeout (SO_TIMEOUT) 
+			// in milliseconds which is the timeout for waiting for data.
+			int timeoutSocket = 10000;
+			HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+			HttpClient httpclient = new DefaultHttpClient(httpParameters);
 			if(hch[0].getRequestType() == HttpConnectionHelper.REQUEST_TYPE_POST) {
 				HttpPost request = new HttpPost(hch[0].getUrl());
 				response = httpclient.execute(request);

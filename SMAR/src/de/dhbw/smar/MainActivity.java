@@ -118,7 +118,13 @@ public class MainActivity extends Activity {
 		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/checkConnection";
 		Log.d(logTag, "server url: " + url);
 		HttpConnectionHelper hch = new HttpConnectionHelper(url);
-		new ASyncHttpConnection().execute(hch);
+		new ASyncHttpConnection() {
+			@Override
+			public void onPostExecute(String result) {
+				pDialog.dismiss();
+			}
+			
+		}.execute(hch);
     }
     
     @Override
