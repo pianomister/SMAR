@@ -9,6 +9,11 @@
         android:layout_height="fill_parent"
         android:orientation="vertical" >
 
+        <ImageView
+            android:id="@+id/svgTest"
+            android:layout_width="match_parent"
+            android:layout_height="104dp" />
+
         <Button
             android:id="@+id/bt_main_search_product"
             android:layout_width="fill_parent"
