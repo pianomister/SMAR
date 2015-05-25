@@ -43,11 +43,10 @@ public class ASyncHttpConnection extends AsyncTask<HttpConnectionHelper, Void, S
 				response = httpclient.execute(request);
 			}
 		    StatusLine statusLine = response.getStatusLine();
+		    hch[0].setResponseCode(statusLine.getStatusCode());
 		    responseString = EntityUtils.toString(response.getEntity());
-	        JSONObject json = new JSONObject(responseString);
-	        hch[0].setResponseCode(statusLine.getStatusCode());
 	        hch[0].setResponseMessage(responseString);
-	        Log.d(logTag, "Check Connection: ready:" + json.get("ready").toString());
+	        Log.d(logTag, "Check Connection: " + responseString);
 		    Log.d(logTag, "Response ("+statusLine.getStatusCode()+") is: " + responseString);
 		} catch(Exception e) {
 			responseString = e.getMessage();
