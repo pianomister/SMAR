@@ -30,6 +30,7 @@
 
     <string name="prefname_use_internal_storage">bUseInternalStorage</string>
     <string name="title_activity_barcode_scanner">BarcodeScannerActivity</string>
+    <string name="title_activity_init_conf">Set initial configuration</string>
     <string name="title_activity_search_product">SearchProduct</string>
     <string name="title_activity_insert_product">InsertProduct</string>
     <string name="title_activity_product_stock">ProductStock</string>

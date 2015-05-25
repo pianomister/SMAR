@@ -24,6 +24,9 @@ import org.json.JSONObject;
 
 import de.dhbw.smar.helpers.LoginHelper;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -36,6 +39,7 @@ import android.widget.Toast;
 
 public class LoginActivity extends Activity {
 	private boolean startingFlag;
+	private final Context context = this;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -46,7 +50,7 @@ public class LoginActivity extends Activity {
 		
 		final TextView mTextView = (TextView) findViewById(R.id.tv_stock_insertproduct);
 
-		String url ="http://192.168.178.20/SMAR-Web-Administration/api/authenticate";
+		/* String url ="http://192.168.178.20/SMAR-Web-Administration/api/authenticate";
 		
 		StatusLine statusLine = null;
 		try {
@@ -69,7 +73,7 @@ public class LoginActivity extends Activity {
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		} */
 		
 		List<String> spinnerArray = new ArrayList<String>(); 
 		spinnerArray.add("Choose user...");
@@ -102,5 +106,41 @@ public class LoginActivity extends Activity {
 		    }
 
 		});
+	}
+	
+	public void cancelLogin() {
+		Intent intent = this.getIntent();
+		this.setResult(RESULT_CANCELED, intent);
+		super.onBackPressed();
+	}
+	
+	@Override
+	public void onBackPressed() {
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+				context);
+ 
+		// set title
+		alertDialogBuilder.setTitle("Exit Application?");
+ 
+			// set dialog message
+		alertDialogBuilder
+			.setMessage("Are you sure you want to exit SMAR?")
+			.setCancelable(false)
+			.setPositiveButton("Yes",new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					cancelLogin();
+				}
+			})
+			.setNegativeButton("No",new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog,int id) {
+					// if this button is clicked, just close
+					// the dialog box and do nothing
+						dialog.cancel();
+					}
+				});
+ 
+				// create alert dialog and show it
+			alertDialogBuilder.create().show();
 	}
 }
