@@ -21,9 +21,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 import de.dhbw.smar.helpers.HttpConnectionHelper;
 
@@ -43,6 +43,9 @@ public class SearchProduct extends Activity {
 		builder.setTitle("Penis");
 		builder.show();
 		
+		startSearchProductWorkflow();
+		//HttpGet get = new HttpGet("http://localhost/api/index.phpgetProduct/1");
+		//String json = httpConnection("http://localhost/api/index.phpgetProduct/1", get);
 		
 	}
 	
@@ -75,12 +78,14 @@ public class SearchProduct extends Activity {
 				//Starte den Barcode-Scanner 
 				
 				//Nachdem der Code erkannt wurde, starte REST API aufruf. 
-
+				Log.e("Achtung", "Startet den Client");
 				HttpClient client = new DefaultHttpClient();
-				HttpGet request = new HttpGet(sURL);
+				HttpGet request = new HttpGet("http://192.168.2.110/api/index.php/getProduct/1");
 				ResponseHandler<String> handler = new BasicResponseHandler();
 				try {
+					Log.d("Achtung", "kurz vor dem Ausführen des Requests");
 					response = client.execute(request, handler);
+					Log.d("Achtung", response);
 				}
 				catch (ClientProtocolException e) {
 					e.printStackTrace();
@@ -90,13 +95,19 @@ public class SearchProduct extends Activity {
 				}
 				client.getConnectionManager().shutdown();
 				
-				//Aus dem erhaltenem String ein JSON Objekt erstellen
-				try { 
-					JSONObject json = new JSONObject(response);
-					//Parse JSONObject
-					sProduct = json.getString("name");
-				}
-				catch (JSONException e) {
+//				//Aus dem erhaltenem String ein JSON Objekt erstellen
+//				try { 
+//					JSONObject json = new JSONObject(response);
+//					//Parse JSONObject
+//					sProduct = json.getString("name");
+//				}
+//				catch (JSONException e) {
+					try {
+						JSONObject json = new JSONObject(response.substring(1, response.length()-1));
+						Log.d("achtuuung",json.toString());
+						sProduct = json.getString("name");
+					}
+					catch (JSONException e) {
 					e.printStackTrace();
 				}
 				
@@ -109,7 +120,7 @@ public class SearchProduct extends Activity {
 				tvProduct.setText(sProduct);
 				
 				//das Layout setzen
-				FrameLayout layout = (FrameLayout) findViewById(R.id.tv_stock);
+				//FrameLayout layout = (FrameLayout) findViewById(R.id.tv_stock);
 	}
 	
 	// ToDo: Implement Warenannahme
@@ -152,9 +163,10 @@ public class SearchProduct extends Activity {
     	//Handled die HttpConnectiono 
     	//Führt einen seperaten Thread aus
     	//
-    	ExecutorService executor =  Executors.newSingleThreadExecutor();
-    	HttpConnectionHelper connection = new HttpConnectionHelper(url, request);
-    	Future<String> json = executor.submit(connection);
+
+    	/* ExecutorService executor =  Executors.newSingleThreadExecutor();
+    	// HttpConnectionHelper connection = new HttpConnectionHelper(url, request);
+    	// Future<String> json = executor.submit(connection);
     	try { 
     		return json.get();
     	}
