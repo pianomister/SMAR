@@ -8,14 +8,7 @@ public class LoginHelper {
 	// Make this class a singleton
 	private static final LoginHelper lh = new LoginHelper();
 	private String username = null;
-	public String getUsername() {
-		return username;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
+	private String jwt = null;
 	private String password = null;
 	private String hwaddress = null;
 	
@@ -25,6 +18,14 @@ public class LoginHelper {
 
 	public void setHwaddress(String hwaddress) {
 		this.hwaddress = hwaddress;
+	}
+	
+	public String getUsername() {
+		return username;
+	}
+
+	public String getPassword() {
+		return password;
 	}
 
 	private boolean loggedIn = false;
@@ -37,12 +38,6 @@ public class LoginHelper {
 		return lh;
 	}
 	
-	public void setLogin(String username, String password) {
-		this.username = username;
-		this.password = password;
-		this.loggedIn = true;
-	}
-	
 	public void setLogout() {
 		this.username = null;
 		this.password = null;
@@ -51,6 +46,10 @@ public class LoginHelper {
 	
 	public boolean isLoggedIn() {
 		return this.loggedIn;
+	}
+	
+	public void setLoggedIn(boolean loggedIn) {
+		this.loggedIn = loggedIn;
 	}
 	
 	public void setUsername(String username) {
@@ -67,5 +66,13 @@ public class LoginHelper {
 		userList.add("Stephan");
 		userList.add("Raffael");
 		return userList;
+	}
+
+	public String getJwt() {
+		return jwt;
+	}
+
+	public void setJwt(String jwt) {
+		this.jwt = jwt;
 	}
 }

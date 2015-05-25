@@ -51,7 +51,10 @@ public class LoginActivity extends Activity {
 	private HttpConnectionHelper hch;
 	
 	private static int ERROR_SERVER = 0;
-	private static int ERROR_CAMERA = 0;
+	private static int ERROR_CAMERA = 1;
+	private static int ERROR_PERMISSION = 2;
+	private static int ERROR_CRED_DEVICE = 3;
+	private static int ERROR_CRED_PASSWORD = 4;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -162,6 +165,12 @@ public class LoginActivity extends Activity {
 		super.onBackPressed();
 	}
 	
+	public void finishLogin() {
+		Intent intent = this.getIntent();
+		this.setResult(RESULT_OK, intent);
+		finish();
+	}
+	
 	@Override
 	public void onBackPressed() {
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
@@ -198,8 +207,9 @@ public class LoginActivity extends Activity {
 	    if (resultCode == RESULT_OK) 
 	    {
 	    	String resultBarcode = data.getStringExtra("BARCODE");
+	    	Log.d(logTag, "result barcode: " + resultBarcode);
 	    	// TODO: resultBarcode == null ist nicht korrekt!
-	    	if(resultBarcode == null)
+	    	if(resultBarcode == null || resultBarcode.equalsIgnoreCase("NULL"))
 	    		Toast.makeText(this, "No barcode/QR-code scanned", Toast.LENGTH_SHORT).show();
 	    	else {
 	    		LoginHelper.getInstance().setPassword(resultBarcode);
@@ -216,28 +226,38 @@ public class LoginActivity extends Activity {
 	    			@Override
 	    			public void onPostExecute(String result) {
 	    				pDialog.dismiss();
-	    				// TODO!!!
-	    				/* if(!hch.getError() && hch.getResponseCode() == 200) {
-	    					Log.d(logTag, "Response (" + hch.getResponseCode() + "): " + hch.getResponseMessage());
-	    					List<String> spinnerArray = new ArrayList<String>(); 
-	    					spinnerArray.add("Choose user...");
+	    				if(!hch.getError()) {
 	    					try {
-	    						JSONArray jArray = new JSONArray(hch.getResponseMessage());
-	    						for(int i = 0; i < jArray.length(); i++) {
-	    							JSONObject json = jArray.getJSONObject(i);
-	    							Log.d(logTag, "Got following username: "+ json.getString("username"));
-	    							spinnerArray.add(json.getString("username"));
-	    						}
-	    						initializeLogin(spinnerArray);
-	    					} catch (JSONException e) {
-	    						Log.e(logTag, e.getMessage());
-	    						createError(ERROR_SERVER);
+		    					JSONArray jArray = new JSONArray(hch.getResponseMessage());
+								JSONObject json = jArray.getJSONObject(0);
+								Log.d(logTag, "Response (" + hch.getResponseCode() + "): " + hch.getResponseMessage());
+		    					if(hch.getResponseCode() == 200) {
+		    						LoginHelper lh = LoginHelper.getInstance();
+		    						lh.setJwt(json.getString("jwt"));
+		    						lh.setLoggedIn(true);
+		    						finishLogin();
+		    					} else if(hch.getResponseCode() == 403) {
+		    						String reason = json.getString("reason");
+		    						if(reason.equals("password")) {
+		    							createError(ERROR_CRED_PASSWORD);
+		    						} else if(reason.equals("device")) {
+		    							createError(ERROR_CRED_DEVICE);
+		    						} else {
+		    							createError(ERROR_SERVER);
+		    						}
+		    					} else if(hch.getResponseCode() == 401) {
+		    						createError(ERROR_PERMISSION);
+		    					} else {
+		    						createError(ERROR_SERVER);
+		    					}
+	    					} catch(Exception e) {
+								createError(ERROR_SERVER);
+								Log.e(logTag, e.getMessage());
 	    					}
-	    					// initializeSMAR();
-	    				} else { */
+	    				} else {
 	    					Log.d(logTag, "Error (" + hch.getResponseCode() + "): " + result);
-	    					/* createError(ERROR_SERVER);
-	    				} */
+	    					createError(ERROR_SERVER);
+	    				}
 	    			}
 	    			
 	    		}.execute(hch);
