@@ -2,12 +2,15 @@ package de.dhbw.smar;
 
 import java.io.File;
 
+import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -25,8 +28,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+import de.dhbw.smar.asynctasks.ASyncHttpConnection;
 import de.dhbw.smar.helpers.ActivityCodeHelper;
 import de.dhbw.smar.helpers.FileHelper;
+import de.dhbw.smar.helpers.HttpConnectionHelper;
 import de.dhbw.smar.helpers.LoginHelper;
 import de.dhbw.smar.helpers.PreferencesHelper;
 
@@ -37,6 +42,7 @@ public class MainActivity extends Activity {
 	private final String logTag = "MainActivity";
 	private final Context context = this;
 	private boolean initConfig = false;
+	ProgressDialog pDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,20 +114,17 @@ public class MainActivity extends Activity {
     	}
     	
     	Log.d(logTag, "checking server connection");
-    	HttpClient client = new DefaultHttpClient();
-		try {
-			String url = "http://" + PreferencesHelper.getInstance().getServer() + "/checkConnection";
-			String SetServerString = "";
-			// Create Request to server and get response
-			HttpGet httpget = new HttpGet(url);
-			ResponseHandler<String> responseHandler = new BasicResponseHandler();
-			SetServerString = client.execute(httpget, responseHandler);
+    	pDialog = ProgressDialog.show(context, "Please wait", "Checking server connection...", true, false);
+		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/checkConnection";
+		Log.d(logTag, "server url: " + url);
+		HttpConnectionHelper hch = new HttpConnectionHelper(url);
+		new ASyncHttpConnection() {
+			@Override
+			public void onPostExecute(String result) {
+				pDialog.dismiss();
+			}
 			
-			// Show response on activity
-			// content.setText(SetServerString);
-		} catch(Exception ex) {
-			// content.setText("Fail!");
-		} 
+		}.execute(hch);
     }
     
     @Override
