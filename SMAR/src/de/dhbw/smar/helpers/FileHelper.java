@@ -125,9 +125,9 @@ public class FileHelper {
 	 * @author Stephan
 	 */
 	public static void writeSerializable(Activity activity, String sFilename, Serializable object) {
-		
+
 		File targetDir = getStorageDir(activity, false);
-			
+
 		if(targetDir != null) {
 			try {
 				// Write to disk with FileOutputStream
@@ -147,7 +147,6 @@ public class FileHelper {
 			Log.e(sLogTag, "Could not write Serializable to " + sFilename);
 		}
 	}
-	
 	
 	/**
 	 * Checks preferences for internal/external storage and returns proper directory
