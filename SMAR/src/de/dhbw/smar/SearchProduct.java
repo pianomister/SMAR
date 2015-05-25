@@ -152,15 +152,16 @@ public class SearchProduct extends Activity {
     	//Handled die HttpConnectiono 
     	//Führt einen seperaten Thread aus
     	//
-    	ExecutorService executor =  Executors.newSingleThreadExecutor();
-    	HttpConnectionHelper connection = new HttpConnectionHelper(url, request);
-    	Future<String> json = executor.submit(connection);
+    	/* ExecutorService executor =  Executors.newSingleThreadExecutor();
+    	// HttpConnectionHelper connection = new HttpConnectionHelper(url, request);
+    	// Future<String> json = executor.submit(connection);
     	try { 
     		return json.get();
     	}
     	catch (Exception e) {
     		return null;
-    	}
+    	} */
+    	return "bla";
     }
     
 }
