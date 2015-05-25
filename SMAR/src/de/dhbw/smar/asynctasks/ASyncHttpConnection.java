@@ -1,0 +1,60 @@
+package de.dhbw.smar.asynctasks;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
+
+import de.dhbw.smar.helpers.HttpConnectionHelper;
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
+import android.util.Log;
+
+public class ASyncHttpConnection extends AsyncTask<HttpConnectionHelper, Void, String> {
+	private String logTag = "ASyncHttpConnection";
+	
+	@Override
+	protected String doInBackground(HttpConnectionHelper... hch) {
+		String responseString;
+		try {
+			HttpResponse response;
+			HttpParams httpParameters = new BasicHttpParams();
+			// Set the timeout in milliseconds until a connection is established.
+			// The default value is zero, that means the timeout is not used. 
+			int timeoutConnection = 10000;
+			HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+			// Set the default socket timeout (SO_TIMEOUT) 
+			// in milliseconds which is the timeout for waiting for data.
+			int timeoutSocket = 10000;
+			HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+			HttpClient httpclient = new DefaultHttpClient(httpParameters);
+			if(hch[0].getRequestType() == HttpConnectionHelper.REQUEST_TYPE_POST) {
+				HttpPost request = new HttpPost(hch[0].getUrl());
+		        request.setEntity(new UrlEncodedFormEntity(hch[0].getPostPair()));
+				response = httpclient.execute(request);
+			} else {
+				HttpGet request = new HttpGet(hch[0].getUrl());
+				response = httpclient.execute(request);
+			}
+		    StatusLine statusLine = response.getStatusLine();
+		    hch[0].setResponseCode(statusLine.getStatusCode());
+		    responseString = EntityUtils.toString(response.getEntity());
+	        hch[0].setResponseMessage(responseString);
+	        Log.d(logTag, "Check Connection: " + responseString);
+		    Log.d(logTag, "Response ("+statusLine.getStatusCode()+") is: " + responseString);
+		} catch(Exception e) {
+			responseString = e.getMessage();
+			hch[0].setError(true);
+		}
+		return responseString;
+	}
+
+}

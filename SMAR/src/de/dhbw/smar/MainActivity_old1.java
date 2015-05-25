@@ -2,15 +2,12 @@ package de.dhbw.smar;
 
 import java.io.File;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -19,8 +16,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
@@ -30,41 +25,29 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-import de.dhbw.smar.asynctasks.ASyncHttpConnection;
 import de.dhbw.smar.helpers.ActivityCodeHelper;
 import de.dhbw.smar.helpers.FileHelper;
-import de.dhbw.smar.helpers.HttpConnectionHelper;
 import de.dhbw.smar.helpers.LoginHelper;
 import de.dhbw.smar.helpers.PreferencesHelper;
 
 
 
-public class MainActivity extends Activity {
+public class MainActivity_old1 extends Activity {
 	
 	private final String logTag = "MainActivity";
 	private final Context context = this;
 	private boolean initConfig = false;
-	HttpConnectionHelper hch;
-	ProgressDialog pDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
     	Log.d(logTag, "Start onCreate");
     	super.onCreate(savedInstanceState);
-    	
-    	WifiManager manager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-    	WifiInfo info = manager.getConnectionInfo();
-    	String hwaddress = info.getMacAddress();
-    	if(hwaddress == null)
-    		hwaddress = "0";
-    	Log.d(logTag, "Saving hwaddress (" + hwaddress + ") in LoginHelper.");
-    	LoginHelper.getInstance().setHwaddress(hwaddress);
         
         Log.d(logTag, "Check for initial configuration");
         // check for initial configuration, if not set start activity
         if(PreferencesHelper.getPreferenceInt(this, PreferencesHelper.PREFKEY_INIT_CONFIG) != 1) {
         	Log.d(logTag, "No initial configuration found - create InitConfActivity");
-        	Intent startNewActivityOpen = new Intent(context, InitConfActivity.class);
+        	Intent startNewActivityOpen = new Intent(this, InitConfActivity.class);
         	startActivityForResult(startNewActivityOpen, ActivityCodeHelper.ACTIVITY_INITCONFIG_REQUEST);
         } else {
         	Log.d(logTag, "Initial configuration found - load preferences");
@@ -111,79 +94,37 @@ public class MainActivity extends Activity {
     
     @Override
     protected void onStart() {
-    	boolean initConfigLoaded = false;
-    	
     	Log.d(logTag, "Start onStart");
     	super.onStart();
     	
     	if(initConfig) {
     		Log.d(logTag, "loading initial configuration");
     		PreferencesHelper.getInstance().loadPreferences(context);
-    		initConfigLoaded = true;
     	} else {
     		Log.e(logTag, "could not load initial configuration");
     		Toast.makeText(context, 
 	    	        "Could not load initial configuration!",
-	    	        Toast.LENGTH_LONG).show();
+	    	        Toast.LENGTH_SHORT).show();
     	}
     	
-    	if(initConfigLoaded) {
-	    	Log.d(logTag, "checking server connection");
-	    	pDialog = ProgressDialog.show(context, "Please wait", "Checking server connection...", true, false);
+    	Log.d(logTag, "checking server connection");
+    	HttpClient client = new DefaultHttpClient();
+		try {
 			String url = "http://" + PreferencesHelper.getInstance().getServer() + "/checkConnection";
-			Log.d(logTag, "server url: " + url);
-			hch = new HttpConnectionHelper(url);
-			new ASyncHttpConnection() {
-				@Override
-				public void onPostExecute(String result) {
-					pDialog.dismiss();
-					if(!hch.getError() && hch.getResponseCode() == 200)
-						initializeSMAR();
-					else {
-						AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-								context);
-				 
-						// set title
-						alertDialogBuilder.setTitle("Could not establish server connection...");
-			 
-						// set dialog message
-						alertDialogBuilder
-							.setMessage("Is this device connected?\n"
-									+ "Are the settings correct?\n"
-									+ "Is the server online and ready?\n\n"
-									+ "Please choose an action...")
-							.setCancelable(false)
-							.setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,int id) {
-									onBackPressed();
-								}
-							})
-							.setPositiveButton("Initial Configuration", new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,int id) {
-									Intent startNewActivityOpen = new Intent(context, InitConfActivity.class);
-						        	startActivityForResult(startNewActivityOpen, ActivityCodeHelper.ACTIVITY_INITCONFIG_REQUEST);
-								}
-							});
-			 
-							// create alert dialog and show it
-							alertDialogBuilder.create().show();
-					}
-				}
-				
-			}.execute(hch);
-    	}
+			String SetServerString = "";
+			// Create Request to server and get response
+			HttpGet httpget = new HttpGet(url);
+			ResponseHandler<String> responseHandler = new BasicResponseHandler();
+			SetServerString = client.execute(httpget, responseHandler);
+			
+			// Show response on activity
+			// content.setText(SetServerString);
+		} catch(Exception ex) {
+			// content.setText("Fail!");
+		} 
     }
     
-    protected void initializeSMAR() {
-		if(LoginHelper.getInstance().isLoggedIn()) {
-			setContentView(R.layout.activity_main);
-		} else {
-			Intent startNewActivityOpen = new Intent(this, LoginActivity.class);
-        	startActivityForResult(startNewActivityOpen, ActivityCodeHelper.ACTIVITY_LOGIN_REQUEST);
-		}
-	}
-
-	@Override
+    @Override
     protected void onPause() {
     	Log.d(logTag, "Start onPause");
     	super.onPause();
