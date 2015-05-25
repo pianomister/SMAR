@@ -49,6 +49,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="de.dhbw.smar.MainActivity" />
         </activity>
+        <activity
+            android:name=".InitConfActivity"
+            android:label="@string/title_activity_init_conf"
+            android:windowSoftInputMode="stateVisible" >
+        </activity>
     </application>
 
 </manifest>

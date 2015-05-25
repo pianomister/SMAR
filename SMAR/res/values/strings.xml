@@ -25,5 +25,6 @@
 
     <string name="prefname_use_internal_storage">bUseInternalStorage</string>
     <string name="title_activity_barcode_scanner">BarcodeScannerActivity</string>
+    <string name="title_activity_init_conf">Set initial configuration</string>
 
 </resources>

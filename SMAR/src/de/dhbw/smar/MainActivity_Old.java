@@ -2,10 +2,6 @@ package de.dhbw.smar;
 
 import java.io.File;
 
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -15,13 +11,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 import de.dhbw.smar.helpers.ActivityCodeHelper;
 import de.dhbw.smar.helpers.FileHelper;
 import de.dhbw.smar.helpers.LoginHelper;
@@ -29,32 +23,14 @@ import de.dhbw.smar.helpers.PreferencesHelper;
 
 
 
-public class MainActivity extends Activity {
+public class MainActivity_Old extends Activity {
 	
-	private final String logTag = "MainActivity";
-	private final Context context = this;
-	private boolean initConfig = false;
+	final Context context = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-    	Log.d(logTag, "Start onCreate");
-    	super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
         
-        Log.d(logTag, "Check for initial configuration");
-        // check for initial configuration, if not set start activity
-        if(PreferencesHelper.getPreferenceInt(this, PreferencesHelper.PREFKEY_INIT_CONFIG) != 1) {
-        	Log.d(logTag, "No initial configuration found - create InitConfActivity");
-        	Intent startNewActivityOpen = new Intent(this, InitConfActivity.class);
-        	startActivityForResult(startNewActivityOpen, ActivityCodeHelper.ACTIVITY_INITCONFIG_REQUEST);
-        } else {
-        	Log.d(logTag, "Initial configuration found - load preferences");
-        	PreferencesHelper.getInstance().loadPreferences(context);
-        	initConfig = true;
-        }
-        
-        Log.d(logTag, "Finish onCreate");
-        
-        /*
         if (android.os.Build.VERSION.SDK_INT > 9) {
         	StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         	StrictMode.setThreadPolicy(policy); 
@@ -74,11 +50,11 @@ public class MainActivity extends Activity {
         }
         
 	        setContentView(R.layout.activity_main);
-	        if (savedInstanceState == null) {
+	        /* if (savedInstanceState == null) {
 	            getFragmentManager().beginTransaction()
 	                    .add(R.id.container, new PlaceholderFragment())
 	                    .commit();
-	        }
+	        } */
 	        
 	        // set initial preference
 	        if(PreferencesHelper.getPreferenceInt(this, getString(R.string.prefname_use_internal_storage)) == -1) {
@@ -86,57 +62,6 @@ public class MainActivity extends Activity {
 	        }
 	        
 	        writeFile();
-	        */
-    }
-    
-    @Override
-    protected void onStart() {
-    	Log.d(logTag, "Start onStart");
-    	super.onStart();
-    	
-    	if(initConfig) {
-    		Log.d(logTag, "loading initial configuration");
-    		PreferencesHelper.getInstance().loadPreferences(context);
-    	} else {
-    		Log.e(logTag, "could not load initial configuration");
-    		Toast.makeText(context, 
-	    	        "Could not load initial configuration!",
-	    	        Toast.LENGTH_SHORT).show();
-    	}
-    	
-    	Log.d(logTag, "checking server connection");
-    }
-    
-    @Override
-    protected void onPause() {
-    	Log.d(logTag, "Start onPause");
-    	super.onPause();
-    }
-    
-    @Override
-    protected void onResume() {
-    	Log.d(logTag, "Start onResume");
-    	super.onResume();
-    }
-    
-    @Override
-    protected void onStop() {
-    	Log.d(logTag, "Start onStop");
-    	super.onStop();
-    }
-    
-    @Override
-    protected void onDestroy() {
-    	Log.d(logTag, "Start onDestroy");
-    	
-    	Log.d(logTag, "Save preferences");
-    	PreferencesHelper.getInstance().savePreferences(this);
-    	
-    	Log.d(logTag, "Debugging: reset initial configuration");
-    	PreferencesHelper.resetPreferences(context);
-    	
-    	Log.d(logTag, "Start super.onDestroy");
-    	super.onDestroy();
     }
 
     //Das ist ein Testkommentar.s
@@ -239,26 +164,11 @@ public class MainActivity extends Activity {
     
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // If cancelled initial configuration or login -> get out of here
-    	if(resultCode == Activity.RESULT_CANCELED && 
-    			(requestCode == ActivityCodeHelper.ACTIVITY_INITCONFIG_REQUEST || 
-    			 requestCode == ActivityCodeHelper.ACTIVITY_LOGIN_REQUEST)) {
-    		Log.d(logTag, "Login or initial configuration canceled. Exec onBackPressed()");
-    		onBackPressed();
-    	}
-    	
-    	if(resultCode == Activity.RESULT_OK) {
-    		if(requestCode == ActivityCodeHelper.ACTIVITY_INITCONFIG_REQUEST) {
-    			if(data.getBooleanExtra(ActivityCodeHelper.ACTIVITY_INITCONFIG_DATA_SET, false))
-    				initConfig = true;
-    		}
-    	}
-    	
-//    	// Results from Login-Activity
-//        if(requestCode == ActivityCodeHelper.ACTIVITY_LOGIN_REQUEST) {
-//        		if(resultCode == Activity.RESULT_CANCELED) {
-//        			onBackPressed();
-//        		} else if(resultCode == Activity.RESULT_OK) {
+        // Results from Login-Activity
+        if(requestCode == ActivityCodeHelper.ACTIVITY_LOGIN_REQUEST) {
+        		if(resultCode == Activity.RESULT_CANCELED) {
+        			onBackPressed();
+        		} else if(resultCode == Activity.RESULT_OK) {
 //        			// Perform a query to the contact's content provider for the contact's name
 //                    Cursor cursor = getContentResolver().query(data.getData(),
 //                    new String[] {Contacts.DISPLAY_NAME}, null, null, null);
@@ -267,7 +177,7 @@ public class MainActivity extends Activity {
 //                        String name = cursor.getString(columnIndex);
 //                        // Do something with the selected contact's name...
 //                    }
-//        		}
-//        }
+        		}
+        }
     }
 }
