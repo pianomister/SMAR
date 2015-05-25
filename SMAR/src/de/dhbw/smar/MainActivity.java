@@ -42,6 +42,7 @@ public class MainActivity extends Activity {
 	private final String logTag = "MainActivity";
 	private final Context context = this;
 	private boolean initConfig = false;
+	HttpConnectionHelper hch;
 	ProgressDialog pDialog;
 
     @Override
@@ -53,7 +54,7 @@ public class MainActivity extends Activity {
         // check for initial configuration, if not set start activity
         if(PreferencesHelper.getPreferenceInt(this, PreferencesHelper.PREFKEY_INIT_CONFIG) != 1) {
         	Log.d(logTag, "No initial configuration found - create InitConfActivity");
-        	Intent startNewActivityOpen = new Intent(this, InitConfActivity.class);
+        	Intent startNewActivityOpen = new Intent(context, InitConfActivity.class);
         	startActivityForResult(startNewActivityOpen, ActivityCodeHelper.ACTIVITY_INITCONFIG_REQUEST);
         } else {
         	Log.d(logTag, "Initial configuration found - load preferences");
@@ -100,12 +101,15 @@ public class MainActivity extends Activity {
     
     @Override
     protected void onStart() {
+    	boolean initConfigLoaded = false;
+    	
     	Log.d(logTag, "Start onStart");
     	super.onStart();
     	
     	if(initConfig) {
     		Log.d(logTag, "loading initial configuration");
     		PreferencesHelper.getInstance().loadPreferences(context);
+    		initConfigLoaded = true;
     	} else {
     		Log.e(logTag, "could not load initial configuration");
     		Toast.makeText(context, 
@@ -113,21 +117,63 @@ public class MainActivity extends Activity {
 	    	        Toast.LENGTH_SHORT).show();
     	}
     	
-    	Log.d(logTag, "checking server connection");
-    	pDialog = ProgressDialog.show(context, "Please wait", "Checking server connection...", true, false);
-		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/checkConnection";
-		Log.d(logTag, "server url: " + url);
-		HttpConnectionHelper hch = new HttpConnectionHelper(url);
-		new ASyncHttpConnection() {
-			@Override
-			public void onPostExecute(String result) {
-				pDialog.dismiss();
-			}
-			
-		}.execute(hch);
+    	if(initConfigLoaded) {
+	    	Log.d(logTag, "checking server connection");
+	    	pDialog = ProgressDialog.show(context, "Please wait", "Checking server connection...", true, false);
+			String url = "http://" + PreferencesHelper.getInstance().getServer() + "/checkConnection";
+			Log.d(logTag, "server url: " + url);
+			hch = new HttpConnectionHelper(url);
+			new ASyncHttpConnection() {
+				@Override
+				public void onPostExecute(String result) {
+					pDialog.dismiss();
+					if(!hch.getError())
+						initializeSMAR();
+					else {
+						AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+								context);
+				 
+						// set title
+						alertDialogBuilder.setTitle("Could not establish server connection...");
+			 
+						// set dialog message
+						alertDialogBuilder
+							.setMessage("Is this device connected?\n"
+									+ "Are the settings correct?\n"
+									+ "Is the server online and ready?\n\n"
+									+ "Please choose an action...")
+							.setCancelable(false)
+							.setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,int id) {
+									onBackPressed();
+								}
+							})
+							.setPositiveButton("Initial Configuration", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,int id) {
+									Intent startNewActivityOpen = new Intent(context, InitConfActivity.class);
+						        	startActivityForResult(startNewActivityOpen, ActivityCodeHelper.ACTIVITY_INITCONFIG_REQUEST);
+								}
+							});
+			 
+							// create alert dialog and show it
+							alertDialogBuilder.create().show();
+					}
+				}
+				
+			}.execute(hch);
+    	}
     }
     
-    @Override
+    protected void initializeSMAR() {
+		// if(LoginHelper.getInstance().isLoggedIn()) {
+			setContentView(R.layout.activity_main);
+		// } else {
+		//	Intent startNewActivityOpen = new Intent(this, LoginActivity.class);
+        //	startActivityForResult(startNewActivityOpen, ActivityCodeHelper.ACTIVITY_LOGIN_REQUEST);
+		// }
+	}
+
+	@Override
     protected void onPause() {
     	Log.d(logTag, "Start onPause");
     	super.onPause();

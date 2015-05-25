@@ -22,9 +22,14 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import de.dhbw.smar.asynctasks.ASyncHttpConnection;
+import de.dhbw.smar.helpers.ActivityCodeHelper;
+import de.dhbw.smar.helpers.HttpConnectionHelper;
 import de.dhbw.smar.helpers.LoginHelper;
+import de.dhbw.smar.helpers.PreferencesHelper;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -40,6 +45,9 @@ import android.widget.Toast;
 public class LoginActivity extends Activity {
 	private boolean startingFlag;
 	private final Context context = this;
+	private final String logTag = "LoginActivity";
+	private ProgressDialog pDialog;
+	private HttpConnectionHelper hch;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -47,33 +55,50 @@ public class LoginActivity extends Activity {
 		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
-		
-		final TextView mTextView = (TextView) findViewById(R.id.tv_stock_insertproduct);
 
-		/* String url ="http://192.168.178.20/SMAR-Web-Administration/api/authenticate";
-		
-		StatusLine statusLine = null;
-		try {
-			HttpClient httpclient = new DefaultHttpClient();
-			HttpPost post = new HttpPost(url);
-			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
-			nameValuePairs.add(new BasicNameValuePair("hwaddress","hwaddress_bla"));
-			nameValuePairs.add(new BasicNameValuePair("user","admin"));
-			nameValuePairs.add(new BasicNameValuePair("password","test"));
-			post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-			post.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
-		    HttpResponse response = httpclient.execute(post);
-		    statusLine = response.getStatusLine();
-		    String responseString = EntityUtils.toString(response.getEntity());
-	        JSONObject json = new JSONObject(responseString);
-	        Log.i(LoginActivity.class.getName(), "JWT:" + json.get("jwt").toString());
-		    mTextView.setText("Response ("+statusLine.getStatusCode()+") is: " + responseString);
-		} catch(IOException e) {
-			 e.printStackTrace();
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} */
+		Log.d(logTag, "receiving device users");
+    	pDialog = ProgressDialog.show(context, "Please wait", "Checking server connection...", true, false);
+		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/listDeviceUsers";
+		Log.d(logTag, "server url: " + url);
+		hch = new HttpConnectionHelper(url);
+		new ASyncHttpConnection() {
+			@Override
+			public void onPostExecute(String result) {
+				pDialog.dismiss();
+				/* if(!hch.getError())
+					initializeSMAR();
+				else {
+					AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+							context);
+			 
+					// set title
+					alertDialogBuilder.setTitle("Could not establish server connection...");
+		 
+					// set dialog message
+					alertDialogBuilder
+						.setMessage("Is this device connected?\n"
+								+ "Are the settings correct?\n"
+								+ "Is the server online and ready?\n\n"
+								+ "Please choose an action...")
+						.setCancelable(false)
+						.setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,int id) {
+								onBackPressed();
+							}
+						})
+						.setPositiveButton("Initial Configuration", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,int id) {
+								Intent startNewActivityOpen = new Intent(context, InitConfActivity.class);
+					        	startActivityForResult(startNewActivityOpen, ActivityCodeHelper.ACTIVITY_INITCONFIG_REQUEST);
+							}
+						});
+		 
+						// create alert dialog and show it
+						alertDialogBuilder.create().show();
+				} */
+			}
+			
+		}.execute(hch);
 		
 		List<String> spinnerArray = new ArrayList<String>(); 
 		spinnerArray.add("Choose user...");
