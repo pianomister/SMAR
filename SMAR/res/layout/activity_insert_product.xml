@@ -35,15 +35,6 @@
         android:text="@string/tv_sales_area"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView
-        android:id="@+id/tv_current_unit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:text="Medium Text"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
     <Button
         android:id="@+id/bt_insert_next_product"
         android:layout_width="wrap_content"
@@ -52,5 +43,15 @@
         android:layout_centerHorizontal="true"
         android:text="@string/bt_next_product" 
         android:onClick="restartInsertProduct"/>
+
+    <TextView
+        android:id="@+id/tv_current_unit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/tv_product"
+        android:layout_alignBottom="@+id/tv_product"
+        android:layout_alignRight="@+id/tv_sales_area_insertproduct"
+        android:text="@string/tv_current_unit"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </RelativeLayout>
