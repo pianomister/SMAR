@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import de.dhbw.smar.helpers.DialogHelper;
 
 public class InsertProduct extends Activity implements DialogHelper.ShareDialogListener{
@@ -74,7 +75,12 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 	}
 	
 	public void onDialogPositiveClick(DialogFragment dialog, String amount) {
+		String vorsilbe;
 		this.current_amount = amount;
+		TextView tv = (TextView) findViewById(R.id.tv_current_unit);
+		vorsilbe = tv.getText().toString().split(":")[0];
+		tv.setText(vorsilbe + ": " + this.current_amount);
+		
 	}
 	
 	public void onDialogNegativeClick(DialogFragment dialog) {

@@ -15,6 +15,7 @@
     <string name="tv_stock">Stock: </string>
     <string name="tv_sales_area">Sales Area: </string>
     <string name="bt_next_product">Next</string>
+    <string name="tv_current_unit">Unit: </string>
 
     <string-array name="country_arrays">
         <item>Malaysia</item>
@@ -32,5 +33,6 @@
     <string name="title_activity_init_conf">Set initial configuration</string>
     <string name="title_activity_search_product">SearchProduct</string>
     <string name="title_activity_insert_product">InsertProduct</string>
+    <string name="title_activity_product_stock">ProductStock</string>
 
 </resources>

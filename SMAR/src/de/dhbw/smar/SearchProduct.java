@@ -37,7 +37,11 @@ public class SearchProduct extends Activity {
 		setContentView(R.layout.activity_search_product);
 		
 		// Start searching the finding a product workflow
-		startSearchProductWorkflow();
+		//startSearchProductWorkflow();
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setTitle("Penis");
+		builder.show();
 		
 		
 	}

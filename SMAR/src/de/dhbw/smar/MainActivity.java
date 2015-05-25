@@ -64,10 +64,10 @@ public class MainActivity extends Activity {
         }
         
         // Debug: Einloggen!
-        // LoginHelper.getInstance().setLogin("test", "test"); // Logge ein
+        LoginHelper.getInstance().setLogin("test", "test"); // Logge ein
         // Debug Ende
         
-        if(!LoginHelper.getInstance().isLoggedIn()) {
+       if(!LoginHelper.getInstance().isLoggedIn()) {
         	ProgressDialog pDialog = ProgressDialog.show(this, "Downloading Data..", "Please wait", true, false);
         	// Set LogIn Activity
         	Intent startNewActivityOpen = new Intent(this, LoginActivity.class);
