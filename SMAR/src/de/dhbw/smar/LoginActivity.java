@@ -48,7 +48,7 @@ public class LoginActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
 		
-		final TextView mTextView = (TextView) findViewById(R.id.textView2);
+		final TextView mTextView = (TextView) findViewById(R.id.tv_stock_insertproduct);
 
 		/* String url ="http://192.168.178.20/SMAR-Web-Administration/api/authenticate";
 		
@@ -79,7 +79,7 @@ public class LoginActivity extends Activity {
 		spinnerArray.add("Choose user...");
 		spinnerArray.addAll(LoginHelper.getInstance().getUserList());
 		
-		Spinner spinner = (Spinner) findViewById(R.id.spinner1);
+		Spinner spinner = (Spinner) findViewById(R.id.spinner_unit);
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(
 			    this, android.R.layout.simple_spinner_item, spinnerArray); 		
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

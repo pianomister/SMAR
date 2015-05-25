@@ -10,19 +10,19 @@
         android:orientation="vertical" >
 
         <TextView
-            android:id="@+id/textView1"
+            android:id="@+id/tv_product"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/login_descr"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <Spinner
-            android:id="@+id/spinner1"
+            android:id="@+id/spinner_unit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/tv_stock_insertproduct"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="TextView" />

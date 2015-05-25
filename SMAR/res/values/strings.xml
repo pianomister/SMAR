@@ -11,6 +11,10 @@
     <string name="bt_main_logout">Logout</string>
     <string name="login_descr">Bitte wählen Sie Ihren Benutzernamen aus und scannen Sie anschließend Ihren Code:</string>
     <string name="country_prompt">Choose a country</string>
+    <string name="tv_product">Product: </string>
+    <string name="tv_stock">Stock: </string>
+    <string name="tv_sales_area">Sales Area: </string>
+    <string name="bt_next_product">Next</string>
 
     <string-array name="country_arrays">
         <item>Malaysia</item>
@@ -26,5 +30,7 @@
     <string name="prefname_use_internal_storage">bUseInternalStorage</string>
     <string name="title_activity_barcode_scanner">BarcodeScannerActivity</string>
     <string name="title_activity_init_conf">Set initial configuration</string>
+    <string name="title_activity_search_product">SearchProduct</string>
+    <string name="title_activity_insert_product">InsertProduct</string>
 
 </resources>
