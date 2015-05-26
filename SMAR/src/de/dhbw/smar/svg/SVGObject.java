@@ -3,9 +3,11 @@ package de.dhbw.smar.svg;
 import java.io.Serializable;
 
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.PictureDrawable;
 
-import com.larvalabs.svgandroid.SVG;
-import com.larvalabs.svgandroid.SVGParser;
+import com.caverock.androidsvg.SVG;
+import com.caverock.androidsvg.SVGParseException;
+import com.caverock.androidsvg.SVGParser;
 
 public class SVGObject implements Serializable {
 
@@ -23,10 +25,16 @@ public class SVGObject implements Serializable {
 	
 	public Drawable getDrawable() {
 
-		// Parse the SVG file from string
-        SVG graphic = SVGParser.getSVGFromString(svg);
-        // Get a drawable from the parsed SVG
-        return graphic.createPictureDrawable();
+        SVG graphic;
+		try {
+			// Parse the SVG file from string
+			graphic = SVG.getFromString(svg);
+			// Get a drawable from the parsed SVG
+	        return new PictureDrawable(graphic.renderToPicture());
+		} catch (SVGParseException e) {
+			e.printStackTrace();
+	        return null;
+		}
 	}
 	
 	
@@ -41,10 +49,16 @@ public class SVGObject implements Serializable {
 
 		// TODO
 		
-		// Parse the SVG file from string
-        SVG graphic = SVGParser.getSVGFromString(svg);
-        // Get a drawable from the parsed SVG
-        return graphic.createPictureDrawable();
+        SVG graphic;
+		try {
+			// Parse the SVG file from string
+			graphic = SVG.getFromString(svg);
+			// Get a drawable from the parsed SVG
+	        return new PictureDrawable(graphic.renderToPicture());
+		} catch (SVGParseException e) {
+			e.printStackTrace();
+	        return null;
+		}
 	}
 	
 	

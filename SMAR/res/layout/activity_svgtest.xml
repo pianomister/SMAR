@@ -8,14 +8,24 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="de.dhbw.smar.SVGTestActivity" >
 
-    <TextView
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
-    
-    <ImageView
-            android:id="@+id/svgTest"
-            android:layout_width="match_parent"
-            android:layout_height="104dp" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical" >
+        
+	    <TextView
+	        android:id="@+id/textView1"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:text="@string/hello_world" />
+	
+	    <ImageView
+	        android:id="@+id/svgTest2"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content" />
+	    
+    </LinearLayout>
 
 </RelativeLayout>

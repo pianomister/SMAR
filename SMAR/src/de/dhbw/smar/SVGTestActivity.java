@@ -2,14 +2,15 @@ package de.dhbw.smar;
 
 import java.io.File;
 
-import de.dhbw.smar.helpers.FileHelper;
-import de.dhbw.smar.svg.SVGObject;
 import android.app.Activity;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
+import de.dhbw.smar.helpers.FileHelper;
+import de.dhbw.smar.svg.SVGObject;
 
 public class SVGTestActivity extends Activity {
 
@@ -19,15 +20,15 @@ public class SVGTestActivity extends Activity {
 		setContentView(R.layout.activity_svgtest);
 		
 		//TODO remove: test for SVG
-        String stringSVG = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 20010904//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\"><svg width=\"600\" height=\"180\" viewBox=\"0 0 600 180\" style=\"width:100%;height: auto;\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\"><title>Shelf 'Softgetränke' (ID: 2, last updated: '22.04.2015 02:01:35')</title><defs><style type=\"text/css\">		<![CDATA[		text {fill: #333;font-family:Roboto;font-size: 8px;}		rect {fill:#ccc; stroke:#777; stroke-width: 2px;}		.section {fill:#ddd; stroke:#555; stroke-width: 1px; opacity:.8;}		.selected {fill:#16a082;}		]]></style></defs><rect id=\"shelf2\" x=\"0\" y=\"0\" width=\"600\" height=\"180\"/><rect id=\"section1\" x=\"110\" y=\"0\" width=\"110\" height=\"60\" class=\"section\"/><text x=\"115\" y=\"15\">1: Likör</text><rect id=\"section2\" x=\"110\" y=\"60\" width=\"110\" height=\"120\" class=\"section\"/><text x=\"115\" y=\"75\">2: Aufstrich</text><rect id=\"section4\" x=\"0\" y=\"0\" width=\"110\" height=\"180\" class=\"section\"/><text x=\"5\" y=\"15\">4: Test-Sektion</text><rect id=\"section8\" x=\"220\" y=\"0\" width=\"110\" height=\"180\" class=\"section\"/><text x=\"225\" y=\"15\">8: Wein</text></svg>";
+        String stringSVG = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 20010904//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\"><svg width=\"600\" height=\"180\" viewBox=\"0 0 600 180\" style=\"width:100%;height: auto;\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\"><title>Shelf 'Softgetränke' (ID: 2, last updated: '22.04.2015 02:01:35')</title><defs><style type=\"text/css\">		<![CDATA[		text {fill: #333;font-family:Roboto;font-size: 8px;}		rect {fill:#ccc; stroke:#777; stroke-width: 2px;}		.section {fill:#ddd; stroke:#555; stroke-width: 1px; opacity:.8;}		.selected {fill:#16a082;}		]]></style></defs><rect id=\"shelf2\" x=\"0\" y=\"0\" width=\"600\" height=\"180\" /><rect id=\"section1\" x=\"110\" y=\"0\" width=\"110\" height=\"60\" class=\"section\"/><text x=\"115\" y=\"15\">1: Likör</text><rect id=\"section2\" x=\"110\" y=\"60\" width=\"110\" height=\"120\" class=\"section\"/><text x=\"115\" y=\"75\">2: Aufstrich</text><rect id=\"section4\" x=\"0\" y=\"0\" width=\"110\" height=\"180\" class=\"section\"/><text x=\"5\" y=\"15\">4: Test-Sektion</text><rect id=\"section8\" x=\"220\" y=\"0\" width=\"110\" height=\"180\" class=\"section\"/><text x=\"225\" y=\"15\">8: Wein</text></svg>";
         SVGObject objectSVG = new SVGObject(stringSVG);
         
-        ImageView svgImage = (ImageView) findViewById(R.id.svgTest);
-        ImageView bla = new ImageView(this);
+        ImageView svgImage = (ImageView) findViewById(R.id.svgTest2);
+        // disable hardware acceleration - causes errors (incompatibility)
+        svgImage.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         Drawable d = objectSVG.getDrawable();
         if(d != null)
-        	bla.setImageDrawable(d);
-        	//svgImage.setImageDrawable(d); // fehlers, fehlers everywhere (nullPointerException) -> svgImage not found?
+        	svgImage.setImageDrawable(d);
 	}
 
 	@Override
