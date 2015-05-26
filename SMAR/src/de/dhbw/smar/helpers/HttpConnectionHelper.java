@@ -24,6 +24,7 @@ public class HttpConnectionHelper{
 	private String responseMessage;
 	private boolean error = false;
 	private List<NameValuePair> postPair;
+	private boolean standardMode = true;
 	
 	public List<NameValuePair> getPostPair() {
 		return postPair;
@@ -37,9 +38,20 @@ public class HttpConnectionHelper{
 		this.url = url;
 	}
 	
+	public HttpConnectionHelper(String url, boolean standardMode) {
+		this.url = url;
+		this.standardMode = standardMode;
+	}
+	
 	public HttpConnectionHelper(String url, int requestType) {
 		this.url = url;
 		this.requestType = requestType;
+	}
+	
+	public HttpConnectionHelper(String url, int requestType, boolean standardMode) {
+		this.url = url;
+		this.requestType = requestType;
+		this.standardMode = standardMode;
 	}
 
 	public int getResponseCode() {
@@ -72,5 +84,13 @@ public class HttpConnectionHelper{
 	
 	public boolean getError() {
 		return this.error;
+	}
+
+	public boolean isStandardMode() {
+		return standardMode;
+	}
+
+	public void setStandardMode(boolean standardMode) {
+		this.standardMode = standardMode;
 	}
 }

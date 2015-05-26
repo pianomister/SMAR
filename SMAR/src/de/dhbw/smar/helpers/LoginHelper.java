@@ -1,25 +1,33 @@
 package de.dhbw.smar.helpers;
 
-import java.util.ArrayList;
-import java.util.List;
-
-// @author Sebastian Kowalski
+/**
+ * 
+ * Class that holds the login data.
+ * 
+ * @author Sebastian Kowalski
+ *
+ */
 public class LoginHelper {
 	// Make this class a singleton
 	private static final LoginHelper lh = new LoginHelper();
+	
+	private LoginHelper() {
+		// No constructor because of singleton
+	}
+	
+	// Get the instance
+	public static LoginHelper getInstance() {
+		return lh;
+	}
+	
+	// Variables	
 	private String username = null;
-	private String jwt = null;
 	private String password = null;
 	private String hwaddress = null;
+	private String jwt = null;
+	private boolean loggedIn = false;
 	
-	public String getHwaddress() {
-		return hwaddress;
-	}
-
-	public void setHwaddress(String hwaddress) {
-		this.hwaddress = hwaddress;
-	}
-	
+	// Getter
 	public String getUsername() {
 		return username;
 	}
@@ -27,31 +35,20 @@ public class LoginHelper {
 	public String getPassword() {
 		return password;
 	}
-
-	private boolean loggedIn = false;
 	
-	private LoginHelper() {
-		// No constructor because of singleton
+	public String getHwaddress() {
+		return hwaddress;
 	}
 	
-	public static LoginHelper getInstance() {
-		return lh;
-	}
-	
-	public void setLogout() {
-		this.username = null;
-		this.password = null;
-		this.loggedIn = false;
+	public String getJwt() {
+		return jwt;
 	}
 	
 	public boolean isLoggedIn() {
 		return this.loggedIn;
 	}
 	
-	public void setLoggedIn(boolean loggedIn) {
-		this.loggedIn = loggedIn;
-	}
-	
+	// Setter
 	public void setUsername(String username) {
 		this.username = username;
 	}
@@ -60,19 +57,23 @@ public class LoginHelper {
 		this.password = password;
 	}
 	
-	public List<String> getUserList() {
-		List<String> userList = new ArrayList<String>();
-		userList.add("Sebastian");
-		userList.add("Stephan");
-		userList.add("Raffael");
-		return userList;
+	public void setHwaddress(String hwaddress) {
+		this.hwaddress = hwaddress;
 	}
-
-	public String getJwt() {
-		return jwt;
-	}
-
+	
 	public void setJwt(String jwt) {
 		this.jwt = jwt;
+	}
+	
+	public void setLoggedIn(boolean loggedIn) {
+		this.loggedIn = loggedIn;
+	}
+	
+	// Easy Method to log out.
+	public void setLogout() {
+		this.username = null;
+		this.password = null;
+		this.jwt = null;
+		this.loggedIn = false;
 	}
 }

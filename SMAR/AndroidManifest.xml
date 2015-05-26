@@ -11,7 +11,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
@@ -55,7 +55,7 @@
             android:label="@string/title_activity_init_conf"
             android:windowSoftInputMode="stateVisible" >
         </activity>
-		<activity
+        <activity
             android:name=".SearchProduct"
             android:label="@string/title_activity_search_product" >
         </activity>
@@ -66,6 +66,10 @@
         <activity
             android:name=".ProductStock"
             android:label="@string/title_activity_product_stock" >
+        </activity>
+        <activity
+            android:name=".SVGTestActivity"
+            android:label="@string/title_activity_svgtest" >
         </activity>
     </application>
 

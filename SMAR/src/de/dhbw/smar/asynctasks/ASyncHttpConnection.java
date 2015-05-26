@@ -1,12 +1,16 @@
 package de.dhbw.smar.asynctasks;
 
+import java.util.List;
+
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -14,6 +18,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
 import de.dhbw.smar.helpers.HttpConnectionHelper;
+import de.dhbw.smar.helpers.LoginHelper;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -23,6 +28,7 @@ public class ASyncHttpConnection extends AsyncTask<HttpConnectionHelper, Void, S
 	
 	@Override
 	protected String doInBackground(HttpConnectionHelper... hch) {
+		Log.d(logTag, "Starting ASyncHttpConnection...");
 		String responseString;
 		try {
 			HttpResponse response;
@@ -37,11 +43,22 @@ public class ASyncHttpConnection extends AsyncTask<HttpConnectionHelper, Void, S
 			HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
 			HttpClient httpclient = new DefaultHttpClient(httpParameters);
 			if(hch[0].getRequestType() == HttpConnectionHelper.REQUEST_TYPE_POST) {
+				Log.d(logTag, "POST-Request");
+				Log.d(logTag, "URL: " + hch[0].getUrl());
 				HttpPost request = new HttpPost(hch[0].getUrl());
-		        request.setEntity(new UrlEncodedFormEntity(hch[0].getPostPair()));
+				List<NameValuePair> postPair = hch[0].getPostPair();
+				if(hch[0].isStandardMode())
+					postPair.add(new BasicNameValuePair("jwt", LoginHelper.getInstance().getJwt()));
+		        request.setEntity(new UrlEncodedFormEntity(postPair));
 				response = httpclient.execute(request);
 			} else {
-				HttpGet request = new HttpGet(hch[0].getUrl());
+				Log.d(logTag, "POST-Request");
+				Log.d(logTag, "URL: " + hch[0].getUrl());
+				String url = hch[0].getUrl();
+				if(hch[0].isStandardMode()) {
+					url = url + "/" + LoginHelper.getInstance().getJwt();
+				}
+				HttpGet request = new HttpGet(url);
 				response = httpclient.execute(request);
 			}
 		    StatusLine statusLine = response.getStatusLine();

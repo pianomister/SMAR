@@ -34,5 +34,6 @@
     <string name="title_activity_search_product">SearchProduct</string>
     <string name="title_activity_insert_product">InsertProduct</string>
     <string name="title_activity_product_stock">ProductStock</string>
+    <string name="title_activity_svgtest">SVGTestActivity</string>
 
 </resources>

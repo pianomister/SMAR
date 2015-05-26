@@ -1,24 +1,10 @@
 package de.dhbw.smar;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,16 +26,24 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
+/**
+ * Activity handling the login
+ * 
+ * @author Sebastian Kowalski
+ *
+ */
 public class LoginActivity extends Activity {
-	private boolean startingFlag;
+	// Context, Logging tag
 	private final Context context = this;
 	private final String logTag = "LoginActivity";
+	
+	// Variables
 	private ProgressDialog pDialog;
 	private HttpConnectionHelper hch;
 	
+	// Constants
 	private static int ERROR_SERVER = 0;
 	private static int ERROR_CAMERA = 1;
 	private static int ERROR_PERMISSION = 2;
@@ -86,7 +80,6 @@ public class LoginActivity extends Activity {
 						Log.e(logTag, e.getMessage());
 						createError(ERROR_SERVER);
 					}
-					// initializeSMAR();
 				} else {
 					Log.d(logTag, "Error (" + hch.getResponseCode() + "): " + result);
 					createError(ERROR_SERVER);
@@ -121,44 +114,6 @@ public class LoginActivity extends Activity {
 		});
 	}
 	
-	public void createError(int error) {
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-		context);
-
-		if(error == ERROR_CAMERA) {
-			// set title
-			alertDialogBuilder.setTitle("Could not load camera...");
-			
-			// set dialog message
-			alertDialogBuilder
-				.setMessage("Camera error...\n\n"
-						+ "Please restart your device and try again.")
-				.setCancelable(false)
-				.setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog,int id) {
-						onBackPressed();
-					}
-				});
-		} else {
-			// set title
-			alertDialogBuilder.setTitle("Could not load users...");
-			
-			// set dialog message
-			alertDialogBuilder
-				.setMessage("Unknown error...\n\n"
-						+ "Please try again later or contact system administrator...")
-				.setCancelable(false)
-				.setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog,int id) {
-						onBackPressed();
-					}
-				});
-		}
-		
-		// create alert dialog and show it
-		alertDialogBuilder.create().show();
-	}
-	
 	public void cancelLogin() {
 		Intent intent = this.getIntent();
 		this.setResult(RESULT_CANCELED, intent);
@@ -171,6 +126,7 @@ public class LoginActivity extends Activity {
 		finish();
 	}
 	
+	// Method executed by back button
 	@Override
 	public void onBackPressed() {
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
@@ -201,6 +157,7 @@ public class LoginActivity extends Activity {
 			alertDialogBuilder.create().show();
 	}
 	
+	// Method executed by result from BarcodeScanner
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
 	{    
@@ -265,5 +222,44 @@ public class LoginActivity extends Activity {
 	    } else if(resultCode == RESULT_CANCELED) {
 	        createError(ERROR_CAMERA);
 	    }
+	}
+	
+	// Creates and Shows an error dialog
+	public void createError(int error) {
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+		context);
+
+		if(error == ERROR_CAMERA) {
+			// set title
+			alertDialogBuilder.setTitle("Could not load camera...");
+			
+			// set dialog message
+			alertDialogBuilder
+				.setMessage("Camera error...\n\n"
+						+ "Please restart your device and try again.")
+				.setCancelable(false)
+				.setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog,int id) {
+						onBackPressed();
+					}
+				});
+		} else {
+			// set title
+			alertDialogBuilder.setTitle("Could not load users...");
+			
+			// set dialog message
+			alertDialogBuilder
+				.setMessage("Unknown error...\n\n"
+						+ "Please try again later or contact system administrator...")
+				.setCancelable(false)
+				.setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog,int id) {
+						onBackPressed();
+					}
+				});
+		}
+		
+		// create alert dialog and show it
+		alertDialogBuilder.create().show();
 	}
 }
