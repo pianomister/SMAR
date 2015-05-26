@@ -3,6 +3,7 @@
 
     <string name="app_name">SMAR</string>
     <string name="hello_world">Hello world!</string>
+    <string name="barcode_note">Focus camera on QR- or barcode to scan.</string>
     <string name="action_settings">Settings</string>
     <string name="bt_main_search_product">Produkt finden</string>
     <string name="bt_main_load_product">Produkt einräumen</string>
@@ -35,5 +36,6 @@
     <string name="title_activity_insert_product">InsertProduct</string>
     <string name="title_activity_product_stock">ProductStock</string>
     <string name="title_activity_svgtest">SVGTestActivity</string>
+    <string name="title_activity_receiving_products">ReceivingProducts</string>
 
 </resources>

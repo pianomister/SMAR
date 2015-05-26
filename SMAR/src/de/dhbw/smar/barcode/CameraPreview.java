@@ -79,7 +79,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
           // ignore: tried to stop a non-existent preview  
         }  
         try {  
-            // Hard code camera surface rotation 90 degs to match Activity view in portrait  
+            // Hard code camera surface rotation 0 degs to match Activity view in landscape m100 mode  
             mCamera.setDisplayOrientation(0);  
    
             mCamera.setPreviewDisplay(mHolder);  
