@@ -17,19 +17,26 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import de.dhbw.smar.asynctasks.ASyncHttpConnection;
+import de.dhbw.smar.helpers.ActivityCodeHelper;
 import de.dhbw.smar.helpers.HttpConnectionHelper;
+import de.dhbw.smar.helpers.PreferencesHelper;
 
 public class SearchProduct extends Activity {
 
 	final Context context = this;
+	private ProgressDialog pDialog;
+	private HttpConnectionHelper hch;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -39,10 +46,11 @@ public class SearchProduct extends Activity {
 		// Start searching the finding a product workflow
 		//startSearchProductWorkflow();
 		
-		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-		builder.setTitle("Penis");
-		builder.show();
+		//startBarcodeScanner
+		startSearchProductWorkflow();
 		
+		//start searching for Product Information and display them
+    	
 		
 	}
 	
@@ -67,49 +75,9 @@ public class SearchProduct extends Activity {
 	}
 	
 	private void startSearchProductWorkflow(){
-		//Set variables
-				String sURL = null;
-				String response = null;
-				String sProduct = null;
-				
-				//Starte den Barcode-Scanner 
-				
-				//Nachdem der Code erkannt wurde, starte REST API aufruf. 
-
-				HttpClient client = new DefaultHttpClient();
-				HttpGet request = new HttpGet(sURL);
-				ResponseHandler<String> handler = new BasicResponseHandler();
-				try {
-					response = client.execute(request, handler);
-				}
-				catch (ClientProtocolException e) {
-					e.printStackTrace();
-				}
-				catch (IOException e) {
-					e.printStackTrace();
-				}
-				client.getConnectionManager().shutdown();
-				
-				//Aus dem erhaltenem String ein JSON Objekt erstellen
-				try { 
-					JSONObject json = new JSONObject(response);
-					//Parse JSONObject
-					sProduct = json.getString("name");
-				}
-				catch (JSONException e) {
-					e.printStackTrace();
-				}
-				
-				//Create Picture
-				
-				//Anzeige der Informationen
-				TextView tvProduct = (TextView) findViewById(R.id.tv_product);
-				TextView tvStock = (TextView) findViewById(R.id.tv_stock);
-				TextView tvSalesArea = (TextView) findViewById(R.id.tv_sales_area);
-				tvProduct.setText(sProduct);
-				
-				//das Layout setzen
-				FrameLayout layout = (FrameLayout) findViewById(R.id.tv_stock);
+		//at first, read barcode
+    	Intent startNewActivityOpen = new Intent(getBaseContext(), BarcodeScannerActivity.class);
+    	startActivityForResult(startNewActivityOpen, ActivityCodeHelper.ACTIVITY_BARCODE_REQUEST);
 	}
 	
 	// ToDo: Implement Warenannahme
@@ -162,6 +130,87 @@ public class SearchProduct extends Activity {
     		return null;
     	} */
     	return "bla";
+    }
+    
+    
+    @Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data)
+	// after read barcode
+	// check it. 
+	// then, start getting product based information
+	{    
+    	if (resultCode == RESULT_OK) 
+	    {
+	    	String resultBarcode = data.getStringExtra("BARCODE");
+	    	if(!resultBarcode.equals(null)) {
+	    		searchProductInformation(resultBarcode);
+	    	}
+	    }
+    	else {
+    		AlertDialog.Builder alert = new AlertDialog.Builder(context);
+    		alert.setTitle("Failure");
+    		alert.setMessage("Couldn't read this code. Check code and try again")
+    			 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+    			public void onClick(DialogInterface dialog, int id) {
+    				dialog.dismiss();
+    				startSearchProductWorkflow();
+    			}
+    		});
+    		alert.create().show();
+    	}
+	}
+    
+    private void searchProductInformation(String productNumber) {
+    	// get information of the product
+    	// set up asynchronous task 
+    	// set up connection to the server 
+    	// retrieve data from server
+    	// display the information
+    	pDialog = ProgressDialog.show(context, "Please wait", "Receiving product information...", true, false);
+		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/getProduct/" + productNumber;
+		Log.d("Start connectinting to: ", "server url: " + url);
+		hch = new HttpConnectionHelper(url);
+		new ASyncHttpConnection() {
+			@Override
+			public void onPostExecute(String result) {
+				pDialog.dismiss();
+				// Result ist das JSON Objekt
+				Log.d("onPostExecute", result);
+				if(!hch.getError() && hch.getResponseCode() == 200) { 
+					try {
+						Log.d("start json", "result");
+						//JSONArray jArray = new JSONArray(hch.getResponseMessage());
+						result = result.substring(1, result.length() -1);
+						JSONObject json = new JSONObject(result);
+						
+						String product_name = json.getString("name");
+						String amount_warehouse = json.getString("amount_warehouse");
+						String amount_shop = json.getString("amount_shop");
+						
+						TextView tv_product = (TextView)findViewById(R.id.tv_product);
+						TextView tv_warehouse = (TextView)findViewById(R.id.tv_sales_area);
+						TextView tv_shop = (TextView)findViewById(R.id.tv_stock);
+						
+						tv_product.setText(getResources().getString(R.string.tv_product) + product_name);
+						tv_warehouse.setText(getResources().getString(R.string.tv_stock) + amount_warehouse);
+						tv_shop.setText(getResources().getString(R.string.tv_sales_area) + amount_shop);
+						
+						//Create the Picture to display
+						
+						//Ask if you want to put this item into shelf
+						//Start then the InsertProduct Activity
+						showQuestionProductPutIntoShelf();
+						
+					}
+					catch (JSONException e)
+					{
+						e.getStackTrace();
+					}
+						
+				}
+				
+			}
+		}.execute(hch);
     }
     
 }

@@ -71,6 +71,10 @@
             android:name=".SVGTestActivity"
             android:label="@string/title_activity_svgtest" >
         </activity>
+        <activity
+            android:name=".ReceivingProducts"
+            android:label="@string/title_activity_receiving_products" >
+        </activity>
     </application>
 
 </manifest>
