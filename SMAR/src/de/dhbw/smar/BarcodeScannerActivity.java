@@ -109,7 +109,7 @@ public class BarcodeScannerActivity extends Activity{
                 {  
                     Intent returnIntent = new Intent();  
                     returnIntent.putExtra("BARCODE", sym.getData());  
-                    setResult(1,returnIntent);  
+                    setResult(RESULT_OK,returnIntent);  
                     releaseCamera();
                     finish();
                 }  

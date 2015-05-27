@@ -102,7 +102,7 @@ public class LoginActivity extends Activity {
 		    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 		        if(position != 0) {
 		        	LoginHelper.getInstance().setUsername(parentView.getItemAtPosition(position).toString());
-		        	Intent startNewActivityOpen = new Intent(getBaseContext(), BarcodeScannerActivity.class);
+		        	Intent startNewActivityOpen = new Intent(context, BarcodeScannerActivity.class);
 		        	startActivityForResult(startNewActivityOpen, ActivityCodeHelper.ACTIVITY_BARCODE_REQUEST);
 		        }
 		    }
@@ -167,7 +167,7 @@ public class LoginActivity extends Activity {
 	    	Log.d(logTag, "result barcode: " + resultBarcode);
 	    	// TODO: resultBarcode == null ist nicht korrekt!
 	    	if(resultBarcode == null || resultBarcode.equalsIgnoreCase("NULL"))
-	    		Toast.makeText(this, "No barcode/QR-code scanned", Toast.LENGTH_SHORT).show();
+	    		Toast.makeText(this, "No barcode/QR-code scanned", Toast.LENGTH_LONG).show();
 	    	else {
 	    		LoginHelper.getInstance().setPassword(resultBarcode);
 	    		pDialog = ProgressDialog.show(context, "Please wait", "Logging in...", true, false);
@@ -185,8 +185,7 @@ public class LoginActivity extends Activity {
 	    				pDialog.dismiss();
 	    				if(!hch.getError()) {
 	    					try {
-		    					JSONArray jArray = new JSONArray(hch.getResponseMessage());
-								JSONObject json = jArray.getJSONObject(0);
+								JSONObject json = new JSONObject(hch.getResponseMessage());
 								Log.d(logTag, "Response (" + hch.getResponseCode() + "): " + hch.getResponseMessage());
 		    					if(hch.getResponseCode() == 200) {
 		    						LoginHelper lh = LoginHelper.getInstance();
@@ -240,7 +239,53 @@ public class LoginActivity extends Activity {
 				.setCancelable(false)
 				.setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog,int id) {
-						onBackPressed();
+						cancelLogin();
+					}
+				});
+		} else if(error == ERROR_PERMISSION) { 
+			// set title
+			alertDialogBuilder.setTitle("Insufficient Permission...");
+			
+			// set dialog message
+			alertDialogBuilder
+				.setMessage("You don't have the permission to enter the SMAR app...")
+				.setCancelable(false)
+				.setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog,int id) {
+						cancelLogin();
+					}
+				});
+		} else if(error == ERROR_CRED_DEVICE) { 
+			// set title
+			alertDialogBuilder.setTitle("Device not active...");
+			
+			// set dialog message
+			alertDialogBuilder
+				.setMessage("This device is not registered/activated...\n\n"
+						+ "Please contact your system administrator.")
+				.setCancelable(false)
+				.setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog,int id) {
+						cancelLogin();
+					}
+				});
+		} else if(error == ERROR_CRED_PASSWORD) { 
+			// set title
+			alertDialogBuilder.setTitle("Wrong credentials...");
+			
+			// set dialog message
+			alertDialogBuilder
+				.setMessage("Wrong QR-code.\n\n"
+						+ "Please try again with correct QR-code.")
+				.setCancelable(false)
+				.setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog,int id) {
+						cancelLogin();
+					}
+				})
+				.setPositiveButton("Try again", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog,int id) {
+						dialog.cancel();
 					}
 				});
 		} else {
@@ -254,7 +299,7 @@ public class LoginActivity extends Activity {
 				.setCancelable(false)
 				.setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog,int id) {
-						onBackPressed();
+						cancelLogin();
 					}
 				});
 		}

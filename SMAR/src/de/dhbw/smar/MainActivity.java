@@ -146,6 +146,12 @@ public class MainActivity extends Activity {
     	super.onDestroy();
     }
     
+    @Override
+	public void onBackPressed() {
+    	LoginHelper.getInstance().setLogout();
+    	super.onBackPressed();
+    }
+    
     // Method executed, if all tests has been successfully
     // 1. Start Login-Activity
     // 2. Show menu
@@ -153,7 +159,7 @@ public class MainActivity extends Activity {
     	// Skip LogIn for debugging.
     	// Attention: Server connection will fail!
     	// TODO remove
-    	LoginHelper.getInstance().setLoggedIn(true);
+    	// LoginHelper.getInstance().setLoggedIn(true);
     	
 		if(LoginHelper.getInstance().isLoggedIn()) {
 			// Logged in. Load main menu
@@ -193,8 +199,7 @@ public class MainActivity extends Activity {
     }
     
     public void onLogoutClicked(View view) {
-    	LoginHelper.getInstance().setLogout();
-    	super.onBackPressed();
+    	onBackPressed();
     }
     
     // Method fired by result of another activity

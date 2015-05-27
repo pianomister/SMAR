@@ -113,8 +113,8 @@ public class PreferencesHelper {
 		setPreferenceInt(context, PREFKEY_BARCODE_SCANNER, pref_barcode_scanner);
 		setPreferenceInt(context, PREFKEY_USE_INTERNAL_STORAGE, pref_storage);
 		
-		Log.d(logTag, "attempt to save svg container with timestamp: " + String.valueOf(this.pref_svg_container.getLastDownload()));
 		if(this.pref_svg_container != null) {
+			Log.d(logTag, "attempt to save svg container with timestamp: " + String.valueOf(this.pref_svg_container.getLastDownload()));
 			try {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				ObjectOutputStream o = new ObjectOutputStream(baos);
@@ -124,8 +124,8 @@ public class PreferencesHelper {
 				Log.e(logTag, "Error while saving occured:" + e.getMessage());
 				e.printStackTrace();
 			}
+			Log.d(logTag, "save complete");
 		}
-		Log.d(logTag, "save complete");
 	}
 	
 	// Resetting Preferences and deleting them
