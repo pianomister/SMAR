@@ -261,8 +261,9 @@ public class LoginActivity extends Activity {
 			
 			// set dialog message
 			alertDialogBuilder
-				.setMessage("This device is not registered/activated...\n\n"
-						+ "Please contact your system administrator.")
+				.setMessage("This device is not registered/activated...\n"
+						+ "Please contact your system administrator.\n\n"
+						+ "Hardware address: '" + LoginHelper.getInstance().getHwaddress() + "'")
 				.setCancelable(false)
 				.setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog,int id) {
