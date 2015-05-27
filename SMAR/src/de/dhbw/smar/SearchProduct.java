@@ -101,6 +101,7 @@ public class SearchProduct extends Activity {
 					public void onClick(DialogInterface dialog, int which) {
 						// if this button is clicked you switch to 
 						// the activity to put products into shelf
+						Log.d("Haloop", "bis hierhin");
 						Intent intent = new Intent(SearchProduct.this, InsertProduct.class);
 						
 						Bundle b = new Bundle();
@@ -111,6 +112,7 @@ public class SearchProduct extends Activity {
 						b.putString("product_name", current_product_name);
 						b.putString("unit_id", current_unit_id);
 						intent.putExtras(b);
+						Log.d("Haloop", "extras put");
 						startActivity(intent);
 						finish();
 					}
@@ -205,6 +207,7 @@ public class SearchProduct extends Activity {
 						current_product_name = json.getString("name");
 						current_amount_warehouse = json.getString("amount_warehouse");
 						current_amount_shop = json.getString("amount_shop");
+						current_unit_id = json.getString("unit_id");
 						
 						TextView tv_product = (TextView)findViewById(R.id.tv_product);
 						TextView tv_warehouse = (TextView)findViewById(R.id.tv_sales_area);

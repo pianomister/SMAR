@@ -40,7 +40,7 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 	String current_amount_shop;
 	String current_barcode;
 	String current_product_id;
-	ArrayList<String> available_units;
+	ArrayList<String> available_units = null;
 	final Context context = this;
 	private ProgressDialog pDialog;
 	private HttpConnectionHelper hch;
@@ -52,15 +52,18 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 		
 		// In the Bundle are some params
 		// They indicate where to start this activity
-		
+		Log.d("InsertProduct", "before getting bundles");
 		Bundle b = getIntent().getExtras();
+		Log.d("InsertProduct", "after getting bundles");
 		if(b != null) {
+			Log.d("InsertProduct", "Bundle is not null");
 			workflow_pos = b.getInt("workflow_position");
 			current_product_id = b.getString("product_id");
 			current_amount_shop = b.getString("amount_shop");
 			current_amount_warehouse = b.getString("amount_warehouse");
 			current_unit_id = b.getString("unit_id");
 		} else {
+			Log.d("InsertProduct", "Bundle is null");
 			workflow_pos = 0;
 		}
 		
@@ -96,12 +99,13 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 	public void startAfterProductSearch() {
 		// Open dialog
 		// User can enter which unit
-		// User can enter the amount of the unit	
-		DialogFragment dialog = new DialogHelper();
-		dialog.show(getFragmentManager(), "DialogHelper");
-		
-		//Use REST API to refresh Database 
-		updateDatabase();
+		// User can enter the amount of the unit
+		Log.d("InsertProduct", "before showing dialoghelper");
+		getUnitsToProduct();
+		Log.d("InsertProduct", current_unit_id);
+
+	//	DialogFragment dialog = newInstance(current_unit_id, available_units);
+	//	dialog.show(getFragmentManager(), "DialogHelper");
 	}
 	
 	public void onDialogPositiveClick(DialogFragment dialog,String selected_unit, String amount) {
@@ -113,6 +117,8 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 		
 		//call rest api to insert the products
 		updateDatabase();
+		//Use REST API to refresh Database 
+				//updateDatabase();
 	}
 	
 	public void onDialogNegativeClick(DialogFragment dialog) {
@@ -135,14 +141,14 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     	//read barcode 
 		//get information to this product
-		if (resultCode == RESULT_OK) 
-	    {
+		/*if (resultCode == RESULT_OK) 
+	    {*/
 	    	String resultBarcode = data.getStringExtra("BARCODE");
 	    	if(!resultBarcode.equals(null)) {
 	    		this.current_barcode = resultBarcode;
 	    		searchProductInformation(this, resultBarcode);
 	    	}
-	    }
+	    /*}
     	else {
     		AlertDialog.Builder alert = new AlertDialog.Builder(context);
     		alert.setTitle("Failure");
@@ -154,7 +160,7 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
     			}
     		});
     		alert.create().show();
-    	}
+    	}*/
 		
 	}
 	
@@ -176,18 +182,21 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 					Log.d("onPostExecute", result);
 					if(!hch.getError() && hch.getResponseCode() == 200) { 
 						try {
-							Log.d("start json", "result");
+							Log.d("start json", result + "teeest");
 							//JSONArray jArray = new JSONArray(hch.getResponseMessage());
 							result = result.substring(1, result.length() -1);
 							JSONObject json = new JSONObject(result);
 							
-							current_product_id = json.getString("id");
+							Log.d("read json", "reading json...");
+							
+							current_product_id = json.getString("product_id");
 							product_name = json.getString("name");
 							current_amount_warehouse = json.getString("amount_warehouse");
 							current_amount_shop = json.getString("amount_shop");
 							current_unit_id = json.getString("unit_id");
 							
 							//layout names setzen
+							Log.d("setLayout", "layout wird jetzt im nächsten schritt gesetzt");
 							setLayoutNames();
 
 							//Create the Picture to display
@@ -215,6 +224,10 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 
 		    // Supply num input as an argument.
 		    Bundle args = new Bundle();
+		    Log.d("creating dialog", current_unit);
+		    if(all_units.isEmpty()) {
+		    	Log.d("creating dialog", "all units is empty");
+		    }
 		    args.putString("current_unit", current_unit);
 		    args.putStringArrayList("all_units", all_units);
 		    f.setArguments(args);
@@ -226,7 +239,7 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 		 // updates the stock of the product
 		 // concrete: move amount from Warehouse to Shop
 		 	int howMuchToTransfer; 
-		 	howMuchToTransfer = Integer.parseInt(selected_unit) * Integer.parseInt(selected_amount);
+		 	howMuchToTransfer = 1; // Integer.parseInt(selected_unit) * Integer.parseInt(selected_amount);
 		 
 	    	pDialog = ProgressDialog.show(context, "Please wait", "Updating product information...", true, false);
 			String url = "http://" + PreferencesHelper.getInstance().getServer() + "/updateProductStock";
@@ -293,20 +306,28 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 			new ASyncHttpConnection() {
 				@Override
 				public void onPostExecute(String result) {
+					Log.d("getting_units", "start on postexecute");
 					pDialog.dismiss();
 					// Result ist das JSON Objekt
 					Log.d("onPostExecute", result);
+					Log.d("onPostExecute", String.valueOf(hch.getResponseCode()));
 					if(!hch.getError() && hch.getResponseCode() == 200) { 
 						try {
-							Log.d("start json", "result");
 							
-							JSONArray jArray = new JSONArray(hch.getResponseMessage());
+							Log.d("start json", result);
+							
+							JSONArray jArray = new JSONArray(result);
+							if(jArray.length() == 0)
+								Log.d("json", "JSONArray is empty");
+							
 							for(int i = 0; i < jArray.length(); i++) {
 								//put all available units into one list
 								JSONObject json = jArray.getJSONObject(i);
 								available_units.add(json.getString("name"));
+								Log.d("units", json.getString("name"));
 							}
 							
+						
 							
 							
 							// open dialog and ask user to enter data
@@ -323,13 +344,19 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 	 
 	 
 	 private void setLayoutNames() {
-			TextView tv_product = (TextView)findViewById(R.id.tv_product);
-			TextView tv_warehouse = (TextView)findViewById(R.id.tv_sales_area);
-			TextView tv_shop = (TextView)findViewById(R.id.tv_stock);
+		 	Log.d("start setting layout", "start");
+		 	Log.d("layout: product_name", product_name);
+		 	Log.d("layout: current_amount_warehouse", current_amount_warehouse);
+		 	Log.d("layout: current_amount_shop", current_amount_shop);
+			TextView tv_product = (TextView)findViewById(R.id.tv_product_insertproduct);
+			TextView tv_warehouse = (TextView)findViewById(R.id.tv_sales_area_insertproduct);
+			TextView tv_shop = (TextView)findViewById(R.id.tv_stock_insertproduct);
 		
 			tv_product.setText(getResources().getString(R.string.tv_product) + product_name);
 			tv_warehouse.setText(getResources().getString(R.string.tv_stock) + current_amount_warehouse);
 			tv_shop.setText(getResources().getString(R.string.tv_sales_area) + current_amount_shop);
+			
+			Log.d("layout finished", "finished");
 	 }
 	 
 	 
