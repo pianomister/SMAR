@@ -27,6 +27,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import de.dhbw.smar.asynctasks.ASyncHttpConnection;
 import de.dhbw.smar.helpers.ActivityCodeHelper;
 import de.dhbw.smar.helpers.HttpConnectionHelper;
@@ -37,6 +38,11 @@ public class SearchProduct extends Activity {
 	final Context context = this;
 	private ProgressDialog pDialog;
 	private HttpConnectionHelper hch;
+	String current_product_id;
+	String current_amount_warehouse;
+	String current_amount_shop;
+	String current_product_name;
+	String current_unit_id;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +92,7 @@ public class SearchProduct extends Activity {
 				context);
  
 			// set title
-			alertDialogBuilder.setTitle("Product int shelf");
+			alertDialogBuilder.setTitle("Product into shelf");
  
 			// set dialog message
 			alertDialogBuilder
@@ -99,6 +105,11 @@ public class SearchProduct extends Activity {
 						
 						Bundle b = new Bundle();
 						b.putInt("workflow_position", 1);
+						b.putString("product_id", current_product_id);
+						b.putString("amount_warehouse", current_amount_warehouse);
+						b.putString("amount_shop", current_amount_shop);
+						b.putString("product_name", current_product_name);
+						b.putString("unit_id", current_unit_id);
 						intent.putExtras(b);
 						startActivity(intent);
 						finish();
@@ -139,12 +150,19 @@ public class SearchProduct extends Activity {
 	// check it. 
 	// then, start getting product based information
 	{    
-    	if (resultCode == RESULT_OK) 
-	    {
+    	/*Log.d("Taaag", String.valueOf(resultCode));
+    	Log.d("Result: ", data.getStringExtra("BARCODE"));
+    	if (resultCode == Activity.RESULT_OK) 
+	    {*/
+    		Log.d("Barcode", data.getStringExtra("BARCODE"));
 	    	String resultBarcode = data.getStringExtra("BARCODE");
-	    	if(!resultBarcode.equals(null)) {
+	    	Log.d("Barcode2" , resultBarcode);
+	    	if(resultBarcode != "") {
+	    		Log.d("Started", "Starte Produktsuche");
 	    		searchProductInformation(resultBarcode);
+	    		
 	    	}
+	    	/*}
 	    }
     	else {
     		AlertDialog.Builder alert = new AlertDialog.Builder(context);
@@ -157,7 +175,7 @@ public class SearchProduct extends Activity {
     			}
     		});
     		alert.create().show();
-    	}
+    	} */
 	}
     
     private void searchProductInformation(String productNumber) {
@@ -183,17 +201,21 @@ public class SearchProduct extends Activity {
 						result = result.substring(1, result.length() -1);
 						JSONObject json = new JSONObject(result);
 						
-						String product_name = json.getString("name");
-						String amount_warehouse = json.getString("amount_warehouse");
-						String amount_shop = json.getString("amount_shop");
+						current_product_id = json.getString("product_id");
+						current_product_name = json.getString("name");
+						current_amount_warehouse = json.getString("amount_warehouse");
+						current_amount_shop = json.getString("amount_shop");
 						
 						TextView tv_product = (TextView)findViewById(R.id.tv_product);
 						TextView tv_warehouse = (TextView)findViewById(R.id.tv_sales_area);
 						TextView tv_shop = (TextView)findViewById(R.id.tv_stock);
 						
-						tv_product.setText(getResources().getString(R.string.tv_product) + product_name);
-						tv_warehouse.setText(getResources().getString(R.string.tv_stock) + amount_warehouse);
-						tv_shop.setText(getResources().getString(R.string.tv_sales_area) + amount_shop);
+						tv_product.setText(getResources().getString(R.string.tv_product) + current_product_name);
+						tv_warehouse.setText(getResources().getString(R.string.tv_stock) + current_amount_warehouse);
+						tv_shop.setText(getResources().getString(R.string.tv_sales_area) + current_amount_shop);
+						
+
+						
 						
 						//Create the Picture to display
 						
