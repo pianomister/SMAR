@@ -139,8 +139,8 @@ public class MainActivity extends Activity {
     	PreferencesHelper.getInstance().savePreferences(this);
     	
     	// TODO REMOVE
-    	Log.d(logTag, "Debugging: reset initial configuration");
-    	PreferencesHelper.resetPreferences(context);
+    	// Log.d(logTag, "Debugging: reset initial configuration");
+    	// PreferencesHelper.resetPreferences(context);
     	
     	Log.d(logTag, "Start super.onDestroy");
     	super.onDestroy();
