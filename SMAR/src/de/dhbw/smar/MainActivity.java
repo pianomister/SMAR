@@ -17,6 +17,7 @@ import de.dhbw.smar.helpers.ActivityCodeHelper;
 import de.dhbw.smar.helpers.HttpConnectionHelper;
 import de.dhbw.smar.helpers.LoginHelper;
 import de.dhbw.smar.helpers.PreferencesHelper;
+import de.dhbw.smar.svg.SVGDownload;
 
 /**
  * 
@@ -35,6 +36,9 @@ public class MainActivity extends Activity {
 	// Logging Tag, Context
 	private final String logTag = "MainActivity";
 	private final Context context = this;
+	
+	// is this the first initialization in this session?
+	private boolean firstInitialize = true;
 	
 	// Variables
 	private boolean initConfig = false;
@@ -134,6 +138,7 @@ public class MainActivity extends Activity {
     	Log.d(logTag, "Save preferences");
     	PreferencesHelper.getInstance().savePreferences(this);
     	
+    	// TODO REMOVE
     	Log.d(logTag, "Debugging: reset initial configuration");
     	PreferencesHelper.resetPreferences(context);
     	
@@ -148,10 +153,17 @@ public class MainActivity extends Activity {
     	// Skip LogIn for debugging.
     	// Attention: Server connection will fail!
     	// TODO remove
-    	// LoginHelper.getInstance().setLoggedIn(true);
+    	LoginHelper.getInstance().setLoggedIn(true);
     	
 		if(LoginHelper.getInstance().isLoggedIn()) {
+			// Logged in. Load main menu
 			setContentView(R.layout.activity_main);
+			
+			// do first initialization stuff, should not be done each time the menu is called!
+			if(firstInitialize) {
+				firstInitialize = false;
+				new SVGDownload(this).checkSVGRepository();
+			}
 		} else {
 			Intent startNewActivityOpen = new Intent(this, LoginActivity.class);
         	startActivityForResult(startNewActivityOpen, ActivityCodeHelper.ACTIVITY_LOGIN_REQUEST);

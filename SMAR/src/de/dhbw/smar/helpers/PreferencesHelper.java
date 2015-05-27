@@ -1,7 +1,17 @@
 package de.dhbw.smar.helpers;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.StreamCorruptedException;
+
+import de.dhbw.smar.container.SVGObjectContainer;
+import de.dhbw.smar.container.SVGObjectContainerElement;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 /**
  * Class for loading, saving and holding preferences
@@ -30,11 +40,16 @@ public class PreferencesHelper {
 	public static String PREFKEY_SERVER_IP = "pref_server_ip";
 	public static String PREFKEY_USE_INTERNAL_STORAGE = "pref_storage";
 	public static String PREFKEY_BARCODE_SCANNER = "pref_storage";
+	public static String PREFKEY_SVG_CONTAINER = "svg_container";
 	
 	// Some variables
 	private String pref_server_ip = null;
 	private int pref_storage = 0; // Default: Use internal storage
 	private int pref_barcode_scanner = 0; // Default: Use camera
+	private SVGObjectContainer pref_svg_container = null;
+	
+	// logTag
+	private String logTag = "PreferencesHelper";
 
 	// Methods for Reading & Writing single preferences from/to file (string and int)
 	public static void setPreference(Context context, String sKey, String sValue) {
@@ -66,6 +81,30 @@ public class PreferencesHelper {
 		this.pref_server_ip = getPreference(context, PREFKEY_SERVER_IP);
 		this.pref_barcode_scanner = getPreferenceInt(context, PREFKEY_BARCODE_SCANNER);
 		this.pref_storage = getPreferenceInt(context, PREFKEY_USE_INTERNAL_STORAGE);
+		
+		if(getPreference(context, PREFKEY_SVG_CONTAINER) == null) {
+			Log.d(logTag, "no svg container to load");
+			this.pref_svg_container = new SVGObjectContainer();
+		} else {
+			Log.d(logTag, "loading svg container");
+			String svgContainerString = getPreference(context, PREFKEY_SVG_CONTAINER);
+			Log.d(logTag, "Show serialized SVGObjectContainer loaded from settings: " + svgContainerString);
+			try {
+				ByteArrayInputStream bais = new ByteArrayInputStream(svgContainerString.getBytes("ISO-8859-1"));
+				ObjectInputStream o = new ObjectInputStream(bais);
+				this.pref_svg_container = (SVGObjectContainer) o.readObject(); 
+			} catch (Exception e) {
+				this.pref_svg_container = null;
+				Log.e(logTag, "Error while loading occured:" + e.getMessage());
+				e.printStackTrace();
+			}
+			if(this.pref_svg_container == null) {
+				Log.e(logTag, "Could not load svg container... Create a new one to pretend SMAR crashing...");
+				this.pref_svg_container = new SVGObjectContainer();
+			} else {
+				Log.d(logTag, "svg container with timestamp " + String.valueOf(this.pref_svg_container.getLastDownload()) + " loaded.");
+			}
+		}
 	}
 	
 	// Saving preferences to file
@@ -73,6 +112,20 @@ public class PreferencesHelper {
 		setPreference(context, PREFKEY_SERVER_IP, pref_server_ip);
 		setPreferenceInt(context, PREFKEY_BARCODE_SCANNER, pref_barcode_scanner);
 		setPreferenceInt(context, PREFKEY_USE_INTERNAL_STORAGE, pref_storage);
+		
+		Log.d(logTag, "attempt to save svg container with timestamp: " + String.valueOf(this.pref_svg_container.getLastDownload()));
+		if(this.pref_svg_container != null) {
+			try {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				ObjectOutputStream o = new ObjectOutputStream(baos);
+				o.writeObject(this.pref_svg_container);
+				setPreference(context, PREFKEY_SVG_CONTAINER, baos.toString("ISO-8859-1"));
+			} catch (Exception e) {
+				Log.e(logTag, "Error while saving occured:" + e.getMessage());
+				e.printStackTrace();
+			}
+		}
+		Log.d(logTag, "save complete");
 	}
 	
 	// Resetting Preferences and deleting them
@@ -106,5 +159,13 @@ public class PreferencesHelper {
 
 	public void setBarcodeScanner(int pref_barcode_scanner) {
 		this.pref_barcode_scanner = pref_barcode_scanner;
+	}
+	
+	public SVGObjectContainer getSVGObjectContainer() {
+		return pref_svg_container;
+	}
+	
+	public void setSVGObjectContainer(SVGObjectContainer pref_svg_container) {
+		this.pref_svg_container = pref_svg_container;
 	}
 }

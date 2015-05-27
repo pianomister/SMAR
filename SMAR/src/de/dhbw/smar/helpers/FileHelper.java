@@ -27,6 +27,8 @@ public class FileHelper {
 	
 	private static String sLogTag = "FileHelper";	
 	
+	public static String SVGOBJECTS_PATH_PREFIX = "svg_shelf_";
+	
 	/**
 	 * Read a file from configured disk location
 	 * 
@@ -161,7 +163,7 @@ public class FileHelper {
 		bCheckWritable = bCheckWritable ? isExternalStorageWritable() : isExternalStorageReadable();
 		
 		// check preference for storage usage
-		boolean bUseInternalStorage = (PreferencesHelper.getPreferenceInt(activity, activity.getString(R.string.prefname_use_internal_storage)) == 1) ? true : false; 
+		boolean bUseInternalStorage = (PreferencesHelper.getPreferenceInt(activity, PreferencesHelper.PREFKEY_USE_INTERNAL_STORAGE) == 1) ? true : false; 
 		
 		// internal storage
 		if(bUseInternalStorage) {

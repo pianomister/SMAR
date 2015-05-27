@@ -56,7 +56,7 @@ public class ASyncHttpConnection extends AsyncTask<HttpConnectionHelper, Void, S
 				Log.d(logTag, "URL: " + hch[0].getUrl());
 				String url = hch[0].getUrl();
 				if(hch[0].isStandardMode()) {
-					url = url + "/" + LoginHelper.getInstance().getJwt();
+					url = url + "?jwt=" + LoginHelper.getInstance().getJwt();
 				}
 				HttpGet request = new HttpGet(url);
 				response = httpclient.execute(request);
