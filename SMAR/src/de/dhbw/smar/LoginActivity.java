@@ -57,7 +57,7 @@ public class LoginActivity extends Activity {
 
 		Log.d(logTag, "receiving device users");
     	pDialog = ProgressDialog.show(context, "Please wait", "Receiving user list...", true, false);
-		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/listDeviceUsers";
+		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/users/device";
 		Log.d(logTag, "server url: " + url);
 		hch = new HttpConnectionHelper(url);
 		new ASyncHttpConnection() {
@@ -171,7 +171,7 @@ public class LoginActivity extends Activity {
 	    	else {
 	    		LoginHelper.getInstance().setPassword(resultBarcode);
 	    		pDialog = ProgressDialog.show(context, "Please wait", "Logging in...", true, false);
-	    		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/authenticate";
+	    		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/authentication";
 	    		Log.d(logTag, "server url: " + url);
 	    		hch = new HttpConnectionHelper(url, HttpConnectionHelper.REQUEST_TYPE_POST);
 	    		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(3);

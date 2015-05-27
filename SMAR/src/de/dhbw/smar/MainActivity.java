@@ -95,7 +95,7 @@ public class MainActivity extends Activity {
     	if(initConfigLoaded) {
 	    	Log.d(logTag, "checking server connection");
 	    	pDialog = ProgressDialog.show(context, "Please wait", "Checking server connection...", true, false);
-			String url = "http://" + PreferencesHelper.getInstance().getServer() + "/checkConnection";
+			String url = "http://" + PreferencesHelper.getInstance().getServer() + "/connection/check";
 			Log.d(logTag, "server url: " + url);
 			hch = new HttpConnectionHelper(url);
 			new ASyncHttpConnection() {
