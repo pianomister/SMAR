@@ -1,5 +1,7 @@
 package de.dhbw.smar.helpers;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -42,30 +44,39 @@ public class DialogHelper extends DialogFragment{
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
     	super.onCreateDialog(savedInstanceState);
-    	
-    	Log.d("current_unit", getArguments().getString("current_unit"));
-    	String current_unit = getArguments().getString("current_unit");
-    	String[] all_units = getArguments().getStringArray("all_units");
-    	
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+    	Log.d("DialogHelper", "Creating");
 
+    	ArrayList<String> all_units_list = getArguments().getStringArrayList("all_units");
+    	Log.d("DialogHelper", "got arguments");
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
         View v = inflater.inflate(R.layout.unit_amount_layout, null); 
         //final EditText name_place =    (EditText)v.findViewById(R.id.sharePlaceName);
         final Spinner spinner = (Spinner)v.findViewById(R.id.spinner_unit);
-        final EditText amount = (EditText)v.findViewById(R.id.txt_amount);
-        Log.d("im dialog", all_units[0]);
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, all_units);
+        final EditText amount = (EditText)v.findViewById(R.id.txt_amount_unit);
+        
+        amount.setText("hallo");
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, all_units_list);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(spinnerAdapter);
+        
+        if(spinner.getSelectedItem().toString() == "" || spinner.getSelectedItem().toString() == null)
+        	Log.d("DialogHelper", "selected item is null");
+        
+ 	   	Log.d("DialogHelper", "s_u: " + spinner.getSelectedItem().toString());
+ 	   	Log.d("DialogHelper", "s_a: " + amount.getText().toString());
+ 	   	
+       // String name = name_place.getText().toString();
+ 	   	
+
         builder.setView(v)
                 
                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                    @Override
                    public void onClick(DialogInterface dialog, int id) {
-                      // String name = name_place.getText().toString();
-                	   String selected_unit = spinner.getSelectedItem().toString();
+                 	   String selected_unit = spinner.getSelectedItem().toString();
                        String samount = amount.getText().toString();
                        mListener.onDialogPositiveClick(DialogHelper.this, selected_unit, samount);
 

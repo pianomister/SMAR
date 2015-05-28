@@ -24,11 +24,11 @@
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <EditText
-        android:id="@+id/txt_amount"
+        android:id="@+id/txt_amount_unit"
         android:layout_width="114dp"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:inputType="number"
+        android:inputType="number|text"
         android:maxLines="1" >
 
         <requestFocus />

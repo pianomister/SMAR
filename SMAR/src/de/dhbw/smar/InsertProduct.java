@@ -40,7 +40,7 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 	String current_amount_shop;
 	String current_barcode;
 	String current_product_id;
-	ArrayList<String> available_units = null;
+	ArrayList<String> available_units = new ArrayList<String>();
 	final Context context = this;
 	private ProgressDialog pDialog;
 	private HttpConnectionHelper hch;
@@ -57,11 +57,17 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 		Log.d("InsertProduct", "after getting bundles");
 		if(b != null) {
 			Log.d("InsertProduct", "Bundle is not null");
+			Log.d("insert", b.getString("amount_shop"));
+			Log.d("InsertProduct", String.valueOf(b.getInt("workflow_position")));
+			
 			workflow_pos = b.getInt("workflow_position");
 			current_product_id = b.getString("product_id");
 			current_amount_shop = b.getString("amount_shop");
 			current_amount_warehouse = b.getString("amount_warehouse");
 			current_unit_id = b.getString("unit_id");
+			product_name = b.getString("product_name");
+			
+			setLayoutNames();
 		} else {
 			Log.d("InsertProduct", "Bundle is null");
 			workflow_pos = 0;
@@ -114,6 +120,20 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 		//call REST API to update database
 		this.selected_unit = selected_unit;
 		this.selected_amount = amount;
+		Log.d("DialogHelper", "Fresh data, unit: " + this.selected_unit);
+		Log.d("DialogHelper", "Fresh data, amount : " + this.selected_amount);
+		
+		if(this.selected_unit.matches("%Single%")) {
+			this.selected_unit = "1";
+		} else {
+			this.selected_unit = selected_unit.split(" ")[1];
+		}
+		
+		
+		Log.d("DialogHelper", this.selected_unit);
+		Log.d("DialogHelper", this.selected_amount);
+		
+		Log.d("DialogHelper", "OnClickPositive");
 		
 		//call rest api to insert the products
 		updateDatabase();
@@ -220,16 +240,19 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 	 
 	 static DialogHelper newInstance(String current_unit, ArrayList<String> all_units) {
 		 // need this, to pass some informationn to the dialog 
+		 Log.d("DialogHelper", "started");
 		 DialogHelper f = new DialogHelper();
-
+		 	
 		    // Supply num input as an argument.
 		    Bundle args = new Bundle();
 		    Log.d("creating dialog", current_unit);
 		    if(all_units.isEmpty()) {
 		    	Log.d("creating dialog", "all units is empty");
 		    }
+		    Log.d("DialogHelper", "setting parameters");
 		    args.putString("current_unit", current_unit);
 		    args.putStringArrayList("all_units", all_units);
+		    Log.d("DialogHelper", "parameters set");
 		    f.setArguments(args);
 
 		    return f;
@@ -238,44 +261,61 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 	 private void updateDatabase() {
 		 // updates the stock of the product
 		 // concrete: move amount from Warehouse to Shop
+		 	Log.d("DialogHelper", "started update");
 		 	int howMuchToTransfer; 
-		 	howMuchToTransfer = 1; // Integer.parseInt(selected_unit) * Integer.parseInt(selected_amount);
-		 
+		 	howMuchToTransfer = Integer.parseInt(selected_unit) * Integer.parseInt(selected_amount);
+		 	
+		 	Log.d("updateDatabase", "Transfer: " + howMuchToTransfer);
+		 	
+		 	Log.d("DialogHelper", String.valueOf(howMuchToTransfer));
+		 	
+		 	int new_amount_shop = Integer.parseInt(this.current_amount_shop) + howMuchToTransfer;
+		 	int new_amount_warehouse = Integer.parseInt(this.current_amount_warehouse) - howMuchToTransfer;
+		 	
 	    	pDialog = ProgressDialog.show(context, "Please wait", "Updating product information...", true, false);
 			String url = "http://" + PreferencesHelper.getInstance().getServer() + "/updateProductStock";
 			Log.d("Start updating: ", "server url: " + url);
 			hch = new HttpConnectionHelper(url, HttpConnectionHelper.REQUEST_TYPE_POST);
-			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(3);
 			nameValuePairs.add(new BasicNameValuePair("product_id", this.current_product_id));
-			nameValuePairs.add(new BasicNameValuePair("amount", String.valueOf(howMuchToTransfer)));
+			nameValuePairs.add(new BasicNameValuePair("new_amount_shop", String.valueOf(new_amount_shop)));
+			nameValuePairs.add(new BasicNameValuePair("new_amount_warehouse", String.valueOf(new_amount_warehouse)));
 			hch.setPostPair(nameValuePairs);
 			new ASyncHttpConnection() {
 				@Override
 				public void onPostExecute(String result) {
 					pDialog.dismiss();
 					// Result ist das JSON Objekt
-					Log.d("onPostExecute", result);
+					Log.d("updateDatabase", result);
 					try {
-						JSONArray jArray = new JSONArray(hch.getResponseMessage());
-						JSONObject json = null;
-						for(int i = 0; i < jArray.length(); i++)
-						{
-							json = jArray.getJSONObject(i);
-						}
+						JSONObject json = new JSONObject(hch.getResponseMessage());
+						Log.d("updateDatabase", "Value of single json object: " + json.getString("success"));
+
 						if(json.getString("success") == "success") {
 						
-						//show toast, that it was successful 
-						Toast toast = Toast.makeText(context, "Successfully inserted", Toast.LENGTH_SHORT);
-						toast.show();
-						
-						//start from beginning
-						startProductSearch();
-						}
+							//show toast, that it was successful 
+							AlertDialog.Builder alert = new AlertDialog.Builder(context);
+							alert.setTitle("Successful update");
+							alert.setNeutralButton("ok", new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int id) {
+									//start from beginning
+									startProductSearch();
+			                   }
+							});
+							alert.create().show();}
 						else {
-							Toast toast = Toast.makeText(context, "There was a problem updating the database. Please try again.", Toast.LENGTH_LONG);
-							toast.show();
-							
-							startProductSearch();
+							//show toast, that it was not successful 
+							AlertDialog.Builder alert = new AlertDialog.Builder(context);
+							alert.setTitle("Successful update");
+							alert.setNeutralButton("ok", new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int id) {
+									//start from beginning
+									startProductSearch();
+			                   }
+							});
+							alert.create().show();
 						}
 						
 					} 
@@ -322,6 +362,7 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 							
 							for(int i = 0; i < jArray.length(); i++) {
 								//put all available units into one list
+								Log.d("json", "started looping");
 								JSONObject json = jArray.getJSONObject(i);
 								available_units.add(json.getString("name"));
 								Log.d("units", json.getString("name"));
@@ -331,11 +372,13 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 							
 							
 							// open dialog and ask user to enter data
+							Log.d("json", "start opening dialog");
 							DialogHelper dialog = newInstance(current_unit_id, available_units);
 							dialog.show(getFragmentManager(), "tag"); 
 						}
 						catch (Exception e) 
 						{
+							e.printStackTrace();
 						}
 					}
 				}
