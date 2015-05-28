@@ -128,22 +128,7 @@ public class SearchProduct extends Activity {
 				// create alert dialog and show it
 				alertDialogBuilder.create().show();
     }
-    
-    private String httpConnection(String url, HttpRequest request) {
-    	//Handled die HttpConnectiono 
-    	//Führt einen seperaten Thread aus
-    	//
-    	/* ExecutorService executor =  Executors.newSingleThreadExecutor();
-    	// HttpConnectionHelper connection = new HttpConnectionHelper(url, request);
-    	// Future<String> json = executor.submit(connection);
-    	try { 
-    		return json.get();
-    	}
-    	catch (Exception e) {
-    		return null;
-    	} */
-    	return "bla";
-    }
+
     
     
     @Override

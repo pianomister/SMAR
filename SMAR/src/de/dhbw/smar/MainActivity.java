@@ -188,7 +188,8 @@ public class MainActivity extends Activity {
     }
     
     public void onProductStockClicked(View view) {
-    	showNoActionDialog();
+    	Intent insertProduct = new Intent(this, ReceivingProducts.class);
+    	startActivity(insertProduct);
     }
     
     public void onSettingsClicked(View view) {

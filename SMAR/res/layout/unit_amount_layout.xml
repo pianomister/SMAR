@@ -13,8 +13,8 @@
 
     <Spinner
         android:id="@+id/spinner_unit"
-        android:layout_width="114dp"
-        android:layout_height="31dp" />
+        android:layout_width="221dp"
+        android:layout_height="46dp" />
 
     <TextView
         android:id="@+id/tv_stock_productstock"
@@ -33,18 +33,5 @@
 
         <requestFocus />
     </EditText>
-
-    <Button
-        android:id="@+id/bt_unit_amount_ok"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Ok" 
-        android:onClick="penis"/>
-
-    <Button
-        android:id="@+id/bt_unit_amount_cancel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Cancel" />
 
 </LinearLayout>

@@ -8,31 +8,20 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="de.dhbw.smar.ProductStock" >
 
-    <TextView
-        android:id="@+id/tv_product_productstock"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <TableLayout
+        android:id="@+id/table_receiving_products"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:text="@string/tv_product"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:layout_alignParentTop="true" >
 
-    <TextView
-        android:id="@+id/tv_stock_productstock"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:text="@string/tv_stock"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TableRow
+            android:id="@+id/tableRow1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
 
-    <TextView
-        android:id="@+id/tv_sales_area_productstock"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/tv_stock_productstock"
-        android:layout_alignParentRight="true"
-        android:text="@string/tv_sales_area"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        </TableRow>
+
+    </TableLayout>
 
 </RelativeLayout>

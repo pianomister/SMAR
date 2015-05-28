@@ -22,12 +22,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 import de.dhbw.smar.asynctasks.ASyncHttpConnection;
 import de.dhbw.smar.helpers.ActivityCodeHelper;
 import de.dhbw.smar.helpers.DialogHelper;
 import de.dhbw.smar.helpers.HttpConnectionHelper;
 import de.dhbw.smar.helpers.PreferencesHelper;
+import de.dhbw.smar.helpers.UnitHelper;
 
 public class InsertProduct extends Activity implements DialogHelper.ShareDialogListener{
 	
@@ -114,16 +114,21 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 	//	dialog.show(getFragmentManager(), "DialogHelper");
 	}
 	
-	public void onDialogPositiveClick(DialogFragment dialog,String selected_unit, String amount) {
+	public void onDialogPositiveClick(DialogFragment dialog, String amount, int index, String valueOfSpinner) {
 		//After ok, clicked
 		//we got selected_unit and the amount
 		//call REST API to update database
+
+
+		
+
+		
 		this.selected_unit = selected_unit;
 		this.selected_amount = amount;
 		Log.d("DialogHelper", "Fresh data, unit: " + this.selected_unit);
 		Log.d("DialogHelper", "Fresh data, amount : " + this.selected_amount);
 		
-		if(this.selected_unit.matches("%Single%")) {
+		if(index == 0) {
 			this.selected_unit = "1";
 		} else {
 			this.selected_unit = selected_unit.split(" ")[1];
@@ -161,14 +166,14 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     	//read barcode 
 		//get information to this product
-		/*if (resultCode == RESULT_OK) 
-	    {*/
+		if (resultCode == RESULT_OK) 
+	    {
 	    	String resultBarcode = data.getStringExtra("BARCODE");
 	    	if(!resultBarcode.equals(null)) {
 	    		this.current_barcode = resultBarcode;
 	    		searchProductInformation(this, resultBarcode);
 	    	}
-	    /*}
+	    }
     	else {
     		AlertDialog.Builder alert = new AlertDialog.Builder(context);
     		alert.setTitle("Failure");
@@ -180,7 +185,7 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
     			}
     		});
     		alert.create().show();
-    	}*/
+    	}
 		
 	}
 	
@@ -252,6 +257,7 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 		    Log.d("DialogHelper", "setting parameters");
 		    args.putString("current_unit", current_unit);
 		    args.putStringArrayList("all_units", all_units);
+		   
 		    Log.d("DialogHelper", "parameters set");
 		    f.setArguments(args);
 
@@ -364,8 +370,8 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 								//put all available units into one list
 								Log.d("json", "started looping");
 								JSONObject json = jArray.getJSONObject(i);
-								available_units.add(json.getString("name"));
-								Log.d("units", json.getString("name"));
+								available_units.add(json.getString("name")+";"+json.getString("capacity"));
+								Log.d("units", json.getString("name")+";"+json.getString("capacity"));
 							}
 							
 						
