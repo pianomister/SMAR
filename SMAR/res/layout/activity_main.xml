@@ -14,35 +14,47 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/bt_main_search_product"
-			android:onClick="onProductSearchClicked"/>
+			android:onClick="onProductSearchClicked"
+			android:nextFocusUp="@+id/bt_main_logout"
+			android:nextFocusDown="@+id/bt_main_load_product">
+			<requestFocus />
+		</Button>
 
         <Button
             android:id="@+id/bt_main_load_product"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/bt_main_load_product"
-			android:onClick="onProductLoadClicked"/>
+			android:onClick="onProductLoadClicked"
+			android:nextFocusUp="@+id/bt_main_search_product"
+			android:nextFocusDown="@+id/bt_main_receive_product" />
 
         <Button
             android:id="@+id/bt_main_receive_product"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/bt_main_receive_product"
-			android:onClick="onProductStockClicked"/>
+			android:onClick="onProductStockClicked"
+			android:nextFocusUp="@+id/bt_main_load_product"
+			android:nextFocusDown="@+id/bt_main_settings" />
 
         <Button
             android:id="@+id/bt_main_settings"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/bt_main_settings"
-			android:onClick="onSettingsClicked"/>
+			android:onClick="onSettingsClicked"
+			android:nextFocusUp="@+id/bt_main_receive_product"
+			android:nextFocusDown="@+id/bt_main_logout" />
 
         <Button
             android:id="@+id/bt_main_logout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/bt_main_logout" 
-            android:onClick="onLogoutClicked"/>
+            android:onClick="onLogoutClicked"
+            android:nextFocusUp="@+id/bt_main_settings"
+			android:nextFocusDown="@+id/bt_main_search_product" />
 
     </LinearLayout>
 
