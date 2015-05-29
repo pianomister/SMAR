@@ -1,17 +1,5 @@
 package de.dhbw.smar;
 
-import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import org.apache.http.HttpRequest;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -25,13 +13,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.FrameLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import de.dhbw.smar.asynctasks.ASyncHttpConnection;
 import de.dhbw.smar.helpers.ActivityCodeHelper;
+import de.dhbw.smar.helpers.FileHelper;
 import de.dhbw.smar.helpers.HttpConnectionHelper;
 import de.dhbw.smar.helpers.PreferencesHelper;
+import de.dhbw.smar.svg.SVGObject;
 
 public class SearchProduct extends Activity {
 
@@ -43,6 +31,7 @@ public class SearchProduct extends Activity {
 	String current_amount_shop;
 	String current_product_name;
 	String current_unit_id;
+	int current_shelf_id;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -137,19 +126,19 @@ public class SearchProduct extends Activity {
 	// check it. 
 	// then, start getting product based information
 	{    
-    	/*Log.d("Taaag", String.valueOf(resultCode));
+    	Log.d("Taaag", String.valueOf(resultCode));
     	Log.d("Result: ", data.getStringExtra("BARCODE"));
     	if (resultCode == Activity.RESULT_OK) 
-	    {*/
+	    {
     		Log.d("Barcode", data.getStringExtra("BARCODE"));
 	    	String resultBarcode = data.getStringExtra("BARCODE");
 	    	Log.d("Barcode2" , resultBarcode);
-	    	if(resultBarcode != "") {
+	    	if(resultBarcode.equals("")){
 	    		Log.d("Started", "Starte Produktsuche");
 	    		searchProductInformation(resultBarcode);
 	    		
 	    	}
-	    	/*}
+	    	
 	    }
     	else {
     		AlertDialog.Builder alert = new AlertDialog.Builder(context);
@@ -162,7 +151,7 @@ public class SearchProduct extends Activity {
     			}
     		});
     		alert.create().show();
-    	} */
+    	} 
 	}
     
     private void searchProductInformation(String productNumber) {
@@ -206,6 +195,7 @@ public class SearchProduct extends Activity {
 						
 						
 						//Create the Picture to display
+						showPicture();
 						
 						//Ask if you want to put this item into shelf
 						//Start then the InsertProduct Activity
@@ -221,6 +211,13 @@ public class SearchProduct extends Activity {
 				
 			}
 		}.execute(hch);
+    }
+    
+    private void showPicture() {
+    	String path = PreferencesHelper.getInstance().getSVGObjectContainer().getSVGObjectPath(current_shelf_id);
+    	FileHelper fh = new FileHelper();
+    	Object svg = fh.readSerializable(this, path);
+    	
     }
     
 }
