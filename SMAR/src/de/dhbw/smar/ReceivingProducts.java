@@ -53,9 +53,9 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_receiving_products);
 		// get currently available units and store them in a list
-		searchAvailableUnits();
+		
 		process_pos = 0;
-		startProductStore();
+		//this.startProductStore();
 		
 	}
 
@@ -77,12 +77,13 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		}
 		return super.onOptionsItemSelected(item);
 	}
+	
 	public void startProductStore() {
 		// starte den barcode scanner
 		// setze flag, damit nicht immer wieder Lieferschein gescanned werden
 		Toast t = Toast.makeText(context, "Scan a receiving list", Toast.LENGTH_SHORT);
 		t.show();
-    	Intent startNewActivityOpen = new Intent(getBaseContext(), BarcodeScannerActivity.class);
+    	Intent startNewActivityOpen = new Intent(context, BarcodeScannerActivity.class);
     	startActivityForResult(startNewActivityOpen, ActivityCodeHelper.ACTIVITY_BARCODE_REQUEST);
 	}
 	
@@ -94,20 +95,19 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 	    {
 	    	String resultBarcode = data.getStringExtra("BARCODE");
 	    	if(!resultBarcode.equals(null)) {
-	    		if(this.process_pos == 0) {
-    			this.process_pos = 1;
-	    		this.current_barcode_receiving_note = resultBarcode;
-	    		//start rest api to get the infos about receiving note 
-	    		Log.d("API CALL", "Start getting infos to Lieferschein");
-	    		startGetReceivingInfos();
-	    		}
-	    		else if(this.process_pos == 1) {
+	    		if(this.process_pos == 1) {
 	    			// scan here products
 	    			this.current_product_barcode = resultBarcode;
 	    			Log.d("API CALL", "Start getting product infos after setlayout");
 	    			startGetProductInfos();
 	    		}
-
+	    		else if(this.process_pos == 0) {
+	    			this.process_pos = 1;
+		    		this.current_barcode_receiving_note = resultBarcode;
+		    		//start rest api to get the infos about receiving note 
+		    		Log.d("API CALL", "Start getting infos to Lieferschein");
+		    		startGetReceivingInfos();
+	    		}
 	    	}
 	    }
     	else {
@@ -127,7 +127,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 
 	
 	protected void startGetReceivingInfos() {
-		pDialog = ProgressDialog.show(context, "Please wait", "Receiving product information...", true, false);
+		pDialog = ProgressDialog.show(context, "Please wait", "Receiving recieve information...", true, false);
 		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/Receiving/" + current_barcode_receiving_note;
 		Log.d("Start connectinting to: ", "server url: " + url);
 		hch = new HttpConnectionHelper(url);
@@ -142,31 +142,31 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 						Log.d("start json", result + "teeest");
 						JSONArray jArray = new JSONArray(hch.getResponseMessage());
 						if(jArray.length() > 0) {
-						for(int i = 0; i < jArray.length(); i++) {
-							JSONObject json = jArray.getJSONObject(i);
-							product p = new product();
-							p.setName(json.getString("product_name"));
-							p.setReceiving_name(json.getString("receiving_name"));
-							p.setAmount(json.getString("amount"));
-							p.setUnit(json.getString("unit"));
-							p.setReceiving_date(json.getString("receiving_date"));
-							p.setId(json.getInt("product_id"));
+							for(int i = 0; i < jArray.length(); i++) {
+								JSONObject json = jArray.getJSONObject(i);
+								product p = new product();
+								p.setName(json.getString("product_name"));
+								p.setReceiving_name(json.getString("receiving_name"));
+								p.setAmount(json.getString("amount"));
+								p.setUnit(json.getString("unit"));
+								p.setReceiving_date(json.getString("receiving_date"));
+								p.setId(json.getInt("product_id"));
+								
+								ListOfReceivingUnits.add(p);
+							}
 							
-							ListOfReceivingUnits.add(p);
-						}
-						
-						
-						CharSequence text = "Got Receiving Note";
-						int duration = Toast.LENGTH_LONG;
-
-						Toast toast = Toast.makeText(context, text, duration);
-						toast.show();
-						Log.d("read json", "reading json...");
-						
-
-						//layout names setzen
-						Log.d("setLayout", "layout wird jetzt im nächsten schritt gesetzt");
-						setLayout();
+							
+							CharSequence text = "Got Receiving Note";
+							int duration = Toast.LENGTH_LONG;
+	
+							Toast toast = Toast.makeText(context, text, duration);
+							toast.show();
+							Log.d("read json", "reading json...");
+							
+	
+							//layout names setzen
+							Log.d("setLayout", "layout wird jetzt im nächsten schritt gesetzt");
+							//setLayout();
 						}
 						else {
 							// show alert, that nothing found to this barcode
@@ -304,15 +304,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 			tl.addView(tr, new TableLayout.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
 			
 			Log.d("API CALL", "set all rows");
-			
-			/*
-			final View vline = new View(context);
-			Log.d("API CALL", "new line");
-			vline.setLayoutParams(new TableRow.LayoutParams(10,5));
-            Log.d("API CALL", "new line params set");
-            vline.setBackgroundColor(Color.BLUE);
-            tl.addView(vline); // add line below heading	
-            */
+
             Log.d("API CALL", "end of first loop");
            
 		}
@@ -604,8 +596,8 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 	}
 
 	public void go_on_scanning(View view) {
-		process_pos = 1;
-		scanProduct();
+		//process_pos = 1;
+		//scanProduct();
 	}
 	
 	public void finish_scanning(View view) {

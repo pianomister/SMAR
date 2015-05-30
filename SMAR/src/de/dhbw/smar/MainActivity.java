@@ -188,8 +188,8 @@ public class MainActivity extends Activity {
     }
     
     public void onProductStockClicked(View view) {
-    	Intent insertProduct = new Intent(this, ReceivingProducts.class);
-    	startActivity(insertProduct);
+    	Intent ReceivingProducts = new Intent(this, ReceivingProducts.class);
+    	startActivity(ReceivingProducts);
     }
     
     public void onSettingsClicked(View view) {
