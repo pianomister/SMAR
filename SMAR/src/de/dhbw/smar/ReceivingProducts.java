@@ -107,9 +107,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 	    			Log.d("API CALL", "Start getting product infos after setlayout");
 	    			startGetProductInfos();
 	    		}
-	    		else if(this.process_pos == 2) {
-	    			Log.d("API CALL", "got barcode. process pos = 2");
-	    		}
+
 	    	}
 	    }
     	else {
@@ -168,7 +166,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 
 						//layout names setzen
 						Log.d("setLayout", "layout wird jetzt im nächsten schritt gesetzt");
-						//setLayout();
+						setLayout();
 						}
 						else {
 							// show alert, that nothing found to this barcode

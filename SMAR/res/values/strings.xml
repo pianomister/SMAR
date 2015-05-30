@@ -17,8 +17,6 @@
     <string name="tv_sales_area">Sales Area: </string>
     <string name="bt_next_product">Next</string>
     <string name="tv_current_unit">Unit: </string>
-    <string name="go_on">Scan next</string>
-    <string name="finish">Finish</string>
 
     <string-array name="country_arrays">
         <item>Malaysia</item>
