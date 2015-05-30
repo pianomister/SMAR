@@ -123,15 +123,15 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 		
 
 		
-		this.selected_unit = selected_unit;
+		//this.selected_unit = selected_unit;
 		this.selected_amount = amount;
-		Log.d("DialogHelper", "Fresh data, unit: " + this.selected_unit);
+		//Log.d("DialogHelper", "Fresh data, unit: " + this.selected_unit);
 		Log.d("DialogHelper", "Fresh data, amount : " + this.selected_amount);
-		
+		Log.d("DialogHelper", "Fresh index, amount : " + index);
 		if(index == 0) {
 			this.selected_unit = "1";
 		} else {
-			this.selected_unit = selected_unit.split(" ")[1];
+			this.selected_unit = valueOfSpinner.split(";")[1];
 		}
 		
 		
@@ -275,8 +275,8 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 		 	
 		 	Log.d("DialogHelper", String.valueOf(howMuchToTransfer));
 		 	
-		 	int new_amount_shop = Integer.parseInt(this.current_amount_shop) + howMuchToTransfer;
-		 	int new_amount_warehouse = Integer.parseInt(this.current_amount_warehouse) - howMuchToTransfer;
+		 	final int new_amount_shop = Integer.parseInt(this.current_amount_shop) + howMuchToTransfer;
+		 	final int new_amount_warehouse = Integer.parseInt(this.current_amount_warehouse) - howMuchToTransfer;
 		 	
 	    	pDialog = ProgressDialog.show(context, "Please wait", "Updating product information...", true, false);
 			String url = "http://" + PreferencesHelper.getInstance().getServer() + "/updateProductStock";
@@ -297,11 +297,17 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 						JSONObject json = new JSONObject(hch.getResponseMessage());
 						Log.d("updateDatabase", "Value of single json object: " + json.getString("success"));
 
-						if(json.getString("success") == "success") {
-						
+						if(json.getString("success").equals("success")) {
+							
+							//update view on screen
+							current_amount_shop = String.valueOf(new_amount_shop);
+							current_amount_warehouse = String.valueOf(new_amount_warehouse);
+							setLayoutNames();
+							
 							//show toast, that it was successful 
 							AlertDialog.Builder alert = new AlertDialog.Builder(context);
 							alert.setTitle("Successful update");
+							alert.setMessage("You have inserted successfully. Click \"ok\" to scan next.");
 							alert.setNeutralButton("ok", new DialogInterface.OnClickListener() {
 								@Override
 								public void onClick(DialogInterface dialog, int id) {
@@ -313,7 +319,8 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 						else {
 							//show toast, that it was not successful 
 							AlertDialog.Builder alert = new AlertDialog.Builder(context);
-							alert.setTitle("Successful update");
+							alert.setTitle("Update failed.");
+							alert.setMessage("Please try again or ask the admin for more support. Click \"ok\" to scan next.");
 							alert.setNeutralButton("ok", new DialogInterface.OnClickListener() {
 								@Override
 								public void onClick(DialogInterface dialog, int id) {

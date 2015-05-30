@@ -1,5 +1,7 @@
 package de.dhbw.smar;
 
+import java.io.File;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -9,10 +11,13 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import de.dhbw.smar.asynctasks.ASyncHttpConnection;
 import de.dhbw.smar.helpers.ActivityCodeHelper;
@@ -32,6 +37,8 @@ public class SearchProduct extends Activity {
 	String current_product_name;
 	String current_unit_id;
 	int current_shelf_id;
+	int current_section_id;
+	int onback_pressed_event = 0;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -70,12 +77,14 @@ public class SearchProduct extends Activity {
 	}
 	
 	private void startSearchProductWorkflow(){
-		//at first, read barcode
+		// clean the view
+		clean_current_store();
+		setLayout();
+		// read barcode
     	Intent startNewActivityOpen = new Intent(getBaseContext(), BarcodeScannerActivity.class);
     	startActivityForResult(startNewActivityOpen, ActivityCodeHelper.ACTIVITY_BARCODE_REQUEST);
 	}
 	
-	// ToDo: Implement Warenannahme
     private void showQuestionProductPutIntoShelf() {
     	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
 				context);
@@ -133,7 +142,7 @@ public class SearchProduct extends Activity {
     		Log.d("Barcode", data.getStringExtra("BARCODE"));
 	    	String resultBarcode = data.getStringExtra("BARCODE");
 	    	Log.d("Barcode2" , resultBarcode);
-	    	if(resultBarcode.equals("")){
+	    	if(!resultBarcode.equals("")){
 	    		Log.d("Started", "Starte Produktsuche");
 	    		searchProductInformation(resultBarcode);
 	    		
@@ -182,24 +191,20 @@ public class SearchProduct extends Activity {
 						current_amount_warehouse = json.getString("amount_warehouse");
 						current_amount_shop = json.getString("amount_shop");
 						current_unit_id = json.getString("unit_id");
+						current_shelf_id = json.getInt("shelf_id");
+						current_section_id = json.getInt("section_id");
 						
-						TextView tv_product = (TextView)findViewById(R.id.tv_product);
-						TextView tv_warehouse = (TextView)findViewById(R.id.tv_sales_area);
-						TextView tv_shop = (TextView)findViewById(R.id.tv_stock);
-						
-						tv_product.setText(getResources().getString(R.string.tv_product) + current_product_name);
-						tv_warehouse.setText(getResources().getString(R.string.tv_stock) + current_amount_warehouse);
-						tv_shop.setText(getResources().getString(R.string.tv_sales_area) + current_amount_shop);
+						setLayout();
 						
 
-						
+						Log.d("onpostexecute", "bis vor das show");
 						
 						//Create the Picture to display
 						showPicture();
-						
+						onback_pressed_event = 1;
 						//Ask if you want to put this item into shelf
 						//Start then the InsertProduct Activity
-						showQuestionProductPutIntoShelf();
+						//showQuestionProductPutIntoShelf();
 						
 					}
 					catch (JSONException e)
@@ -208,6 +213,18 @@ public class SearchProduct extends Activity {
 					}
 						
 				}
+				else {
+					AlertDialog.Builder alert = new AlertDialog.Builder(context);
+		    		alert.setTitle("Failure");
+		    		alert.setMessage("Couldn't find information to this product. Check code and talk to admin. Click \"ok\" to scan next prodcut")
+		    			 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+		    			public void onClick(DialogInterface dialog, int id) {
+		    				dialog.dismiss();
+		    				startSearchProductWorkflow();
+		    			}
+		    		});
+		    		alert.create().show();
+				}
 				
 			}
 		}.execute(hch);
@@ -215,9 +232,44 @@ public class SearchProduct extends Activity {
     
     private void showPicture() {
     	String path = PreferencesHelper.getInstance().getSVGObjectContainer().getSVGObjectPath(current_shelf_id);
-    	FileHelper fh = new FileHelper();
-    	Object svg = fh.readSerializable(this, path);
+    	SVGObject svg = (SVGObject) FileHelper.readSerializable(this, path);
+
     	
+    	ImageView iv = (ImageView)findViewById(R.id.iv_product_shelf);
+    	iv.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+    	Drawable d = svg.getDrawable(current_section_id);
+        if(d != null)
+        	iv.setImageDrawable(d);
     }
     
+    @Override
+    public void onBackPressed() {
+    	if(onback_pressed_event  == 1) {
+    		showQuestionProductPutIntoShelf();
+    	}
+    	else if (onback_pressed_event == 0) {
+    		finishFromChild(this);
+    	}
+    }
+    
+    private void clean_current_store() {
+    	current_product_id = "";
+    	current_product_name = "";
+    	current_amount_shop = "";
+    	current_amount_warehouse = "";
+    	current_unit_id = "";
+    	current_shelf_id = 0;
+    	current_section_id = 0;
+    	onback_pressed_event = 0;
+    }
+    
+    private void setLayout() {
+    	TextView tv_product = (TextView)findViewById(R.id.tv_product);
+		TextView tv_warehouse = (TextView)findViewById(R.id.tv_sales_area);
+		TextView tv_shop = (TextView)findViewById(R.id.tv_stock);
+		
+		tv_product.setText(getResources().getString(R.string.tv_product) + current_product_name);
+		tv_warehouse.setText(getResources().getString(R.string.tv_stock) + current_amount_warehouse);
+		tv_shop.setText(getResources().getString(R.string.tv_sales_area) + current_amount_shop);
+    }
 }
