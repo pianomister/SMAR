@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -565,15 +566,50 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 //		updateDatabase(Integer.parseInt(amount), Integer.parseInt(valueOfString));
 //		put this value in extra list --> ListOfScannedProducts
 		int last_index = ListOfScannedProducts.lastIndexOf(new product());
+		last_index = ListOfScannedProducts.size() - 1;
+		Log.d("DialogHelper", "Der letzte index ist: " + last_index);
 		product p = ListOfScannedProducts.get(last_index);
 		p.setAmount_to_add(Integer.parseInt(amount));
 		p.setUnit_to_add(valueOfString);
 		
 		Log.d("DialogHelper", "added new product to intern list");
-//		scan next product
-		scanProduct();
+		Toast t = Toast.makeText(context, "product added to intern list", Toast.LENGTH_LONG);
+		t.show();
+		
+		//		scan next product
+		
+		AlertDialog.Builder alert = new AlertDialog.Builder(context);
+		alert.setTitle("Next product?.");
+		alert.setMessage("To scan next product, press ok. To finish scanning, press \"No\".");
+		alert.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog,int id) {
+				process_pos = 1;
+				scanProduct();
+			}
+		})
+			.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog,int id) {
+					Toast t = Toast.makeText(context, "finished scanninng", Toast.LENGTH_SHORT);
+					t.show();
+					process_pos = 2;
+				}
+			});
+		alert.create().show();
+		
+		
+//		scanProduct();
 	}
 
+	public void go_on_scanning(View view) {
+		scanProduct();
+	}
+	
+	public void finish_scanning(View view) {
+		Toast t = Toast.makeText(context, "Start updating database", Toast.LENGTH_SHORT);
+		t.show();
+	}
+	
+	
 	@Override
 	public void onDialogNegativeClick(DialogFragment dialog) {
 		// TODO Auto-generated method stub
