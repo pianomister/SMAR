@@ -54,7 +54,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		setContentView(R.layout.activity_receiving_products);
 		// get currently available units and store them in a list
 		searchAvailableUnits();
-		
+		process_pos = 0;
 		startProductStore();
 		
 	}
@@ -80,7 +80,8 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 	public void startProductStore() {
 		// starte den barcode scanner
 		// setze flag, damit nicht immer wieder Lieferschein gescanned werden
-		
+		Toast t = Toast.makeText(context, "Scan a receiving list", Toast.LENGTH_SHORT);
+		t.show();
     	Intent startNewActivityOpen = new Intent(getBaseContext(), BarcodeScannerActivity.class);
     	startActivityForResult(startNewActivityOpen, ActivityCodeHelper.ACTIVITY_BARCODE_REQUEST);
 	}
@@ -105,6 +106,9 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 	    			this.current_product_barcode = resultBarcode;
 	    			Log.d("API CALL", "Start getting product infos after setlayout");
 	    			startGetProductInfos();
+	    		}
+	    		else if(this.process_pos == 2) {
+	    			Log.d("API CALL", "got barcode. process pos = 2");
 	    		}
 	    	}
 	    }
@@ -164,7 +168,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 
 						//layout names setzen
 						Log.d("setLayout", "layout wird jetzt im nächsten schritt gesetzt");
-						setLayout();
+						//setLayout();
 						}
 						else {
 							// show alert, that nothing found to this barcode
@@ -223,7 +227,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 			// set headings
 			if(flag == 1) {
 				TableRow tr = new TableRow(this);
-				tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+				tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
 				
 				TextView tv1 = new TextView(this);
 				tv1.setText("Name");
@@ -239,7 +243,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 				tv3.setText("Amount");
 				tv3.setTextSize(15);
 				tr.addView(tv3);
-				
+				/*
 				TextView tv4 = new TextView(this);
 				tv4.setText("R. name");
 				tv4.setTextSize(15);
@@ -249,10 +253,10 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 				tv5.setText("Date");
 				tv5.setTextSize(15);
 				tr.addView(tv5);
+				*/
+				Log.d("API CALL", "after last item in heading");
 				
-				Log.d("API CALL", "after last item");
-				
-				tl.addView(tr);
+				tl.addView(tr, new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
                 flag=0;
 			}
 			
@@ -266,27 +270,27 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 			String date = ListOfReceivingUnits.get(i).getReceiving_date();
 			
 			TableRow tr = new TableRow(this);
-			tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+			tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
 			
 			Log.d("API CALL", "got all values");
 			TextView tv1 = new TextView(this);
 			tv1.setText(current_name);
-			tv1.setTextColor(Color.BLACK);
+			tv1.setTextColor(Color.WHITE);
 			tv1.setTextSize(15);
 			tr.addView(tv1);
 			
 			TextView tv2 = new TextView(this);
 			tv2.setText(current_unit);
-			tv2.setTextColor(Color.BLACK);
+			tv2.setTextColor(Color.WHITE);
 			tv2.setTextSize(15);
 			tr.addView(tv2);
 			
 			TextView tv3 = new TextView(this);
 			tv3.setText(current_amount);
-			tv3.setTextColor(Color.BLACK);
+			tv3.setTextColor(Color.WHITE);
 			tv3.setTextSize(15);
 			tr.addView(tv3);
-			
+			/*
 			TextView tv4 = new TextView(this);
 			tv4.setText(r_name);
 			tv4.setTextColor(Color.BLACK);
@@ -298,8 +302,9 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 			tv5.setTextColor(Color.BLACK);
 			tv5.setTextSize(12);
 			tr.addView(tv5);
+			*/
+			tl.addView(tr, new TableLayout.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
 			
-			tl.addView(tr);
 			Log.d("API CALL", "set all rows");
 			
 			/*
@@ -322,7 +327,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		Log.d("API CALL", "End of method");
 		
 		//now scan product to insert it into stock 
-		scanProduct();
+		//scanProduct();
 	}
 
 	private void scanProduct() {
@@ -601,6 +606,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 	}
 
 	public void go_on_scanning(View view) {
+		process_pos = 1;
 		scanProduct();
 	}
 	
