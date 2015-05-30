@@ -43,6 +43,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 	private String current_product_barcode;
 	private String current_product_id;
 	private ArrayList<product> ListOfReceivingUnits = new ArrayList<product>();
+	private ArrayList<product> ListOfScannedProducts = new ArrayList<product>();
 	private ArrayList<String> available_units = new ArrayList<String>();
 	private String current_product_amount_warehouse;
 	
@@ -50,6 +51,9 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_receiving_products);
+		// get currently available units and store them in a list
+		searchAvailableUnits();
+		
 		startProductStore();
 		
 	}
@@ -134,7 +138,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 					try {
 						Log.d("start json", result + "teeest");
 						JSONArray jArray = new JSONArray(hch.getResponseMessage());
-						
+						if(jArray.length() > 0) {
 						for(int i = 0; i < jArray.length(); i++) {
 							JSONObject json = jArray.getJSONObject(i);
 							product p = new product();
@@ -143,6 +147,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 							p.setAmount(json.getString("amount"));
 							p.setUnit(json.getString("unit"));
 							p.setReceiving_date(json.getString("receiving_date"));
+							p.setId(json.getInt("product_id"));
 							
 							ListOfReceivingUnits.add(p);
 						}
@@ -159,7 +164,20 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 						//layout names setzen
 						Log.d("setLayout", "layout wird jetzt im nächsten schritt gesetzt");
 						setLayout();
-						
+						}
+						else {
+							// show alert, that nothing found to this barcode
+							AlertDialog.Builder p = new AlertDialog.Builder(context);
+							p.setTitle("No Information");
+							p.setMessage("Didn't find infos to this bardcode. Try again with another barcode.");
+							p.setNeutralButton("ok", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,int id) {
+									process_pos = 0;
+									startProductStore();
+								}
+							});
+							p.create().show();
+						}
 					}
 					catch (JSONException e)
 					{
@@ -171,7 +189,8 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 					// wrong barcode 
 					// show alert, that wrong barcode and return to scanning
 					AlertDialog.Builder p = new AlertDialog.Builder(context);
-					p.setTitle("Failure. Try again with another barcode.");
+					p.setTitle("Wrong code.");
+					p.setMessage("There is no Receiving-List for this barcode. Try again or another. Click \"ok\" to scan next.");
 					p.setNeutralButton("ok", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog,int id) {
 							process_pos = 0;
@@ -327,12 +346,22 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 					
 					for(int i = 0; i < jArray.length(); i++) {
 						JSONObject json = jArray.getJSONObject(i);
+						product p = new product();
+						p.setId(json.getInt("product_id"));
 						current_product_id = json.getString("product_id");
+						p.setAmount(json.getString("amount_warehouse"));
 						current_product_amount_warehouse = json.getString("amount_warehouse");
+						ListOfScannedProducts.add(p);
 					}
 					Log.d("API CALL", "Got Product_id: " + current_product_id + " and the amount, which is currently in the warehose: " + current_product_amount_warehouse );
+					
+					
 					//get all available units
-					searchAvailableUnits();
+//					searchAvailableUnits();
+					
+//					open dialog to let the user enter his amounts
+					DialogHelper dialog = newInstance("0", available_units);
+					dialog.show(getFragmentManager(), "tag");
 				}
 				catch (Exception e) {
 					e.getStackTrace();
@@ -341,22 +370,6 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		}.execute(hch);
 	}
 	
-	public void onDialogPositiveClick(DialogFragment dialog,String selected_unit, String selected_amount, int index) {
-		//After ok, clicked
-		//we got selected_unit and the amount
-		//call REST API to update database
-		if(index == 1) {
-			selected_unit = "1";
-		} else {
-			selected_unit = selected_unit.split(" ")[1];
-		}
-		
-		int amount = Integer.parseInt(selected_amount);
-		int unit_size = Integer.parseInt(selected_unit);
-		
-		updateDatabase(amount, unit_size);
-		
-	}
 	
 	private void searchAvailableUnits() {
 		 //get all available Units to this product
@@ -392,10 +405,12 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 							}
 						
 							
+							
 							Log.d("API CALL", "I got the unit, fuck yeah");
 							// open dialog and ask user to enter data
-							DialogHelper dialog = newInstance("0", available_units);
-							dialog.show(getFragmentManager(), "tag");
+							
+//							DialogHelper dialog = newInstance("0", available_units);
+//							dialog.show(getFragmentManager(), "tag");
 							
 							
 						}
@@ -535,10 +550,10 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		tl.addView(tr, new TableLayout.LayoutParams(TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
 	}
 
+
 	@Override
 	public void onDialogPositiveClick(DialogFragment dialog, String amount, int index, String valueOfString) {
 		// TODO Auto-generated method stub
-		//
 		Log.d("DialogHelper", "Amount: " + amount + " Index: " + index + " Value: " + valueOfString);
 		// use REST API to update amount_warehouse in SMAR_stock
 		if(index == 0) {
@@ -547,7 +562,16 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 			valueOfString = valueOfString.split(";")[1];
 		
 		Log.d("DialogHelper", "amount: " + amount + " unit: " + valueOfString);
-		updateDatabase(Integer.parseInt(amount), Integer.parseInt(valueOfString));
+//		updateDatabase(Integer.parseInt(amount), Integer.parseInt(valueOfString));
+//		put this value in extra list --> ListOfScannedProducts
+		int last_index = ListOfScannedProducts.lastIndexOf(new product());
+		product p = ListOfScannedProducts.get(last_index);
+		p.setAmount_to_add(Integer.parseInt(amount));
+		p.setUnit_to_add(valueOfString);
+		
+		Log.d("DialogHelper", "added new product to intern list");
+//		scan next product
+		scanProduct();
 	}
 
 	@Override

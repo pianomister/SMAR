@@ -137,7 +137,7 @@ public class SearchProduct extends Activity {
 	{    
     	Log.d("Taaag", String.valueOf(resultCode));
     	Log.d("Result: ", data.getStringExtra("BARCODE"));
-    	if (resultCode == Activity.RESULT_OK) 
+    	if (resultCode == Activity.RESULT_OK && !data.getStringExtra("BARCODE").equals(null)) 
 	    {
     		Log.d("Barcode", data.getStringExtra("BARCODE"));
 	    	String resultBarcode = data.getStringExtra("BARCODE");
@@ -209,6 +209,16 @@ public class SearchProduct extends Activity {
 					}
 					catch (JSONException e)
 					{
+						AlertDialog.Builder alert = new AlertDialog.Builder(context);
+			    		alert.setTitle("Failure");
+			    		alert.setMessage("Couldn't find information to this product. Check code and talk to admin. Click \"ok\" to scan next prodcut")
+			    			 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+			    			public void onClick(DialogInterface dialog, int id) {
+			    				dialog.dismiss();
+			    				startSearchProductWorkflow();
+			    			}
+			    		});
+			    		alert.create().show();
 						e.getStackTrace();
 					}
 						
@@ -216,7 +226,7 @@ public class SearchProduct extends Activity {
 				else {
 					AlertDialog.Builder alert = new AlertDialog.Builder(context);
 		    		alert.setTitle("Failure");
-		    		alert.setMessage("Couldn't find information to this product. Check code and talk to admin. Click \"ok\" to scan next prodcut")
+		    		alert.setMessage("Couldn't connect to server to receice information. Check code and talk to admin. Click \"ok\" to scan next prodcut")
 		    			 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 		    			public void onClick(DialogInterface dialog, int id) {
 		    				dialog.dismiss();
@@ -248,7 +258,10 @@ public class SearchProduct extends Activity {
     		showQuestionProductPutIntoShelf();
     	}
     	else if (onback_pressed_event == 0) {
-    		finishFromChild(this);
+    		// go back to main menu
+    		Intent intent = new Intent(context, MainActivity.class);
+    		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // to clear the rest of activity stack
+    		startActivity(intent);
     	}
     }
     
@@ -261,6 +274,7 @@ public class SearchProduct extends Activity {
     	current_shelf_id = 0;
     	current_section_id = 0;
     	onback_pressed_event = 0;
+    	
     }
     
     private void setLayout() {
