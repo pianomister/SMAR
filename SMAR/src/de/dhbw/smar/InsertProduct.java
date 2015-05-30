@@ -166,15 +166,19 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     	//read barcode 
 		//get information to this product
-		if (resultCode == RESULT_OK) 
+		if (resultCode == RESULT_OK && !data.getStringExtra("BARCODE").equals("NULL")) 
 	    {
-	    	String resultBarcode = data.getStringExtra("BARCODE");
-	    	if(!resultBarcode.equals(null)) {
-	    		this.current_barcode = resultBarcode;
-	    		searchProductInformation(this, resultBarcode);
-	    	}
+			String resultBarcode = data.getStringExtra("BARCODE");
+	    	
+    		this.current_barcode = resultBarcode;
+    		searchProductInformation(this, resultBarcode);
+	    	
 	    }
     	else {
+	   		 Intent intent = new Intent(this, MainActivity.class);
+	   		 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+	   		 startActivity(intent);
+    		/*
     		AlertDialog.Builder alert = new AlertDialog.Builder(context);
     		alert.setTitle("Failure");
     		alert.setMessage("Couldn't read this code. Check code and try again")
@@ -184,7 +188,7 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
     				startProductSearch();
     			}
     		});
-    		alert.create().show();
+    		alert.create().show(); */
     	}
 		
 	}
@@ -415,5 +419,11 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 			Log.d("layout finished", "finished");
 	 }
 	 
+	 @Override
+	 public void onBackPressed() {
+		 Intent intent = new Intent(this, MainActivity.class);
+		 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		 startActivity(intent);
+	 }
 	 
 }

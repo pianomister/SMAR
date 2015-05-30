@@ -36,7 +36,7 @@ import de.dhbw.smar.helpers.product;
 
 public class ReceivingProducts extends Activity implements DialogHelper.ShareDialogListener{
 
-	private int process_pos = 0;
+	private int process_pos; // 0 = scan Lieferschein, 1 = scan products, 2 = finished work
 	private String current_barcode_receiving_note;
 	private HttpConnectionHelper hch;
 	final Context context = this;
@@ -53,10 +53,9 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_receiving_products);
 		// get currently available units and store them in a list
-		
+//		searchAvailableUnits();
 		process_pos = 0;
-		//this.startProductStore();
-		
+		this.startProductStore();
 	}
 
 	@Override
@@ -79,38 +78,41 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 	}
 	
 	public void startProductStore() {
-		// starte den barcode scanner
+		// start barcode scanner
 		// setze flag, damit nicht immer wieder Lieferschein gescanned werden
-		Toast t = Toast.makeText(context, "Scan a receiving list", Toast.LENGTH_SHORT);
-		t.show();
-    	Intent startNewActivityOpen = new Intent(context, BarcodeScannerActivity.class);
+    	Intent startNewActivityOpen = new Intent(getBaseContext(), BarcodeScannerActivity.class);
     	startActivityForResult(startNewActivityOpen, ActivityCodeHelper.ACTIVITY_BARCODE_REQUEST);
 	}
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		
     	//read barcode 
 		//get information to this product
-		if (resultCode == RESULT_OK) 
+		if (resultCode == RESULT_OK && !data.getStringExtra("BARCODE").equals("NULL")) 
 	    {
-	    	String resultBarcode = data.getStringExtra("BARCODE");
-	    	if(!resultBarcode.equals(null)) {
-	    		if(this.process_pos == 1) {
-	    			// scan here products
-	    			this.current_product_barcode = resultBarcode;
-	    			Log.d("API CALL", "Start getting product infos after setlayout");
-	    			startGetProductInfos();
-	    		}
-	    		else if(this.process_pos == 0) {
-	    			this.process_pos = 1;
-		    		this.current_barcode_receiving_note = resultBarcode;
-		    		//start rest api to get the infos about receiving note 
-		    		Log.d("API CALL", "Start getting infos to Lieferschein");
-		    		startGetReceivingInfos();
-	    		}
-	    	}
+			String resultBarcode = data.getStringExtra("BARCODE");
+			
+			if(this.process_pos == 1) {
+				// scan here products
+				this.current_product_barcode = resultBarcode;
+				Log.d("API CALL", "Start getting product infos after setlayout");
+				startGetProductInfos();
+			}
+			else if(this.process_pos == 0) {
+				this.process_pos = 1;
+				this.current_barcode_receiving_note = resultBarcode;
+				//start rest api to get the infos about receiving note 
+				Log.d("API CALL", "Start getting infos to Lieferschein");
+				startGetReceivingInfos();
+			}
+	    	
 	    }
     	else {
+	   		 Intent intent = new Intent(this, MainActivity.class);
+	   		 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+	   		 startActivity(intent);
+    		/*
     		AlertDialog.Builder alert = new AlertDialog.Builder(context);
     		alert.setTitle("Failure");
     		alert.setMessage("Couldn't read this code. Check code and try again")
@@ -120,7 +122,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
     				
     			}
     		});
-    		alert.create().show();
+    		alert.create().show(); */
     	}
 		
 	}
@@ -166,7 +168,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 	
 							//layout names setzen
 							Log.d("setLayout", "layout wird jetzt im nächsten schritt gesetzt");
-							//setLayout();
+							setLayout();
 						}
 						else {
 							// show alert, that nothing found to this barcode
@@ -241,17 +243,21 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 				tv3.setText("Amount");
 				tv3.setTextSize(15);
 				tr.addView(tv3);
-				/*
-				TextView tv4 = new TextView(this);
-				tv4.setText("R. name");
-				tv4.setTextSize(15);
-				tr.addView(tv4);
 				
-				TextView tv5 = new TextView(this);
-				tv5.setText("Date");
-				tv5.setTextSize(15);
-				tr.addView(tv5);
-				*/
+				
+				if(process_pos == 2) {
+				TextView tv4 = new TextView(this);
+					tv4.setText("R. name");
+					tv4.setTextSize(15);
+					tv4.setTextColor(Color.GREEN);
+					tr.addView(tv4);
+					
+					TextView tv5 = new TextView(this);
+					tv5.setText("Date");
+					tv5.setTextSize(15);
+					tv5.setTextColor(Color.GREEN);
+					tr.addView(tv5);
+				}
 				Log.d("API CALL", "after last item in heading");
 				
 				tl.addView(tr, new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
@@ -264,8 +270,12 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 			Log.d("API CALL", "try get first name " + current_name );
 			String current_unit = ListOfReceivingUnits.get(i).getUnit();
 			String current_amount = ListOfReceivingUnits.get(i).getAmount();
-			String r_name = ListOfReceivingUnits.get(i).getReceiving_name();
-			String date = ListOfReceivingUnits.get(i).getReceiving_date();
+			String scanned_unit = "";
+			String scannd_amount = "";
+			if(process_pos == 2) {
+				scanned_unit = ListOfReceivingUnits.get(i).getUnit_to_add();
+				scannd_amount= String.valueOf(ListOfReceivingUnits.get(i).getAmount_to_add());
+			}
 			
 			TableRow tr = new TableRow(this);
 			tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
@@ -277,30 +287,35 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 			tv1.setTextSize(15);
 			tr.addView(tv1);
 			
-			TextView tv2 = new TextView(this);
-			tv2.setText(current_unit);
-			tv2.setTextColor(Color.WHITE);
-			tv2.setTextSize(15);
-			tr.addView(tv2);
+			if(!current_unit.equals(null) || !current_unit.equals("")) {
+				TextView tv2 = new TextView(this);
+				tv2.setText(current_unit);
+				tv2.setTextColor(Color.WHITE);
+				tv2.setTextSize(15);
+				tr.addView(tv2);
+			}
 			
-			TextView tv3 = new TextView(this);
-			tv3.setText(current_amount);
-			tv3.setTextColor(Color.WHITE);
-			tv3.setTextSize(15);
-			tr.addView(tv3);
-			/*
+			if(!current_amount.equals(null) || !current_amount.equals("")) {
+				TextView tv3 = new TextView(this);
+				tv3.setText(current_amount);
+				tv3.setTextColor(Color.WHITE);
+				tv3.setTextSize(15);
+				tr.addView(tv3);
+			}
+			
+			if(process_pos == 2) {
 			TextView tv4 = new TextView(this);
-			tv4.setText(r_name);
-			tv4.setTextColor(Color.BLACK);
+			tv4.setText(scanned_unit);
+			tv4.setTextColor(Color.GREEN);
 			tv4.setTextSize(15);
 			tr.addView(tv4);
 			
 			TextView tv5 = new TextView(this);
-			tv5.setText(date);
-			tv5.setTextColor(Color.BLACK);
+			tv5.setText(scannd_amount);
+			tv5.setTextColor(Color.GREEN);
 			tv5.setTextSize(12);
 			tr.addView(tv5);
-			*/
+			}
 			tl.addView(tr, new TableLayout.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
 			
 			Log.d("API CALL", "set all rows");
@@ -317,10 +332,11 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		Log.d("API CALL", "End of method");
 		
 		//now scan product to insert it into stock 
-		//scanProduct();
+		scanProduct();
 	}
 
 	private void scanProduct() {
+		process_pos = 1;
     	Intent startNewActivityOpen = new Intent(getBaseContext(), BarcodeScannerActivity.class);
     	startActivityForResult(startNewActivityOpen, ActivityCodeHelper.ACTIVITY_BARCODE_REQUEST);
 	}
@@ -503,49 +519,6 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 				
 	}
 	
-	private void setLayout1() {
-		/* Find Tablelayout defined in main.xml */
-		TableLayout tl = (TableLayout) findViewById(R.id.table_receiving_products);
-		/* Create a new row to be added. */
-		TableRow tr = new TableRow(this);
-		tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-		/* Create a Button to be the row-content. */
-		Button b = new Button(this);
-		b.setText("Dynamic Button");
-		b.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-		/* Add Button to row. */
-		
-		TextView tv = new TextView(this);
-		tv.setText("hallo");
-		tv.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-		
-		tr.addView(tv);
-		/* Add row to TableLayout. */
-		TextView tv2 = new TextView(this);
-		tv2.setText("welt");
-		tv2.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-		
-		tr.addView(tv2);
-		//tr.setBackgroundResource(R.drawable.sf_gradient_03);
-		tl.addView(tr, new TableLayout.LayoutParams(TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
-		
-		tr = new TableRow(this);
-		tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-		
-		TextView tv3 = new TextView(this);
-		tv3.setText("hallo");
-		tv3.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-		
-		tr.addView(tv3);
-		/* Add row to TableLayout. */
-		TextView tv4 = new TextView(this);
-		tv4.setText("welt");
-		tv4.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-		tr.addView(tv4);
-		
-		tl.addView(tr, new TableLayout.LayoutParams(TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
-	}
-
 
 	@Override
 	public void onDialogPositiveClick(DialogFragment dialog, String amount, int index, String valueOfString) {
@@ -560,8 +533,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		Log.d("DialogHelper", "amount: " + amount + " unit: " + valueOfString);
 //		updateDatabase(Integer.parseInt(amount), Integer.parseInt(valueOfString));
 //		put this value in extra list --> ListOfScannedProducts
-		int last_index = ListOfScannedProducts.lastIndexOf(new product());
-		last_index = ListOfScannedProducts.size() - 1;
+		int last_index = ListOfScannedProducts.size() - 1;
 		Log.d("DialogHelper", "Der letzte index ist: " + last_index);
 		product p = ListOfScannedProducts.get(last_index);
 		p.setAmount_to_add(Integer.parseInt(amount));
@@ -574,7 +546,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		//		scan next product
 		
 		AlertDialog.Builder alert = new AlertDialog.Builder(context);
-		alert.setTitle("Next product?.");
+		alert.setTitle("Next product?");
 		alert.setMessage("To scan next product, press ok. To finish scanning, press \"No\".");
 		alert.setPositiveButton("ok", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog,int id) {
@@ -587,22 +559,23 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 					Toast t = Toast.makeText(context, "finished scanninng", Toast.LENGTH_SHORT);
 					t.show();
 					process_pos = 2;
+					
 				}
 			});
 		alert.create().show();
 		
-		
-//		scanProduct();
 	}
 
 	public void go_on_scanning(View view) {
-		//process_pos = 1;
-		//scanProduct();
+		process_pos = 1;
+		scanProduct();
 	}
 	
 	public void finish_scanning(View view) {
 		Toast t = Toast.makeText(context, "Start updating database", Toast.LENGTH_SHORT);
 		t.show();
+		process_pos = 2; 
+		
 	}
 	
 	
@@ -610,6 +583,42 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 	public void onDialogNegativeClick(DialogFragment dialog) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	private void createDiffList() {
+		for(int i = 0; i < ListOfReceivingUnits.size() - 1; i++) {
+			for(int j = 0; j < ListOfScannedProducts.size() - 1; j++) {
+				product a = ListOfReceivingUnits.get(i);
+				product b = ListOfScannedProducts.get(j);
+				
+				//compare them 
+				if(a.getId() == b.getId()) {
+					// put them in one big list 
+					a.setAmount_to_add(b.getAmount_to_add());
+					a.setUnit_to_add(b.getUnit_to_add());
+				}
+			}
+		}
+		
+		// add those product, that are scanned but not expected
+		int flag = 0;
+		for(int i = 0; i < ListOfScannedProducts.size() - 1; i++) {
+			for(int j = 0; j < ListOfReceivingUnits.size() - 1; i++) {
+				product a = ListOfScannedProducts.get(i);
+				product b = ListOfReceivingUnits.get(j);
+				
+				if(a.getId() != b.getId()) {
+					flag++;
+				}
+				// if flag = the size, then there is a product which is not in the list
+				if (flag >= ListOfReceivingUnits.size()) {
+					ListOfReceivingUnits.add(ListOfScannedProducts.get(i));
+				}
+			}
+			flag = 0;
+		}
+		
+//		display the list of differences
 	}
 }
 

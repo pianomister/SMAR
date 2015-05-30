@@ -1,8 +1,6 @@
 package de.dhbw.smar;
 
-import java.io.File;
-
-import org.json.JSONException;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.Activity;
@@ -101,7 +99,7 @@ public class SearchProduct extends Activity {
 						// the activity to put products into shelf
 						Log.d("Haloop", "bis hierhin");
 						Intent intent = new Intent(SearchProduct.this, InsertProduct.class);
-						
+						intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 						Bundle b = new Bundle();
 						b.putInt("workflow_position", 1);
 						b.putString("product_id", current_product_id);
@@ -137,7 +135,7 @@ public class SearchProduct extends Activity {
 	{    
     	Log.d("Taaag", String.valueOf(resultCode));
     	Log.d("Result: ", data.getStringExtra("BARCODE"));
-    	if (resultCode == Activity.RESULT_OK && !data.getStringExtra("BARCODE").equals(null)) 
+    	if (resultCode == Activity.RESULT_OK && !data.getStringExtra("BARCODE").equals("NULL")) 
 	    {
     		Log.d("Barcode", data.getStringExtra("BARCODE"));
 	    	String resultBarcode = data.getStringExtra("BARCODE");
@@ -145,11 +143,14 @@ public class SearchProduct extends Activity {
 	    	if(!resultBarcode.equals("")){
 	    		Log.d("Started", "Starte Produktsuche");
 	    		searchProductInformation(resultBarcode);
-	    		
 	    	}
 	    	
 	    }
     	else {
+   		 Intent intent = new Intent(this, MainActivity.class);
+   		 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+   		 startActivity(intent);
+    		/*
     		AlertDialog.Builder alert = new AlertDialog.Builder(context);
     		alert.setTitle("Failure");
     		alert.setMessage("Couldn't read this code. Check code and try again")
@@ -159,8 +160,9 @@ public class SearchProduct extends Activity {
     				startSearchProductWorkflow();
     			}
     		});
-    		alert.create().show();
+    		alert.create().show(); */
     	} 
+
 	}
     
     private void searchProductInformation(String productNumber) {
@@ -181,33 +183,45 @@ public class SearchProduct extends Activity {
 				Log.d("onPostExecute", result);
 				if(!hch.getError() && hch.getResponseCode() == 200) { 
 					try {
-						Log.d("start json", "result");
+						Log.d("start json", result);
 						//JSONArray jArray = new JSONArray(hch.getResponseMessage());
-						result = result.substring(1, result.length() -1);
-						JSONObject json = new JSONObject(result);
-						
-						current_product_id = json.getString("product_id");
-						current_product_name = json.getString("name");
-						current_amount_warehouse = json.getString("amount_warehouse");
-						current_amount_shop = json.getString("amount_shop");
-						current_unit_id = json.getString("unit_id");
-						current_shelf_id = json.getInt("shelf_id");
-						current_section_id = json.getInt("section_id");
-						
-						setLayout();
-						
-
-						Log.d("onpostexecute", "bis vor das show");
-						
-						//Create the Picture to display
-						showPicture();
-						onback_pressed_event = 1;
-						//Ask if you want to put this item into shelf
-						//Start then the InsertProduct Activity
-						//showQuestionProductPutIntoShelf();
-						
+//						result = result.substring(1, result.length() -1);
+//						JSONObject json = new JSONObject(result);
+						JSONArray jArray = new JSONArray(result);
+						int i = 0;
+						if (jArray.length() > 1) {
+							JSONObject json = jArray.getJSONObject(0);
+							current_product_id = json.getString("product_id");
+							current_product_name = json.getString("name");
+							current_amount_warehouse = json.getString("amount_warehouse");
+							current_amount_shop = json.getString("amount_shop");
+							current_unit_id = json.getString("unit_id");
+							current_shelf_id = json.getInt("shelf_id");
+							current_section_id = json.getInt("section_id");
+							setLayout();
+							Log.d("onpostexecute", "bis vor das show");
+							
+							//Create the Picture to display
+							onback_pressed_event = 1;
+							showPicture();
+							//Ask if you want to put this item into shelf
+							//Start then the InsertProduct Activity
+							//showQuestionProductPutIntoShelf();
+						}
+						else {
+							AlertDialog.Builder alert = new AlertDialog.Builder(context);
+				    		alert.setTitle("Failure");
+				    		alert.setMessage("Couldn't find information to this product. Check code and talk to admin. Click \"ok\" to scan next prodcut")
+				    			 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+				    			public void onClick(DialogInterface dialog, int id) {
+				    				dialog.dismiss();
+				    				startSearchProductWorkflow();
+				    			}
+				    		});
+				    		alert.create().show();
+						}						
 					}
-					catch (JSONException e)
+					catch (Exception e)
 					{
 						AlertDialog.Builder alert = new AlertDialog.Builder(context);
 			    		alert.setTitle("Failure");
@@ -254,15 +268,7 @@ public class SearchProduct extends Activity {
     
     @Override
     public void onBackPressed() {
-    	if(onback_pressed_event  == 1) {
     		showQuestionProductPutIntoShelf();
-    	}
-    	else if (onback_pressed_event == 0) {
-    		// go back to main menu
-    		Intent intent = new Intent(context, MainActivity.class);
-    		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // to clear the rest of activity stack
-    		startActivity(intent);
-    	}
     }
     
     private void clean_current_store() {
