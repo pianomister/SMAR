@@ -288,27 +288,4 @@ public class MainActivity extends Activity {
 			// create alert dialog and show it
 			alertDialogBuilder.create().show();
     }
-        
-    private void showNoActionDialog() {
-    	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-				context);
- 
-			// set title
-			alertDialogBuilder.setTitle("No Action...");
- 
-			// set dialog message
-			alertDialogBuilder
-				.setMessage("There is no action here...\nPlease stand by!")
-				.setCancelable(false)
-				.setNeutralButton("Okay",new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog,int id) {
-						// if this button is clicked, just close
-						// the dialog box and do nothing
-						dialog.cancel();
-					}
-				});
- 
-				// create alert dialog and show it
-				alertDialogBuilder.create().show();
-    }
 }
