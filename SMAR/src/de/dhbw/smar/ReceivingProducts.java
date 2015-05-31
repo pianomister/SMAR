@@ -358,7 +358,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 	
 	private void startGetProductInfos() {
 		pDialog = ProgressDialog.show(context, "Please wait", "Receiving product information...", true, false);
-		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/getProduct/" + current_product_barcode;
+		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/getProduct/" + current_product_barcode + "/receiving";
 		Log.d("Start connectinting to: ", "server url: " + url);
 		hch = new HttpConnectionHelper(url);
 		new ASyncHttpConnection() {
@@ -427,8 +427,8 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 									//put all available units into one list
 									Log.d("json", "started looping");
 									JSONObject json = jArray.getJSONObject(i);
-									available_units.add(json.getString("name")+";"+json.getString("capacity"));
-									Log.d("API CALLL","getting units: " +  json.getString("name")+";"+json.getString("capacity"));
+									available_units.add(json.getString("unit_id")+": "+json.getString("name"));
+									Log.d("API CALLL","getting units: " +  json.getString("unit_id")+": "+json.getString("name"));
 								}
 							}
 							
@@ -486,6 +486,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 //		Put data into $_POST variable
 		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
 		nameValuePairs.add(new BasicNameValuePair("order_id", String.valueOf(current_order_id)));
+		Log.d("ReceivingProducts", "post_data: " + post_data.toString());
 		nameValuePairs.add(new BasicNameValuePair("array", post_data.toString()));
 		hch.setPostPair(nameValuePairs);
 //		inform user and start
@@ -550,7 +551,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		if(index == 0) {
 			valueOfString = "1";
 		} else 
-			valueOfString = valueOfString.split(";")[1];
+			valueOfString = valueOfString.split(":")[0];
 		
 		Log.d("DialogHelper", "amount: " + amount + " unit: " + valueOfString);
 //		updateDatabase(Integer.parseInt(amount), Integer.parseInt(valueOfString));

@@ -84,6 +84,14 @@ public class MainActivity extends Activity {
         } else {
         	Log.d(logTag, "Initial configuration found - load preferences");
         	PreferencesHelper.getInstance().loadPreferences(context);
+        	// set Locale as in configuration
+        	Resources res = getResources();
+            DisplayMetrics dm = res.getDisplayMetrics();
+            Configuration conf = res.getConfiguration();
+            conf.locale = new Locale(PreferencesHelper.getInstance().getLocale());
+            res.updateConfiguration(conf, dm);
+            
+            // set flag
         	initConfig = true;
         }
         

@@ -21,6 +21,19 @@ public class InitConfActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_init_conf);
+		
+		if(PreferencesHelper.getPreferenceInt(this, PreferencesHelper.PREFKEY_INIT_CONFIG) == 1) {
+			boolean useIntStorage = false;
+			if(PreferencesHelper.getInstance().getStorage() == 0)
+				useIntStorage = true;
+			((CheckBox) findViewById(R.id.initConfig_storage)).setChecked(useIntStorage);
+			
+			String serverIP_temp = PreferencesHelper.getInstance().getServer();
+			if(serverIP_temp.contains("/index.php"))
+				serverIP_temp = serverIP_temp.replace("/index.php", "");
+			((EditText) findViewById(R.id.initConfig_serverIP))
+				.setText(serverIP_temp);
+		}
 	}
 	
 	public void onSaveConfigurationPressed(View view) {
