@@ -294,6 +294,7 @@ public class LoginActivity extends Activity {
 				.setPositiveButton(getResources().getString(R.string.ad_bt_tryagain), 
 						new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog,int id) {
+						((Spinner) findViewById(R.id.spinner_unit)).setSelection(0);
 						dialog.cancel();
 					}
 				});
