@@ -220,8 +220,8 @@ public class SearchProduct extends Activity {
     		alert.create().show();
     	} else if(errorCode == ERROR_SVG) {
     		AlertDialog.Builder alert = new AlertDialog.Builder(context);
-    		alert.setTitle("Error while showing shelf&#8230;");
-    		alert.setMessage("Could not show shelf picture. Maybe there are new information on the server.\nPlease restart the app&#8230;")
+    		alert.setTitle(getResources().getString(R.string.ad_title_svg_error));
+    		alert.setMessage(getResources().getString(R.string.ad_content_svg_error))
     			 .setPositiveButton(getResources().getString(R.string.ad_bt_exitapp), new DialogInterface.OnClickListener() {
     			public void onClick(DialogInterface dialog, int id) {
     				dialog.dismiss();
@@ -233,7 +233,7 @@ public class SearchProduct extends Activity {
     		AlertDialog.Builder alert = new AlertDialog.Builder(context);
     		alert.setTitle(getResources().getString(R.string.ad_title_unfortunely_closed));
     		alert.setMessage(getResources().getString(R.string.ad_content_json))
-    			 .setPositiveButton(getResources().getString(R.string.ad_bt_ok), new DialogInterface.OnClickListener() {
+    			 .setPositiveButton(getResources().getString(R.string.ad_bt_exitapp), new DialogInterface.OnClickListener() {
     			public void onClick(DialogInterface dialog, int id) {
     				dialog.dismiss();
     				cancelApp();
@@ -244,7 +244,7 @@ public class SearchProduct extends Activity {
     		AlertDialog.Builder alert = new AlertDialog.Builder(context);
     		alert.setTitle(getResources().getString(R.string.ad_title_unfortunely_closed));
     		alert.setMessage(getResources().getString(R.string.ad_content_json))
-    			 .setPositiveButton(getResources().getString(R.string.ad_bt_ok), new DialogInterface.OnClickListener() {
+    			 .setPositiveButton(getResources().getString(R.string.ad_bt_exitapp), new DialogInterface.OnClickListener() {
     			public void onClick(DialogInterface dialog, int id) {
     				dialog.dismiss();
     				cancelApp();
