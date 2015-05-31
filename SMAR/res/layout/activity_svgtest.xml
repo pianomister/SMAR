@@ -19,7 +19,7 @@
 	        android:id="@+id/textView1"
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
-	        android:text="@string/hello_world" />
+	        android:text="Hello World" />
 	
 	    <ImageView
 	        android:id="@+id/svgTest2"

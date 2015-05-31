@@ -9,49 +9,40 @@
     tools:context="de.dhbw.smar.InsertProduct" >
 
     <TextView
-        android:id="@+id/tv_product_insertproduct"
+        android:id="@+id/tv_insertproduct_product"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:text="@string/tv_product"
+        android:text="@string/tv_product_product"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
-        android:id="@+id/tv_stock_insertproduct"
+        android:id="@+id/tv_insertproduct_stock"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:text="@string/tv_stock"
+        android:text="@string/tv_product_stock"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
-        android:id="@+id/tv_sales_area_insertproduct"
+        android:id="@+id/tv_insertproduct_sales_area"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/tv_stock_insertproduct"
+        android:layout_alignBottom="@+id/tv_insertproduct_stock"
         android:layout_alignParentRight="true"
-        android:text="@string/tv_sales_area"
+        android:text="@string/tv_product_sales_area"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <Button
-        android:id="@+id/bt_insert_next_product"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:text="@string/bt_next_product" 
-        android:onClick="restartInsertProduct"/>
-
     <TextView
-        android:id="@+id/tv_current_unit"
+        android:id="@+id/tv_insertproduct_current_unit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/tv_product"
-        android:layout_alignBottom="@+id/tv_product"
-        android:layout_alignRight="@+id/tv_sales_area_insertproduct"
-        android:text="@string/tv_current_unit"
+        android:layout_alignBaseline="@+id/tv_insertproduct_product"
+        android:layout_alignBottom="@+id/tv_insertproduct_product"
+        android:layout_alignRight="@+id/tv_insertproduct_sales_area"
+        android:text="@string/tv_product_current_unit"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </RelativeLayout>

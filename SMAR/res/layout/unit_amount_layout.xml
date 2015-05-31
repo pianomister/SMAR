@@ -8,7 +8,7 @@
         android:id="@+id/tv_product_productstock"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Wählen Sie eine Einheit aus:"
+        android:text="@string/tv_product_unit"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <Spinner
@@ -20,7 +20,7 @@
         android:id="@+id/tv_stock_productstock"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Wählen Sie die Anzahl aus:"
+        android:text="@string/tv_product_amount"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <EditText

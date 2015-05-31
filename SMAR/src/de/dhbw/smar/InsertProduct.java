@@ -408,13 +408,13 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 		 	Log.d("layout: product_name", product_name);
 		 	Log.d("layout: current_amount_warehouse", current_amount_warehouse);
 		 	Log.d("layout: current_amount_shop", current_amount_shop);
-			TextView tv_product = (TextView)findViewById(R.id.tv_product_insertproduct);
-			TextView tv_warehouse = (TextView)findViewById(R.id.tv_sales_area_insertproduct);
-			TextView tv_shop = (TextView)findViewById(R.id.tv_stock_insertproduct);
+			TextView tv_product = (TextView)findViewById(R.id.tv_insertproduct_product);
+			TextView tv_warehouse = (TextView)findViewById(R.id.tv_insertproduct_sales_area);
+			TextView tv_shop = (TextView)findViewById(R.id.tv_insertproduct_stock);
 		
-			tv_product.setText(getResources().getString(R.string.tv_product) + product_name);
-			tv_warehouse.setText(getResources().getString(R.string.tv_stock) + current_amount_warehouse);
-			tv_shop.setText(getResources().getString(R.string.tv_sales_area) + current_amount_shop);
+			tv_product.setText(getResources().getString(R.string.tv_product_product) + product_name);
+			tv_warehouse.setText(getResources().getString(R.string.tv_product_stock) + current_amount_warehouse);
+			tv_shop.setText(getResources().getString(R.string.tv_product_sales_area) + current_amount_shop);
 			
 			Log.d("layout finished", "finished");
 	 }
