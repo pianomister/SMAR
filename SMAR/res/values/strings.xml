@@ -46,6 +46,11 @@
     <string name="iv_product_shelf_descr">Shows the shelf and the product position</string>
     <string name="bt_scan">Scan</string>
     <string name="bt_finish_receiving">Finish</string>
+    <string name="tv_name">Name</string>
+    <string name="tv_amount">Amount</string>
+    <string name="tv_unit">Unit</string>
+    <string name="tv_new_amount">Entered amount</string>
+    <string name="tv_new_unit">Entered unit</string>
     
     <!-- Settings -->
     <string name="tv_settings_title">Settings</string>
@@ -64,26 +69,36 @@
     <string name="pd_content_recuser">Receiving user list&#8230;</string>
     <string name="pd_content_login">Logging in&#8230;</string>
     <string name="pd_content_checkconnection">Checking server connection&#8230;</string>
-    <string name="pd_content_receiving_product_infos">Receiving product information...</string>
+    <string name="pd_content_receiving_product_infos">Receiving product information</string>
     <string name="pd_content_available_units">Receiving available units.</string>
+    <string name="pd_content_receiving_receive_infos">Receiving recieve information</string>
+    
 
     <!-- AlertDialogs -->
     <string name="ad_title_shelfdownloaderror">Could not download shelf graphics&#8230;</string>
     <string name="ad_content_shelfdownloaderror">This could cause SMAR stop working.\n Please restart the app or your device.</string>
+    
     <string name="ad_title_exitapp">Exit Application?</string>
     <string name="ad_content_exitapp">Are you sure you want to exit SMAR?</string>
+    
     <string name="ad_title_cameraerror">Could not load camera&#8230;</string>
     <string name="ad_content_cameraerror">Camera error&#8230;\n\n Please restart your device and try again.</string>
+    
     <string name="ad_title_permissionerror">Insufficient Permission&#8230;</string>
     <string name="ad_content_permissionerror">You don\'t have the permission to enter the SMAR app&#8230;</string>
+    
     <string name="ad_title_creddeviceerror">Device not active&#8230;</string>
     <string name="ad_content_creddeviceerror">This device is not registered/activated&#8230;\n Please contact your system administrator.\n\n Hardware address:</string>
+    
     <string name="ad_title_crederror">Wrong credentials&#8230;</string>
     <string name="ad_content_crederror">Wrong QR-code.\n\n Please try again with correct QR-code.</string>
+    
     <string name="ad_title_unknownerror">Could not load users&#8230;</string>
     <string name="ad_content_unknownerror">Unknown error&#8230;\n\n Please try again later or contact system administrator&#8230;</string>
+    
     <string name="ad_title_connectionerror">Could not establish server connection&#8230;</string>
     <string name="ad_content_connectionerror">Is this device connected?\n Are the settings correct?\n Is the server online and ready?\n\n Please choose an action&#8230;</string>
+    
     <string name="ad_bt_exitapp">Exit App</string>
     <string name="ad_bt_tryagain">Try Again</string>
     <string name="ad_bt_ignore">Ignore</string>
@@ -91,8 +106,9 @@
     <string name="ad_bt_yes">Yes</string>
     <string name="ad_bt_no">No</string>
     <string name="ad_bt_ok">Ok</string>
+    
     <string name="ad_title_update">Update failed</string>
-    <string name="ad_content_try_again">"Please try again or ask the admin for more support. Click \"ok\" to scan next."</string>
+    <string name="ad_content_try_again">Please try again or ask the admin for more support. Click OK to scan next.</string>
     <string name="ad_title_put_into_shelf">Product into shelf</string>
     <string name="ad_content_put_into_shelf">Do you want to put this article into the shelf?</string>
 	<string name="ad_content_no_information">Could not find information to this product. Check code and talk to admin. Click \"ok\" to scan next prodcut.</string>
@@ -104,9 +120,15 @@
 	<string name="ad_content_successful_insert">You have inserted successfully. Click \"ok\" to scan next.</string>
     <string name="ad_title_no_information">No information</string>
     
+    <string name="ad_title_next_product">Next product</string>
+    <string name="ad_content_next">To scan next product, press OK. To finish scanning, press No.</string>
+
     <!-- Toast -->
     <string name="t_initconfigerror">Could not load initial configuration!</string>
     <string name="title_activity_settings">SettingsActivity</string>
     <string name="hello_world">Hello world!</string>
+    <string name="toast_got_receiving_note">Got Receiving Note</string>
+    <string name="toast_finished_scanning">Finished scanning</string>
+    <string name="toast_starting_update">Starting update</string>
 
 </resources>
