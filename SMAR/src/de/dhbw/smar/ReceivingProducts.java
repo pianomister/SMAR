@@ -241,7 +241,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 			// set headings
 			if(flag == 1) {
 				TableRow tr = new TableRow(this);
-				tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+				tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT / 5, TableRow.LayoutParams.WRAP_CONTENT));
 				
 				TextView tv1 = new TextView(this);
 				tv1.setText(getResources().getString(R.string.tv_name));
@@ -249,6 +249,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 				tr.addView(tv1);
 				
 				TextView tv2 = new TextView(this);
+				
 				tv2.setText(getResources().getString(R.string.tv_unit));
 				tv2.setTextSize(15);
 				tr.addView(tv2);
@@ -258,20 +259,21 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 				tv3.setTextSize(15);
 				tr.addView(tv3);
 				
-				
+				/*
 				if(process_pos == 2) {
 				TextView tv4 = new TextView(this);
-					tv4.setText(getResources().getString(R.string.tv_new_unit));
+					tv4.setText("(" + getResources().getString(R.string.tv_new_unit) + ",  " + getResources().getString(R.string.tv_new_amount) + ")");
 					tv4.setTextSize(15);
 					tv4.setTextColor(Color.GREEN);
 					tr.addView(tv4);
+					
 					
 					TextView tv5 = new TextView(this);
 					tv5.setText(getResources().getString(R.string.tv_new_amount));
 					tv5.setTextSize(15);
 					tv5.setTextColor(Color.GREEN);
-					tr.addView(tv5);
-				}
+					tr.addView(tv5); 
+				}*/
 				Log.d("API CALL", "after last item in heading");
 				
 				tl.addView(tr, new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
@@ -285,14 +287,16 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 			String current_unit = ReceivingListHelper.getInstance().get().get(i).getUnit();
 			String current_amount = ReceivingListHelper.getInstance().get().get(i).getAmount();
 			String scanned_unit = "";
-			String scannd_amount = "";
+			String scanned_amount = "";
+			
+			
 			if(process_pos == 2) {
 				scanned_unit = ReceivingListHelper.getInstance().get().get(i).getUnit_to_add();
-				scannd_amount= String.valueOf(ReceivingListHelper.getInstance().get().get(i).getAmount_to_add());
+				scanned_amount= String.valueOf(ReceivingListHelper.getInstance().get().get(i).getAmount_to_add());
 			}
 			
 			TableRow tr = new TableRow(this);
-			tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+			tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT / 3, TableRow.LayoutParams.WRAP_CONTENT));
 			
 			Log.d("API CALL", "got all values");
 			TextView tv1 = new TextView(this);
@@ -301,25 +305,33 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 			tv1.setTextSize(15);
 			tr.addView(tv1);
 			
-			if(!current_unit.equals(null) || !current_unit.equals("")) {
+			if(current_unit.equals(null) || current_unit.equals("")) 
+				current_unit = "0";
+			if(scanned_unit.equals(null) || scanned_unit.equals(""))
+				scanned_unit = "0";
 				TextView tv2 = new TextView(this);
-				tv2.setText(current_unit);
-				tv2.setTextColor(Color.WHITE);
-				tv2.setTextSize(15);
-				tr.addView(tv2);
-			}
+			tv2.setText("(" + current_unit + ", " +  scanned_unit + ")");
+			tv2.setTextColor(Color.WHITE);
+			tv2.setTextSize(15);
+			tr.addView(tv2);
 			
-			if(!current_amount.equals(null) || !current_amount.equals("")) {
-				TextView tv3 = new TextView(this);
-				tv3.setText(current_amount);
-				tv3.setTextColor(Color.WHITE);
-				tv3.setTextSize(15);
-				tr.addView(tv3);
-			}
 			
+			if(current_amount.equals(null) || current_amount.equals("")) 
+				current_amount = "0";
+			if(scanned_unit.equals(null) || scanned_unit.equals(""))
+				scanned_amount = "0";
+			TextView tv3 = new TextView(this);
+			tv3.setText("(" + current_amount + ",  " + scanned_amount + ")");
+			tv3.setTextColor(Color.WHITE);
+			tv3.setTextSize(15);
+			tr.addView(tv3);
+		
+			/*
 			if(process_pos == 2) {
 			TextView tv4 = new TextView(this);
-			tv4.setText(scanned_unit);
+			if(scanned_unit.equals(null))
+				scanned_unit = "0";
+			tv4.setText("(" + scanned_unit + ",  " + scanned_amount + ")");
 			tv4.setTextColor(Color.GREEN);
 			tv4.setTextSize(15);
 			tr.addView(tv4);
@@ -328,8 +340,8 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 			tv5.setText(scannd_amount);
 			tv5.setTextColor(Color.GREEN);
 			tv5.setTextSize(12);
-			tr.addView(tv5);
-			}
+			tr.addView(tv5); 
+			}*/
 			tl.addView(tr, new TableLayout.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
 			
 			Log.d("API CALL", "set all rows");

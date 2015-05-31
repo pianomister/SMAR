@@ -48,8 +48,8 @@
     <string name="tv_name">Name</string>
     <string name="tv_amount">Menge</string>
     <string name="tv_unit">Verpackung</string>
-    <string name="tv_new_amount">Ein. Menge</string>
-    <string name="tv_new_unit">Ein. Verpackung</string>
+    <string name="tv_new_amount">M</string>
+    <string name="tv_new_unit">V</string>
     
     <!-- Settings -->
     <string name="tv_settings_title">Einstellungen</string>
