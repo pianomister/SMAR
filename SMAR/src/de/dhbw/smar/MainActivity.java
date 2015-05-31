@@ -75,6 +75,7 @@ public class MainActivity extends Activity {
         	startActivityForResult(startNewActivityOpen, ActivityCodeHelper.ACTIVITY_INITCONFIG_REQUEST);
         	Log.d(logTag, "Set default language to english");
         	PreferencesHelper.setPreference(context, PreferencesHelper.PREFKEY_LOCALE, "en");
+        	PreferencesHelper.getInstance().setLocale("en");
         	Resources res = getResources();
             DisplayMetrics dm = res.getDisplayMetrics();
             Configuration conf = res.getConfiguration();
