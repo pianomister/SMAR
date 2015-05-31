@@ -45,18 +45,14 @@ public class SearchProduct extends Activity {
 		setContentView(R.layout.activity_search_product);
 		
 		// Start searching the finding a product workflow
-		//startSearchProductWorkflow();
-		
-		//startBarcodeScanner
 		Intent intent = getIntent();
 		if(!intent.equals(null)) {
-			String data = intent.getStringExtra("started");
-			if (data.equals("main")) 
-				startSearchProductWorkflow();
+			if(intent.hasExtra("started")) {
+				String data = intent.getStringExtra("started");
+				if (data.equals("main")) 
+					startSearchProductWorkflow();
+			}
 		}
-		//start searching for Product Information and display them
-    	
-		
 	}
 	
 
@@ -152,20 +148,9 @@ public class SearchProduct extends Activity {
 	    	
 	    }
     	else {
-   		 Intent intent = new Intent(this, MainActivity.class);
-   		 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-   		 startActivity(intent);
-    		/*
-    		AlertDialog.Builder alert = new AlertDialog.Builder(context);
-    		alert.setTitle("Failure");
-    		alert.setMessage("Couldn't read this code. Check code and try again")
-    			 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-    			public void onClick(DialogInterface dialog, int id) {
-    				dialog.dismiss();
-    				startSearchProductWorkflow();
-    			}
-    		});
-    		alert.create().show(); */
+	   		 Intent intent = new Intent(this, MainActivity.class);
+	   		 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+	   		 startActivity(intent);
     	} 
 
 	}
@@ -229,8 +214,8 @@ public class SearchProduct extends Activity {
 					catch (Exception e)
 					{
 						AlertDialog.Builder alert = new AlertDialog.Builder(context);
-			    		alert.setTitle("Failure");
-			    		alert.setMessage("Couldn't find information to this product. Check code and talk to admin. Click \"ok\" to scan next prodcut" + barcode)
+			    		alert.setTitle("Unfortunely closed");
+			    		alert.setMessage("Failed to use json obejcts. Contact admin. The scanned barcode is: " + barcode)
 			    			 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 			    			public void onClick(DialogInterface dialog, int id) {
 			    				dialog.dismiss();
@@ -245,7 +230,7 @@ public class SearchProduct extends Activity {
 				else {
 					AlertDialog.Builder alert = new AlertDialog.Builder(context);
 		    		alert.setTitle("Failure");
-		    		alert.setMessage("Couldn't connect to server to receice information. Check code and talk to admin. Click \"ok\" to scan next prodcut: "+ barcode)
+		    		alert.setMessage("Couldn't connect to server to receive information. Check code and talk to admin. Click \"ok\" to scan next prodcut: "+ barcode)
 		    			 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 		    			public void onClick(DialogInterface dialog, int id) {
 		    				dialog.dismiss();

@@ -32,6 +32,7 @@ import de.dhbw.smar.helpers.ActivityCodeHelper;
 import de.dhbw.smar.helpers.DialogHelper;
 import de.dhbw.smar.helpers.HttpConnectionHelper;
 import de.dhbw.smar.helpers.PreferencesHelper;
+import de.dhbw.smar.helpers.ReceivingListHelper;
 import de.dhbw.smar.helpers.product;
 
 public class ReceivingProducts extends Activity implements DialogHelper.ShareDialogListener{
@@ -43,7 +44,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 	private ProgressDialog pDialog;
 	private String current_product_barcode;
 	private String current_product_id;
-	private ArrayList<product> ListOfReceivingUnits = new ArrayList<product>();
+	private ArrayList<product> ListOfReceivingUnits = ReceivingListHelper.getInstance().get();
 	private ArrayList<product> ListOfScannedProducts = new ArrayList<product>();
 	private ArrayList<String> available_units = new ArrayList<String>();
 	private String current_product_amount_warehouse;
@@ -58,7 +59,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		//startBarcodeScanner
 		Intent intent = getIntent();
 		if(!intent.equals(null)) {
-			if(intent.getExtras().containsKey("started")) {
+			if(intent.hasExtra("started")) {
 			String data = intent.getStringExtra("started");
 				if (data.equals("main")) {
 					intent.removeExtra("started");
@@ -166,7 +167,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 								p.setReceiving_date(json.getString("receiving_date"));
 								p.setId(json.getInt("product_id"));
 								current_order_id = json.getInt("order_id");
-								ListOfReceivingUnits.add(p);
+								ReceivingListHelper.getInstance().get().add(p);
 							}
 							
 							
@@ -224,7 +225,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 	
 	private void setLayout() {
 		Log.d("API CALL", "starting setting layout");
-		Log.d("API CALL", String.valueOf(ListOfReceivingUnits.size()));
+//		Log.d("API CALL", String.valueOf(ListOfReceivingUnits.size()));
 		
 		TableLayout tl = (TableLayout)findViewById(R.id.table_receiving_products);
 		tl.removeAllViews();
@@ -232,7 +233,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		int flag = 1;
 		try {
 		Log.d("API CALL", "starting setting layout");
-		for(int i = 0; i < ListOfReceivingUnits.size(); i++) {
+		for(int i = 0; i < ReceivingListHelper.getInstance().get().size(); i++) {
 			Log.d("API CALL", "inside loop");
 
 			
@@ -279,15 +280,15 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 			
 			// set values
 			Log.d("API CALL", "outside if statement");
-			String current_name = ListOfReceivingUnits.get(i).getName();
+			String current_name = ReceivingListHelper.getInstance().get().get(i).getName();
 			Log.d("API CALL", "try get first name " + current_name );
-			String current_unit = ListOfReceivingUnits.get(i).getUnit();
-			String current_amount = ListOfReceivingUnits.get(i).getAmount();
+			String current_unit = ReceivingListHelper.getInstance().get().get(i).getUnit();
+			String current_amount = ReceivingListHelper.getInstance().get().get(i).getAmount();
 			String scanned_unit = "";
 			String scannd_amount = "";
 			if(process_pos == 2) {
-				scanned_unit = ListOfReceivingUnits.get(i).getUnit_to_add();
-				scannd_amount= String.valueOf(ListOfReceivingUnits.get(i).getAmount_to_add());
+				scanned_unit = ReceivingListHelper.getInstance().get().get(i).getUnit_to_add();
+				scannd_amount= String.valueOf(ReceivingListHelper.getInstance().get().get(i).getAmount_to_add());
 			}
 			
 			TableRow tr = new TableRow(this);
@@ -367,30 +368,31 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 				// Result ist das JSON Objekt
 				Log.d("API CALL", result);
 				Log.d("start json", result + "teeest");
+				if(!hch.getError() && hch.getResponseCode() == 200) { 
 				try { 
-					JSONArray jArray = new JSONArray(hch.getResponseMessage());
-					
-					for(int i = 0; i < jArray.length(); i++) {
-						JSONObject json = jArray.getJSONObject(i);
-						product p = new product();
-						p.setId(json.getInt("product_id"));
-						current_product_id = json.getString("product_id");
-						p.setAmount(json.getString("amount_warehouse"));
-						current_product_amount_warehouse = json.getString("amount_warehouse");
-						ListOfScannedProducts.add(p);
+						JSONArray jArray = new JSONArray(hch.getResponseMessage());
+						
+						for(int i = 0; i < jArray.length(); i++) {
+							JSONObject json = jArray.getJSONObject(i);
+							product p = new product();
+							p.setId(json.getInt("product_id"));
+							current_product_id = json.getString("product_id");
+							p.setAmount(json.getString("amount_warehouse"));
+							current_product_amount_warehouse = json.getString("amount_warehouse");
+							ListOfScannedProducts.add(p);
+						}
+						
+	
+	//					open dialog to let the user enter his amounts
+						DialogHelper dialog = newInstance("0", available_units);
+						dialog.show(getFragmentManager(), "tag");
 					}
-					Log.d("API CALL", "Got Product_id: " + current_product_id + " and the amount, which is currently in the warehose: " + current_product_amount_warehouse );
-					
-					
-					//get all available units
-//					searchAvailableUnits();
-					
-//					open dialog to let the user enter his amounts
-					DialogHelper dialog = newInstance("0", available_units);
-					dialog.show(getFragmentManager(), "tag");
+					catch (Exception e) {
+						e.getStackTrace();
+					}
 				}
-				catch (Exception e) {
-					e.getStackTrace();
+				else {
+					
 				}
 			}
 		}.execute(hch);
@@ -429,14 +431,6 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 									Log.d("API CALLL","getting units: " +  json.getString("name")+";"+json.getString("capacity"));
 								}
 							}
-						
-							
-							
-							Log.d("API CALL", "I got the unit, fuck yeah");
-							// open dialog and ask user to enter data
-							
-//							DialogHelper dialog = newInstance("0", available_units);
-//							dialog.show(getFragmentManager(), "tag");
 							
 							
 						}
@@ -444,6 +438,18 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 						{
 							e.printStackTrace();
 						}
+					}
+					else {
+						AlertDialog.Builder alert = new AlertDialog.Builder(context);
+						alert.setTitle("No information");
+						alert.setMessage("There are no information to this barcode. Try again or talk to admin.");
+						alert.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,int id) {
+								process_pos = 1;
+								scanProduct();
+							}
+						});
+						alert.create().show();
 					}
 				}
 			}.execute(hch);					
@@ -472,9 +478,9 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		JSONArray post_data = new JSONArray();
 		for(int i = 0; i < ListOfReceivingUnits.size(); i++) {
 			JSONObject jobj = new JSONObject();
-			jobj.put("product_id", ListOfReceivingUnits.get(i).getId());
-			jobj.put("unit_id", ListOfReceivingUnits.get(i).getUnit_to_add());
-			jobj.put("amount", ListOfReceivingUnits.get(i).getAmount_to_add());
+			jobj.put("product_id", ReceivingListHelper.getInstance().get().get(i).getId());
+			jobj.put("unit_id", ReceivingListHelper.getInstance().get().get(i).getUnit_to_add());
+			jobj.put("amount",ReceivingListHelper.getInstance().get().get(i).getAmount_to_add());
 			post_data.put(jobj);
 		}
 //		Put data into $_POST variable
@@ -610,9 +616,9 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 	}
 	
 	private void createDiffList() {
-		for(int i = 0; i < ListOfReceivingUnits.size(); i++) {
+		for(int i = 0; i < ReceivingListHelper.getInstance().get().size(); i++) {
 			for(int j = 0; j < ListOfScannedProducts.size(); j++) {
-				product a = ListOfReceivingUnits.get(i);
+				product a = ReceivingListHelper.getInstance().get().get(i);
 				product b = ListOfScannedProducts.get(j);
 				
 				//compare them 
@@ -627,16 +633,16 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		// add those product, that are scanned but not expected
 		int flag = 0;
 		for(int i = 0; i < ListOfScannedProducts.size(); i++) {
-			for(int j = 0; j < ListOfReceivingUnits.size(); j++) {
+			for(int j = 0; j < ReceivingListHelper.getInstance().get().size(); j++) {
 				product a = ListOfScannedProducts.get(i);
-				product b = ListOfReceivingUnits.get(j);
+				product b = ReceivingListHelper.getInstance().get().get(j);
 				
 				if(a.getId() != b.getId()) {
 					flag++;
 				}
 				// if flag = the size, then there is a product which is not in the list
-				if (flag >= ListOfReceivingUnits.size()) {
-					ListOfReceivingUnits.add(ListOfScannedProducts.get(i));
+				if (flag >= ReceivingListHelper.getInstance().get().size()) {
+					ReceivingListHelper.getInstance().get().add(ListOfScannedProducts.get(i));
 				}
 			}
 			flag = 0;
