@@ -96,4 +96,5 @@
     
     <!-- Toast -->
     <string name="t_initconfigerror">Initiale Konfiguration konnte nicht geladen werden!</string>
+
 </resources>

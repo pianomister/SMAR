@@ -47,6 +47,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 	private ArrayList<product> ListOfScannedProducts = new ArrayList<product>();
 	private ArrayList<String> available_units = new ArrayList<String>();
 	private String current_product_amount_warehouse;
+	private int current_order_id = 0;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -164,7 +165,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 								p.setUnit(json.getString("unit"));
 								p.setReceiving_date(json.getString("receiving_date"));
 								p.setId(json.getInt("product_id"));
-								
+								current_order_id = json.getInt("order_id");
 								ListOfReceivingUnits.add(p);
 							}
 							
@@ -460,40 +461,53 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		    return f;
 		}
 	
-	private void updateDatabase(int amount, int unit_size) {
+	private void updateDatabase() throws JSONException {
 		// erhöhe den Amount of Warehouse
 		// ToDo: Update Setzliste
 		// Question: update Lieferschein?
-		int howMuchToTransfer;
-		howMuchToTransfer = Integer.parseInt(current_product_amount_warehouse) + ( amount * unit_size);
-		
-		Log.d("API CALL", "Starting Updating. Transfer: " + howMuchToTransfer);
 		pDialog = ProgressDialog.show(context, "Please wait", "Receiving product information...", true, false);
-		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/Product";
-		Log.d("API CALL: ", "server url: " + url);
+		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/delivery/create";
 		hch = new HttpConnectionHelper(url,  HttpConnectionHelper.REQUEST_TYPE_POST);
+//		data to post to server
+		JSONArray post_data = new JSONArray();
+		for(int i = 0; i < ListOfReceivingUnits.size(); i++) {
+			JSONObject jobj = new JSONObject();
+			jobj.put("product_id", ListOfReceivingUnits.get(i).getId());
+			jobj.put("unit_id", ListOfReceivingUnits.get(i).getUnit_to_add());
+			jobj.put("amount", ListOfReceivingUnits.get(i).getAmount_to_add());
+			post_data.put(jobj);
+		}
+//		Put data into $_POST variable
 		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-		nameValuePairs.add(new BasicNameValuePair("product_id", this.current_product_id));
-		nameValuePairs.add(new BasicNameValuePair("amount", String.valueOf(howMuchToTransfer)));
+		nameValuePairs.add(new BasicNameValuePair("order_id", String.valueOf(current_order_id)));
+		nameValuePairs.add(new BasicNameValuePair("array", post_data.toString()));
 		hch.setPostPair(nameValuePairs);
+//		inform user and start
+		Toast t = Toast.makeText(context, post_data.toString(), Toast.LENGTH_LONG);
+		t.show();
+
 		new ASyncHttpConnection() {
 			@Override
 			public void onPostExecute(String result) {
 				pDialog.dismiss();
+				Toast toast = Toast.makeText(context, result, Toast.LENGTH_LONG);
+				toast.show();
+				
+				Log.d("database", result);
 				// Result ist das JSON Objekt
-				Log.d("API CALL", result);
+				/*Log.d("API CALL", result);
 				Log.d("start json", result + "teeest");
 				try { 
 					JSONArray jArray = new JSONArray(hch.getResponseMessage());
 					String result_message = "";
 					JSONObject json = new JSONObject(hch.getResponseMessage());
 					result_message = json.getString("result");
-					/*for(int i = 0; i < jArray.length(); i++) {
+					for(int i = 0; i < jArray.length(); i++) {
 						JSONObject json = jArray.getJSONObject(i);
 						result_message = json.getString("result");
 						Log.d("API CALL", " : result_message:"+ result_message);
 						Log.d("API CALL", ": resultss: " + result);
-					}*/
+					}
 					if(result_message.equals("success")) {
 						AlertDialog.Builder p = new AlertDialog.Builder(context);
 						p.setTitle("Successfully inserted");
@@ -516,9 +530,9 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 				catch (Exception e) {
 					e.getStackTrace();
 				}
-			}
+			*/}
 		}.execute(hch);
-				
+		
 	}
 	
 
@@ -562,6 +576,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 					t.show();
 					process_pos = 2;
 					createDiffList();
+					setLayout();
 				}
 			});
 		alert.create().show();
@@ -579,6 +594,12 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		process_pos = 2; 
 		createDiffList();
 		setLayout();
+		try {
+			updateDatabase();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -620,6 +641,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 			}
 			flag = 0;
 		}
+		
 		
 //		display the list of differences
 		
