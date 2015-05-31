@@ -30,6 +30,8 @@ public class SVGDownload {
 	}
 	
 	public void checkSVGRepository() {
+		Log.d(logTag, "Starting download from SVG graphics");
+		Log.d(logTag, "Showing progress dialog");
 		pDialog = ProgressDialog.show(context, 
 				context.getResources().getString(R.string.pd_title_wait), 
 				context.getResources().getString(R.string.pd_content_shelfdownload), true, false);
@@ -45,6 +47,7 @@ public class SVGDownload {
 		new ASyncHttpConnection() {
 			@Override
 			public void onPostExecute(String result) {
+				Log.d(logTag, "got Response");
 				pDialog.dismiss();
 				if(!hch.getError() && hch.getResponseCode() == 200) {
 					try {
@@ -62,6 +65,7 @@ public class SVGDownload {
 	}
 	
 	public void updateLocalSVGRepository(JSONArray svgArray) {
+		Log.d(logTag, "Updating local SVG Repository");
 		SVGObjectContainer svgObjectContainer = new SVGObjectContainer(curUpdate);
 		
 		try {
@@ -81,6 +85,7 @@ public class SVGDownload {
 			}
 			
 			PreferencesHelper.getInstance().setSVGObjectContainer(svgObjectContainer);
+			Log.d(logTag, "Close progress dialog");
 			pDialog.dismiss();
 		} catch(Exception e) {
 			Log.e(logTag, e.getMessage());
@@ -90,6 +95,7 @@ public class SVGDownload {
 	}
 	
 	public void createErrorResponse() {
+		Log.d(logTag, "ERROR: Close progress dialog, show alert dialog");
 		pDialog.dismiss();
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
 				context);

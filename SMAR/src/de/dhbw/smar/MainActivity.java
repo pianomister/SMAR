@@ -1,14 +1,19 @@
 package de.dhbw.smar;
 
+import java.util.Locale;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -33,6 +38,9 @@ import de.dhbw.smar.svg.SVGDownload;
  *
  */
 public class MainActivity extends Activity {
+	// Reset executed?
+	private boolean resetButton = false;
+	
 	// Logging Tag, Context
 	private final String logTag = "MainActivity";
 	private final Context context = this;
@@ -65,6 +73,13 @@ public class MainActivity extends Activity {
         	Log.d(logTag, "No initial configuration found - create InitConfActivity");
         	Intent startNewActivityOpen = new Intent(context, InitConfActivity.class);
         	startActivityForResult(startNewActivityOpen, ActivityCodeHelper.ACTIVITY_INITCONFIG_REQUEST);
+        	Log.d(logTag, "Set default language to english");
+        	PreferencesHelper.setPreference(context, PreferencesHelper.PREFKEY_LOCALE, "en");
+        	Resources res = getResources();
+            DisplayMetrics dm = res.getDisplayMetrics();
+            Configuration conf = res.getConfiguration();
+            conf.locale = new Locale("en");
+            res.updateConfiguration(conf, dm);
         } else {
         	Log.d(logTag, "Initial configuration found - load preferences");
         	PreferencesHelper.getInstance().loadPreferences(context);
@@ -137,12 +152,13 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
     	Log.d(logTag, "Start onDestroy");
     	
-    	Log.d(logTag, "Save preferences");
-    	PreferencesHelper.getInstance().savePreferences(this);
-    	
-    	// TODO REMOVE
-    	// Log.d(logTag, "Debugging: reset initial configuration");
-    	// PreferencesHelper.resetPreferences(context);
+    	if(resetButton) {
+    		Log.d(logTag, "Debugging: reset initial configuration");
+        	PreferencesHelper.resetPreferences(context);
+    	} else {
+	    	Log.d(logTag, "Save preferences");
+	    	PreferencesHelper.getInstance().savePreferences(this);
+    	}
     	
     	Log.d(logTag, "Start super.onDestroy");
     	super.onDestroy();
@@ -198,10 +214,8 @@ public class MainActivity extends Activity {
     }
     
     public void onSettingsClicked(View view) {
-    	// TODO: Write settings activity
-    	// Intent startNewActivityOpen = new Intent(this, SettingsActivity.class);
-    	// startActivityForResult(startNewActivityOpen, 0);
-    	showNoActionDialog();
+    	Intent settingsActivity = new Intent(context, SettingsActivity.class);
+    	startActivityForResult(settingsActivity, ActivityCodeHelper.ACTIVITY_SETTINGS_REQUEST);
     }
     
     public void onLogoutClicked(View view) {
@@ -223,6 +237,15 @@ public class MainActivity extends Activity {
     		if(requestCode == ActivityCodeHelper.ACTIVITY_INITCONFIG_REQUEST) {
     			if(data.getBooleanExtra(ActivityCodeHelper.ACTIVITY_INITCONFIG_DATA_SET, false))
     				initConfig = true;
+    		}
+    		
+    		if(requestCode == ActivityCodeHelper.ACTIVITY_SETTINGS_REQUEST) {
+    			if(data.getBooleanExtra(ActivityCodeHelper.ACTIVITY_SETTINGS_RESET, false)) {
+    				resetButton = true;
+    				onBackPressed();
+    			} else {
+    				PreferencesHelper.getInstance().savePreferences(context);
+    			}
     		}
     	}
     }
