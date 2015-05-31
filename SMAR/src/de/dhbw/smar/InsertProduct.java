@@ -270,7 +270,7 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 		 	final int new_amount_warehouse = Integer.parseInt(this.current_amount_warehouse) - howMuchToTransfer;
 		 	
 	    	pDialog = ProgressDialog.show(context, getResources().getString(R.string.pd_title_wait), getResources().getString(R.string.pd_content_updating), true, false);
-			String url = "http://" + PreferencesHelper.getInstance().getServer() + "/updateProductStock";
+			String url = "http://" + PreferencesHelper.getInstance().getServer() + "/stock/update";
 			Log.d("Start updating: ", "server url: " + url);
 			hch = new HttpConnectionHelper(url, HttpConnectionHelper.REQUEST_TYPE_POST);
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(3);
@@ -344,7 +344,7 @@ public class InsertProduct extends Activity implements DialogHelper.ShareDialogL
 	 private void searchAvailableUnits() {
 		 //get all available Units to this product
 		 pDialog = ProgressDialog.show(context, getResources().getString(R.string.pd_title_wait), getResources().getString(R.string.pd_content_receiving_product_infos), true, false);
-			String url = "http://" + PreferencesHelper.getInstance().getServer() + "/getUnits";
+			String url = "http://" + PreferencesHelper.getInstance().getServer() + "/units";
 			Log.d("Start connectinting to: ", "server url: " + url);
 			hch = new HttpConnectionHelper(url);
 			new ASyncHttpConnection() {

@@ -142,8 +142,8 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 
 	
 	protected void startGetReceivingInfos() {
-		pDialog = ProgressDialog.show(context, "Please wait", "Receiving recieve information...", true, false);
-		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/Receiving/" + current_barcode_receiving_note;
+		pDialog = ProgressDialog.show(context, getResources().getString(R.string.pd_title_wait), getResources().getString(R.string.pd_content_receiving_receive_infos), true, false);
+		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/order/" + current_barcode_receiving_note;
 		Log.d("Start connectinting to: ", "server url: " + url);
 		hch = new HttpConnectionHelper(url);
 		new ASyncHttpConnection() {
@@ -154,7 +154,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 				Log.d("API CALL", result);
 				if(!hch.getError() && hch.getResponseCode() == 200) { 
 					try {
-						Log.d("start json", result + "teeest");
+						
 						JSONArray jArray = new JSONArray(hch.getResponseMessage());
 						if(jArray.length() > 0) {
 							for(int i = 0; i < jArray.length(); i++) {
@@ -171,7 +171,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 							}
 							
 							
-							CharSequence text = "Got Receiving Note";
+							CharSequence text = getResources().getString(R.string.toast_got_receiving_note);
 							int duration = Toast.LENGTH_LONG;
 	
 							Toast toast = Toast.makeText(context, text, duration);
@@ -187,9 +187,9 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 						else {
 							// show alert, that nothing found to this barcode
 							AlertDialog.Builder p = new AlertDialog.Builder(context);
-							p.setTitle("No Information");
-							p.setMessage("Didn't find infos to this bardcode. Try again with another barcode.");
-							p.setNeutralButton("ok", new DialogInterface.OnClickListener() {
+							p.setTitle(getResources().getString(R.string.ad_title_no_information));
+							p.setMessage(getResources().getString(R.string.ad_content_no_information));
+							p.setNeutralButton(getResources().getString(R.string.ad_bt_ok), new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,int id) {
 									process_pos = 0;
 									startProductStore();
@@ -208,9 +208,9 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 					// wrong barcode 
 					// show alert, that wrong barcode and return to scanning
 					AlertDialog.Builder p = new AlertDialog.Builder(context);
-					p.setTitle("Wrong code.");
-					p.setMessage("There is no Receiving-List for this barcode. Try again or another. Click \"ok\" to scan next.");
-					p.setNeutralButton("ok", new DialogInterface.OnClickListener() {
+					p.setTitle(getResources().getString(R.string.ad_title_no_information));
+					p.setMessage(getResources().getString(R.string.ad_content_no_information));
+					p.setNeutralButton(getResources().getString(R.string.ad_bt_ok), new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog,int id) {
 							process_pos = 0;
 							startProductStore();
@@ -244,30 +244,30 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 				tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
 				
 				TextView tv1 = new TextView(this);
-				tv1.setText("Name");
+				tv1.setText(getResources().getString(R.string.tv_name));
 				tv1.setTextSize(15);
 				tr.addView(tv1);
 				
 				TextView tv2 = new TextView(this);
-				tv2.setText("Unit");
+				tv2.setText(getResources().getString(R.string.tv_unit));
 				tv2.setTextSize(15);
 				tr.addView(tv2);
 				
 				TextView tv3 = new TextView(this);
-				tv3.setText("Amount");
+				tv3.setText(getResources().getString(R.string.tv_amount));
 				tv3.setTextSize(15);
 				tr.addView(tv3);
 				
 				
 				if(process_pos == 2) {
 				TextView tv4 = new TextView(this);
-					tv4.setText("R. name");
+					tv4.setText(getResources().getString(R.string.tv_new_unit));
 					tv4.setTextSize(15);
 					tv4.setTextColor(Color.GREEN);
 					tr.addView(tv4);
 					
 					TextView tv5 = new TextView(this);
-					tv5.setText("Date");
+					tv5.setText(getResources().getString(R.string.tv_new_amount));
 					tv5.setTextSize(15);
 					tv5.setTextColor(Color.GREEN);
 					tr.addView(tv5);
@@ -357,7 +357,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 	}
 	
 	private void startGetProductInfos() {
-		pDialog = ProgressDialog.show(context, "Please wait", "Receiving product information...", true, false);
+		pDialog = ProgressDialog.show(context, getResources().getString(R.string.pd_title_wait), getResources().getString(R.string.pd_content_receiving_product_infos), true, false);
 		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/getProduct/" + current_product_barcode + "/receiving";
 		Log.d("Start connectinting to: ", "server url: " + url);
 		hch = new HttpConnectionHelper(url);
@@ -401,8 +401,8 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 	
 	private void searchAvailableUnits() {
 		 //get all available Units to this product
-		 pDialog = ProgressDialog.show(context, "Please wait", "Receiving product information...", true, false);
-			String url = "http://" + PreferencesHelper.getInstance().getServer() + "/getUnits";
+		 pDialog = ProgressDialog.show(context, getResources().getString(R.string.pd_title_wait), getResources().getString(R.string.pd_content_available_units), true, false);
+			String url = "http://" + PreferencesHelper.getInstance().getServer() + "/units";
 			Log.d("Start connectinting to: ", "server url: " + url);
 			Log.d("API CALL", "starting search for available units");
 			hch = new HttpConnectionHelper(url);
@@ -441,9 +441,9 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 					}
 					else {
 						AlertDialog.Builder alert = new AlertDialog.Builder(context);
-						alert.setTitle("No information");
-						alert.setMessage("There are no information to this barcode. Try again or talk to admin.");
-						alert.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+						alert.setTitle(getResources().getString(R.string.ad_title_no_information));
+						alert.setMessage(getResources().getString(R.string.ad_content_no_information));
+						alert.setPositiveButton(getResources().getString(R.string.ad_bt_ok), new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,int id) {
 								process_pos = 1;
 								scanProduct();
@@ -471,7 +471,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		// erhöhe den Amount of Warehouse
 		// ToDo: Update Setzliste
 		// Question: update Lieferschein?
-		pDialog = ProgressDialog.show(context, "Please wait", "Receiving product information...", true, false);
+		pDialog = ProgressDialog.show(context, getResources().getString(R.string.pd_title_wait), getResources().getString(R.string.pd_content_updating), true, false);
 		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/delivery/create";
 		hch = new HttpConnectionHelper(url,  HttpConnectionHelper.REQUEST_TYPE_POST);
 //		data to post to server
@@ -490,9 +490,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		nameValuePairs.add(new BasicNameValuePair("array", post_data.toString()));
 		hch.setPostPair(nameValuePairs);
 //		inform user and start
-		Toast t = Toast.makeText(context, post_data.toString(), Toast.LENGTH_LONG);
-		t.show();
-
+		
 		new ASyncHttpConnection() {
 			@Override
 			public void onPostExecute(String result) {
@@ -501,43 +499,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 				toast.show();
 				
 				Log.d("database", result);
-				// Result ist das JSON Objekt
-				/*Log.d("API CALL", result);
-				Log.d("start json", result + "teeest");
-				try { 
-					JSONArray jArray = new JSONArray(hch.getResponseMessage());
-					String result_message = "";
-					JSONObject json = new JSONObject(hch.getResponseMessage());
-					result_message = json.getString("result");
-					for(int i = 0; i < jArray.length(); i++) {
-						JSONObject json = jArray.getJSONObject(i);
-						result_message = json.getString("result");
-						Log.d("API CALL", " : result_message:"+ result_message);
-						Log.d("API CALL", ": resultss: " + result);
-					}
-					if(result_message.equals("success")) {
-						AlertDialog.Builder p = new AlertDialog.Builder(context);
-						p.setTitle("Successfully inserted");
-						p.setNeutralButton("ok", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog,int id) {
-								scanProduct();
-							}
-						});
-					} 
-					else {
-						AlertDialog.Builder p = new AlertDialog.Builder(context);
-						p.setTitle("Failure. Try again.");
-						p.setNeutralButton("ok", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog,int id) {
-								scanProduct();
-							}
-						});
-					}
 				}
-				catch (Exception e) {
-					e.getStackTrace();
-				}
-			*/}
 		}.execute(hch);
 		
 	}
@@ -563,23 +525,22 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		p.setUnit_to_add(valueOfString);
 		
 		Log.d("DialogHelper", "added new product to intern list");
-		Toast t = Toast.makeText(context, "product added to intern list", Toast.LENGTH_LONG);
-		t.show();
+		
 		
 		//		scan next product
 		
 		AlertDialog.Builder alert = new AlertDialog.Builder(context);
-		alert.setTitle("Next product?");
-		alert.setMessage("To scan next product, press ok. To finish scanning, press \"No\".");
-		alert.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+		alert.setTitle(getResources().getString(R.string.ad_title_next_product));
+		alert.setMessage(getResources().getString(R.string.ad_title_next_product));
+		alert.setPositiveButton(getResources().getString(R.string.ad_bt_yes), new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog,int id) {
 				process_pos = 1;
 				scanProduct();
 			}
 		})
-			.setNegativeButton("No", new DialogInterface.OnClickListener() {
+			.setNegativeButton(getResources().getString(R.string.ad_bt_no), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog,int id) {
-					Toast t = Toast.makeText(context, "finished scanninng", Toast.LENGTH_SHORT);
+					Toast t = Toast.makeText(context, getResources().getString(R.string.toast_finished_scanning), Toast.LENGTH_SHORT);
 					t.show();
 					process_pos = 2;
 					createDiffList();
@@ -596,7 +557,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 	}
 	
 	public void finish_scanning(View view) {
-		Toast t = Toast.makeText(context, "Start updating database", Toast.LENGTH_SHORT);
+		Toast t = Toast.makeText(context, getResources().getString(R.string.toast_starting_update), Toast.LENGTH_SHORT);
 		t.show();
 		process_pos = 2; 
 		createDiffList();
