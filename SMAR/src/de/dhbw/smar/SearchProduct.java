@@ -89,16 +89,16 @@ public class SearchProduct extends Activity {
 				context);
  
 			// set title
-			alertDialogBuilder.setTitle("Product into shelf");
+			alertDialogBuilder.setTitle(getResources().getString(R.string.ad_title_put_into_shelf));
  
 			// set dialog message
 			alertDialogBuilder
-				.setMessage("Do you want to put this article into the shelf?")
-				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+				.setMessage(getResources().getString(R.string.ad_content_put_into_shelf))
+				.setPositiveButton(getResources().getString(R.string.ad_bt_yes), new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
 						// if this button is clicked you switch to 
 						// the activity to put products into shelf
-						Log.d("Haloop", "bis hierhin");
+
 						Intent intent = new Intent(SearchProduct.this, InsertProduct.class);
 						intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 						Bundle b = new Bundle();
@@ -108,20 +108,20 @@ public class SearchProduct extends Activity {
 						b.putString("amount_shop", current_amount_shop);
 						b.putString("product_name", current_product_name);
 						b.putString("unit_id", current_unit_id);
+						b.putString("started", "search");
 						intent.putExtras(b);
-						Log.d("Haloop", "extras put");
+;
 						startActivity(intent);
 						finish();
 					}
 				})
-				.setNegativeButton("No",new DialogInterface.OnClickListener() {
+				.setNegativeButton(getResources().getString(R.string.ad_bt_no),new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog,int id) {
 						// if this button is clicked, just close
 						// the dialog box and go back to main activity
 						startSearchProductWorkflow();
 					}
 				});
- 
 				// create alert dialog and show it
 				alertDialogBuilder.create().show();
     }
@@ -161,7 +161,7 @@ public class SearchProduct extends Activity {
     	// set up connection to the server 
     	// retrieve data from server
     	// display the information
-    	pDialog = ProgressDialog.show(context, "Please wait", "Receiving product information...", true, false);
+    	pDialog = ProgressDialog.show(context, getResources().getString(R.string.pd_title_wait), getResources().getString(R.string.pd_content_receiving_product_infos), true, false);
 		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/getProduct/" + barcode;
 		Log.d("Start connectinting to: ", "server url: " + url);
 		hch = new HttpConnectionHelper(url);
@@ -200,9 +200,9 @@ public class SearchProduct extends Activity {
 						}
 						else {
 							AlertDialog.Builder alert = new AlertDialog.Builder(context);
-				    		alert.setTitle("Failure");
-				    		alert.setMessage("Couldn't find information to this product. Check code and talk to admin. Click \"ok\" to scan next prodcut"+ barcode)
-				    			 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+				    		alert.setTitle(getResources().getString(R.string.ad_title_no_information));
+				    		alert.setMessage(getResources().getString(R.string.ad_content_no_information))
+				    			 .setPositiveButton(getResources().getString(R.string.ad_bt_ok), new DialogInterface.OnClickListener() {
 				    			public void onClick(DialogInterface dialog, int id) {
 				    				dialog.dismiss();
 				    				startSearchProductWorkflow();
@@ -214,9 +214,9 @@ public class SearchProduct extends Activity {
 					catch (Exception e)
 					{
 						AlertDialog.Builder alert = new AlertDialog.Builder(context);
-			    		alert.setTitle("Unfortunely closed");
-			    		alert.setMessage("Failed to use json obejcts. Contact admin. The scanned barcode is: " + barcode)
-			    			 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+			    		alert.setTitle(getResources().getString(R.string.ad_title_unfortunely_closed));
+			    		alert.setMessage(getResources().getString(R.string.ad_content_json))
+			    			 .setPositiveButton(getResources().getString(R.string.ad_bt_ok), new DialogInterface.OnClickListener() {
 			    			public void onClick(DialogInterface dialog, int id) {
 			    				dialog.dismiss();
 			    				startSearchProductWorkflow();
@@ -229,9 +229,9 @@ public class SearchProduct extends Activity {
 				}
 				else {
 					AlertDialog.Builder alert = new AlertDialog.Builder(context);
-		    		alert.setTitle("Failure");
-		    		alert.setMessage("Couldn't connect to server to receive information. Check code and talk to admin. Click \"ok\" to scan next prodcut: "+ barcode)
-		    			 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+		    		alert.setTitle(hch.getResponseCode());
+		    		alert.setMessage(getResources().getString(R.string.ad_content_no_information))
+		    			 .setPositiveButton(getResources().getString(R.string.ad_bt_ok), new DialogInterface.OnClickListener() {
 		    			public void onClick(DialogInterface dialog, int id) {
 		    				dialog.dismiss();
 		    				startSearchProductWorkflow();

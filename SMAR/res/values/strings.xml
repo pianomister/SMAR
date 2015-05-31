@@ -64,6 +64,8 @@
     <string name="pd_content_recuser">Receiving user list&#8230;</string>
     <string name="pd_content_login">Logging in&#8230;</string>
     <string name="pd_content_checkconnection">Checking server connection&#8230;</string>
+    <string name="pd_content_receiving_product_infos">Receiving product information...</string>
+    <string name="pd_content_available_units">Receiving available units.</string>
 
     <!-- AlertDialogs -->
     <string name="ad_title_shelfdownloaderror">Could not download shelf graphics&#8230;</string>
@@ -88,7 +90,20 @@
     <string name="ad_bt_initconfig">Initial Configuration</string>
     <string name="ad_bt_yes">Yes</string>
     <string name="ad_bt_no">No</string>
-
+    <string name="ad_bt_ok">Ok</string>
+    <string name="ad_title_update">Update failed</string>
+    <string name="ad_content_try_again">"Please try again or ask the admin for more support. Click \"ok\" to scan next."</string>
+    <string name="ad_title_put_into_shelf">Product into shelf</string>
+    <string name="ad_content_put_into_shelf">Do you want to put this article into the shelf?</string>
+	<string name="ad_content_no_information">Could not find information to this product. Check code and talk to admin. Click \"ok\" to scan next prodcut.</string>
+	<string name="ad_title_unfortunely_closed">Unfortunely closed</string>
+    <string name="ad_content_json">Failed to use json obejcts. Contact admin.</string>
+	<string name="ad_title_successful_update">Successful update</string>
+	<string name="ad_content_successful_update">You have updated successfully. Click \"ok\" to scan next.</string>
+    <string name="pd_content_updating">Updating</string>
+	<string name="ad_content_successful_insert">You have inserted successfully. Click \"ok\" to scan next.</string>
+    <string name="ad_title_no_information">No information</string>
+    
     <!-- Toast -->
     <string name="t_initconfigerror">Could not load initial configuration!</string>
     <string name="title_activity_settings">SettingsActivity</string>
