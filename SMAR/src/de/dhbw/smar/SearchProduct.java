@@ -37,6 +37,7 @@ public class SearchProduct extends Activity {
 	int current_shelf_id;
 	int current_section_id;
 	int onback_pressed_event = 0;
+	private int starting_flag = 0;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +48,12 @@ public class SearchProduct extends Activity {
 		//startSearchProductWorkflow();
 		
 		//startBarcodeScanner
-		startSearchProductWorkflow();
-		
+		Intent intent = getIntent();
+		if(!intent.equals(null)) {
+			String data = intent.getStringExtra("started");
+			if (data.equals("main")) 
+				startSearchProductWorkflow();
+		}
 		//start searching for Product Information and display them
     	
 		
@@ -165,14 +170,14 @@ public class SearchProduct extends Activity {
 
 	}
     
-    private void searchProductInformation(String productNumber) {
+    private void searchProductInformation(final String barcode) {
     	// get information of the product
     	// set up asynchronous task 
     	// set up connection to the server 
     	// retrieve data from server
     	// display the information
     	pDialog = ProgressDialog.show(context, "Please wait", "Receiving product information...", true, false);
-		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/getProduct/" + productNumber;
+		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/getProduct/" + barcode;
 		Log.d("Start connectinting to: ", "server url: " + url);
 		hch = new HttpConnectionHelper(url);
 		new ASyncHttpConnection() {
@@ -189,7 +194,7 @@ public class SearchProduct extends Activity {
 //						JSONObject json = new JSONObject(result);
 						JSONArray jArray = new JSONArray(result);
 						int i = 0;
-						if (jArray.length() > 1) {
+						if (jArray.length() > 0) {
 							JSONObject json = jArray.getJSONObject(0);
 							current_product_id = json.getString("product_id");
 							current_product_name = json.getString("name");
@@ -211,7 +216,7 @@ public class SearchProduct extends Activity {
 						else {
 							AlertDialog.Builder alert = new AlertDialog.Builder(context);
 				    		alert.setTitle("Failure");
-				    		alert.setMessage("Couldn't find information to this product. Check code and talk to admin. Click \"ok\" to scan next prodcut")
+				    		alert.setMessage("Couldn't find information to this product. Check code and talk to admin. Click \"ok\" to scan next prodcut"+ barcode)
 				    			 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 				    			public void onClick(DialogInterface dialog, int id) {
 				    				dialog.dismiss();
@@ -225,7 +230,7 @@ public class SearchProduct extends Activity {
 					{
 						AlertDialog.Builder alert = new AlertDialog.Builder(context);
 			    		alert.setTitle("Failure");
-			    		alert.setMessage("Couldn't find information to this product. Check code and talk to admin. Click \"ok\" to scan next prodcut")
+			    		alert.setMessage("Couldn't find information to this product. Check code and talk to admin. Click \"ok\" to scan next prodcut" + barcode)
 			    			 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 			    			public void onClick(DialogInterface dialog, int id) {
 			    				dialog.dismiss();
@@ -240,7 +245,7 @@ public class SearchProduct extends Activity {
 				else {
 					AlertDialog.Builder alert = new AlertDialog.Builder(context);
 		    		alert.setTitle("Failure");
-		    		alert.setMessage("Couldn't connect to server to receice information. Check code and talk to admin. Click \"ok\" to scan next prodcut")
+		    		alert.setMessage("Couldn't connect to server to receice information. Check code and talk to admin. Click \"ok\" to scan next prodcut: "+ barcode)
 		    			 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 		    			public void onClick(DialogInterface dialog, int id) {
 		    				dialog.dismiss();

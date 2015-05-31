@@ -53,9 +53,20 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_receiving_products);
 		// get currently available units and store them in a list
-//		searchAvailableUnits();
-		process_pos = 0;
-		this.startProductStore();
+		
+		//startBarcodeScanner
+		Intent intent = getIntent();
+		if(!intent.equals(null)) {
+			if(intent.getExtras().containsKey("started")) {
+			String data = intent.getStringExtra("started");
+				if (data.equals("main")) {
+					intent.removeExtra("started");
+					process_pos = 0;
+					searchAvailableUnits();
+					this.startProductStore();
+				}
+			}
+		}
 	}
 
 	@Override
@@ -169,6 +180,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 							//layout names setzen
 							Log.d("setLayout", "layout wird jetzt im nächsten schritt gesetzt");
 							setLayout();
+							scanProduct();
 						}
 						else {
 							// show alert, that nothing found to this barcode
@@ -214,7 +226,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		Log.d("API CALL", String.valueOf(ListOfReceivingUnits.size()));
 		
 		TableLayout tl = (TableLayout)findViewById(R.id.table_receiving_products);
-		//tl.removeAllViews();
+		tl.removeAllViews();
 		
 		int flag = 1;
 		try {
@@ -332,7 +344,8 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		Log.d("API CALL", "End of method");
 		
 		//now scan product to insert it into stock 
-		scanProduct();
+		
+			
 	}
 
 	private void scanProduct() {
@@ -440,20 +453,9 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		 Log.d("DialogHelper", "started");
 		 DialogHelper f = new DialogHelper();
 		 	
-		    // Supply num input as an argument.
 		    Bundle args = new Bundle();
-		    Log.d("creating dialog", current_unit);
-		    if(all_units.isEmpty()) {
-		    	Log.d("creating dialog", "all units is empty");
-		    }
-		    Log.d("DialogHelper", "setting parameters");
 		    args.putStringArrayList("all_units", all_units);
-		    
-		    Log.d("DialogHelper", "parameters set");
-		    Log.d("DialogHelper", "param1: " + all_units.get(0));
 		    f.setArguments(args);
-		    
-		    Log.d("DialogHelper", "param1: " + all_units.get(1));
 		    
 		    return f;
 		}
@@ -559,7 +561,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 					Toast t = Toast.makeText(context, "finished scanninng", Toast.LENGTH_SHORT);
 					t.show();
 					process_pos = 2;
-					
+					createDiffList();
 				}
 			});
 		alert.create().show();
@@ -575,19 +577,20 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		Toast t = Toast.makeText(context, "Start updating database", Toast.LENGTH_SHORT);
 		t.show();
 		process_pos = 2; 
-		
+		createDiffList();
+		setLayout();
 	}
 	
 	
 	@Override
 	public void onDialogNegativeClick(DialogFragment dialog) {
 		// TODO Auto-generated method stub
-		
+//		createDiffList();
 	}
 	
 	private void createDiffList() {
-		for(int i = 0; i < ListOfReceivingUnits.size() - 1; i++) {
-			for(int j = 0; j < ListOfScannedProducts.size() - 1; j++) {
+		for(int i = 0; i < ListOfReceivingUnits.size(); i++) {
+			for(int j = 0; j < ListOfScannedProducts.size(); j++) {
 				product a = ListOfReceivingUnits.get(i);
 				product b = ListOfScannedProducts.get(j);
 				
@@ -602,8 +605,8 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		
 		// add those product, that are scanned but not expected
 		int flag = 0;
-		for(int i = 0; i < ListOfScannedProducts.size() - 1; i++) {
-			for(int j = 0; j < ListOfReceivingUnits.size() - 1; i++) {
+		for(int i = 0; i < ListOfScannedProducts.size(); i++) {
+			for(int j = 0; j < ListOfReceivingUnits.size(); j++) {
 				product a = ListOfScannedProducts.get(i);
 				product b = ListOfReceivingUnits.get(j);
 				
@@ -619,6 +622,7 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 		}
 		
 //		display the list of differences
+		
 	}
 }
 
