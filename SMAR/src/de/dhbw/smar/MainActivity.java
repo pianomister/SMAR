@@ -181,16 +181,19 @@ public class MainActivity extends Activity {
     // Methods executed, if a menu button has been selected
     public void onProductSearchClicked(View view) {
     	Intent searchProduct = new Intent(this, SearchProduct.class);
+    	searchProduct.putExtra("started", "main");
     	startActivity(searchProduct);
     }
     
     public void onProductLoadClicked(View view) {
     	Intent insertProduct = new Intent(this, InsertProduct.class);
+    	insertProduct.putExtra("started", "main");
     	startActivity(insertProduct);
     }
     
     public void onProductStockClicked(View view) {
     	Intent ReceivingProducts = new Intent(this, ReceivingProducts.class);
+    	ReceivingProducts.putExtra("started", "main");
     	startActivity(ReceivingProducts);
     }
     
