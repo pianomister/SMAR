@@ -37,12 +37,14 @@
     <!-- Barcode Scanner -->
     <string name="tv_barcode_note">Focus camera on QR- or barcode to scan.</string>
     
-    <!-- Insert and Search Product -->
+    <!-- Insert and Search Product and Receive Prodcut -->
     <string name="tv_product_product">Product: </string>
     <string name="tv_product_stock">Stock: </string>
     <string name="tv_product_current_unit">Unit: </string>
     <string name="tv_product_sales_area">Sales Area: </string>
     <string name="iv_product_shelf_descr">Shows the shelf and the product position</string>
+    <string name="bt_scan">Scan</string>
+    <string name="bt_finish_receiving">Finish</string>
     
     <!-- Dialog: Choosing unit and amount -->
     <string name="tv_product_unit">Please choose an unit:</string>
