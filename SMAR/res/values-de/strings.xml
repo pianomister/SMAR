@@ -44,6 +44,11 @@
     <string name="tv_product_sales_area">Verkaufsbereich: </string>
     <string name="iv_product_shelf_descr">Shows the shelf and the product position</string>
     
+    <!-- Settings -->
+    <string name="tv_settings_title">Einstellungen</string>
+    <string name="tv_settings_localization">Sprache:</string>
+   	<string name="bt_settings_reset">SMAR zurücksetzen und schließen</string>
+    
     <!-- Dialog: Choosing unit and amount -->
     <string name="tv_product_unit">Bitte eine Einheit auswählen:</string>
     <string name="tv_product_amount">Anzahl:</string>

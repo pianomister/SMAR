@@ -41,12 +41,14 @@ public class PreferencesHelper {
 	public static String PREFKEY_USE_INTERNAL_STORAGE = "pref_storage";
 	public static String PREFKEY_BARCODE_SCANNER = "pref_storage";
 	public static String PREFKEY_SVG_CONTAINER = "svg_container";
+	public static String PREFKEY_LOCALE = "pref_locale";
 	
 	// Some variables
 	private String pref_server_ip = null;
 	private int pref_storage = 0; // Default: Use internal storage
 	private int pref_barcode_scanner = 0; // Default: Use camera
 	private SVGObjectContainer pref_svg_container = null;
+	private String pref_locale = "en"; // Default: English
 	
 	// logTag
 	private String logTag = "PreferencesHelper";
@@ -81,6 +83,7 @@ public class PreferencesHelper {
 		this.pref_server_ip = getPreference(context, PREFKEY_SERVER_IP);
 		this.pref_barcode_scanner = getPreferenceInt(context, PREFKEY_BARCODE_SCANNER);
 		this.pref_storage = getPreferenceInt(context, PREFKEY_USE_INTERNAL_STORAGE);
+		this.pref_locale = getPreference(context, PREFKEY_LOCALE);
 		
 		if(getPreference(context, PREFKEY_SVG_CONTAINER) == null) {
 			Log.d(logTag, "no svg container to load");
@@ -112,6 +115,7 @@ public class PreferencesHelper {
 		setPreference(context, PREFKEY_SERVER_IP, pref_server_ip);
 		setPreferenceInt(context, PREFKEY_BARCODE_SCANNER, pref_barcode_scanner);
 		setPreferenceInt(context, PREFKEY_USE_INTERNAL_STORAGE, pref_storage);
+		setPreference(context, PREFKEY_LOCALE, pref_locale);
 		
 		if(this.pref_svg_container != null) {
 			Log.d(logTag, "attempt to save svg container with timestamp: " + String.valueOf(this.pref_svg_container.getLastDownload()));
@@ -167,5 +171,13 @@ public class PreferencesHelper {
 	
 	public void setSVGObjectContainer(SVGObjectContainer pref_svg_container) {
 		this.pref_svg_container = pref_svg_container;
+	}
+
+	public String getLocale() {
+		return pref_locale;
+	}
+
+	public void setLocale(String pref_locale) {
+		this.pref_locale = pref_locale;
 	}
 }

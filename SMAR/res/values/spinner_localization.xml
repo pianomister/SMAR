@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="spinner_localization">
+        <item>English (en)</item>
+        <item>Deutsch (de)</item>
+    </string-array>
+</resources>
