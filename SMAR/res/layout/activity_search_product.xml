@@ -38,10 +38,21 @@
 
     <ImageView
         android:id="@+id/iv_searchproduct_product_shelf"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/tv_searchproduct_stock"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/tv_searchproduct_product"
+        android:contentDescription="@string/iv_product_shelf_descr" />
+
+    <TextView
+        android:id="@+id/tv_searchproduct_shelfid"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:contentDescription="@string/iv_product_shelf_descr" />
+        android:layout_alignBottom="@+id/tv_searchproduct_product"
+        android:layout_alignRight="@+id/iv_searchproduct_product_shelf"
+        android:text="@string/tv_product_shelfid"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </RelativeLayout>

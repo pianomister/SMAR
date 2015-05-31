@@ -21,16 +21,57 @@
         android:id="@+id/tv_insertproduct_stock"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
         android:text="@string/tv_product_stock"
         android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <Button
+        android:id="@+id/bt_insertproduct"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:text="@string/bt_insertproduct"
+        android:onClick="insertProductPressed" />
+
+    <ImageView
+        android:id="@+id/iv_insertproduct_product_shelf"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/tv_insertproduct_current_unit"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/tv_insertproduct_product"
+        android:contentDescription="@string/iv_product_shelf_descr" />
+
+    <TextView
+        android:id="@+id/tv_insertproduct_amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:text="@string/tv_insertproduct_amount"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <EditText
+        android:id="@+id/et_insertproduct_amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/tv_insertproduct_stock"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/bt_insertproduct"
+        android:ems="3"
+        android:inputType="number" >
+
+        <requestFocus />
+    </EditText>
 
     <TextView
         android:id="@+id/tv_insertproduct_sales_area"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/tv_insertproduct_stock"
+        android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:text="@string/tv_product_sales_area"
         android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -39,9 +80,8 @@
         android:id="@+id/tv_insertproduct_current_unit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/tv_insertproduct_product"
-        android:layout_alignBottom="@+id/tv_insertproduct_product"
-        android:layout_alignRight="@+id/tv_insertproduct_sales_area"
+        android:layout_above="@+id/tv_insertproduct_amount"
+        android:layout_alignParentLeft="true"
         android:text="@string/tv_product_current_unit"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 

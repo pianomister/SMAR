@@ -220,9 +220,10 @@ public class MainActivity extends Activity {
     }
     
     public void onProductLoadClicked(View view) {
-    	Intent insertProduct = new Intent(this, InsertProduct.class);
+    	Intent insertProduct = new Intent(this, SearchProduct.class);
     	insertProduct.putExtra("started", "main");
-    	startActivity(insertProduct);
+    	insertProduct.putExtra("insertAction", true);
+    	startActivityForResult(insertProduct, ActivityCodeHelper.ACTIVITY_SEARCHPRODUCT_REQUEST);
     }
     
     public void onProductStockClicked(View view) {

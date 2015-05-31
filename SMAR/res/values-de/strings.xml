@@ -40,8 +40,9 @@
     <!-- Insert and Search Product -->
     <string name="tv_product_product">Produkt: </string>
     <string name="tv_product_stock">Lager: </string>
+    <string name="tv_product_shelfid">Regal: </string>
     <string name="tv_product_current_unit">Einheit: </string>
-    <string name="tv_product_sales_area">Verkaufsbereich: </string>
+    <string name="tv_product_sales_area">Shop: </string>
     <string name="iv_product_shelf_descr">Shows the shelf and the product position</string>
     <string name="bt_scan">Scanne</string>
     <string name="bt_finish_receiving">Beende</string>
@@ -50,6 +51,9 @@
     <string name="tv_unit">Verpackung</string>
     <string name="tv_new_amount">M</string>
     <string name="tv_new_unit">V</string>
+    <string name="bt_insertproduct">Einräumen</string>
+    <string name="tv_insertproduct_amount">Menge: </string>
+    <string name="var_unit_single">Einzeln</string>
     
     <!-- Settings -->
     <string name="tv_settings_title">Einstellungen</string>
@@ -98,6 +102,24 @@
     <string name="ad_title_connectionerror">Verbindung konnte nicht hergestellt werden&#8230;</string>
     <string name="ad_content_connectionerror">Ist das Gerät verbunden?\n Sind die Einstellungen korrekt?\n Ist der Server online?\n\n Bitte wählen Sie eine Aktion&#8230;</string>
     
+    <string name="ad_title_query">Query fehlgeschlagen</string>
+    <string name="ad_content_query">Datenbankaktualisierung ist fehlgeschlagen.\nBitte versuchen Sie es später erneut oder kontaktieren Sie Ihren Systemadministrator&#8230;</string>
+    
+    <string name="ad_title_permission">Keine Berechtigung</string>
+    <string name="ad_content_permission">Für diese Aktion haben Sie keine Berechtigung.\nBitte kontaktieren Sie Ihren Systemadministrator.</string>
+    
+    <string name="ad_title_unknown">Aktualisierung fehlgeschlagen</string>
+    <string name="ad_content_unknown">Unbekannter Fehler&#8230;\n\n Bitte versuchen Sie es später erneut oder kontaktieren Sie Ihren Systemadministrator&#8230;</string>
+    
+    <string name="ad_title_parameters">Fehlende Parameter</string>
+    <string name="ad_content_parameters">Serverantwort: Fehlende Parameter&#8230;\n\n Bitte versuchen Sie es später erneut oder kontaktieren Sie Ihren Systemadministrator&#8230;</string>
+    
+    <string name="ad_title_capacity">Nicht genügend Regalplatz</string>
+    <string name="ad_content_capacity">In dem Regal ist nicht ausreichend Platz vorhanden. Bitte füllen Sie weniger ein.</string>
+    
+    <string name="ad_title_outofstock">Nicht genügend Ware vorhanden</string>
+    <string name="ad_content_outofstock">Sie möchten mehr Ware einräumen als im Lager vorhanden. Bitte reduzieren Sie die Einräummenge.</string>
+    
     <string name="ad_bt_exitapp">App Schließen</string>
     <string name="ad_bt_tryagain">Erneut versuchen</string>
     <string name="ad_bt_ignore">Ignorieren</string>
@@ -115,6 +137,8 @@
     <string name="ad_content_json">Fehler beim Laden der Produktinformationen.\nBitte probieren Sie es später erneut oder kontaktieren Sie den Systemadministrator&#8230;</string>
     <string name="ad_title_svg_error">Fehler beim Laden der Regalgrafik</string>
     <string name="ad_content_svg_error">Das Regal konnte nicht geladen werden.\nEventuell befinden sich neuere Informationen auf dem Server.\nBitte starten Sie die App neu&#8230;</string>
+    <string name="ad_title_noshelf">Kein Produktplatz</string>
+    <string name="ad_content_noshelf">Das Produkt ist keinem Regal zugeordnet&#8230;\nZurück zum Scannen.</string>
 	<string name="ad_title_successful_update">Erfolgreiches Update</string>
 	<string name="ad_content_successful_update">Das Update ist erfolgreich verlaufen. Drücke OK, um weiter zu scannen.</string>
     <string name="pd_content_updating">Update</string>
@@ -132,5 +156,5 @@
     <string name="toast_got_receiving_note">Bestellscheininformationen erhalten.</string>
     <string name="toast_finished_scanning">Scan beendet.</string>
     <string name="toast_starting_update">Starte Update</string>
-    
+    <string name="t_dbupdated">Produkt erfolgreich eingeräumt.</string>
 </resources>

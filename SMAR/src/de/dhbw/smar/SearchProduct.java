@@ -29,19 +29,20 @@ public class SearchProduct extends Activity {
 	
 	private int ERROR_SVG = 0;
 	private int ERROR_UNKNOWN = 1;
+	private int ERROR_NOSHELF = 2;
 
 	final Context context = this;
 	private ProgressDialog pDialog;
 	private HttpConnectionHelper hch;
 	String current_product_id;
-	String current_amount_warehouse;
-	String current_amount_shop;
+	int current_amount_warehouse;
+	int current_amount_shop;
 	String current_product_name;
 	String current_unit_id;
 	int current_shelf_id;
 	int current_section_id;
-	int onback_pressed_event = 0;
-	private int starting_flag = 0;
+	int current_shelf_capacity;
+	private boolean startedInsertProduct = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +52,9 @@ public class SearchProduct extends Activity {
 		// Start searching the finding a product workflow
 		Intent intent = getIntent();
 		if(!intent.equals(null)) {
+			if(intent.hasExtra("insertAction")) {
+				startedInsertProduct = intent.getBooleanExtra("insertAction", false);
+			}
 			if(intent.hasExtra("started")) {
 				String data = intent.getStringExtra("started");
 				if (data.equals("main")) 
@@ -102,21 +106,7 @@ public class SearchProduct extends Activity {
 					public void onClick(DialogInterface dialog, int which) {
 						// if this button is clicked you switch to 
 						// the activity to put products into shelf
-
-						Intent intent = new Intent(SearchProduct.this, InsertProduct.class);
-						intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-						Bundle b = new Bundle();
-						b.putInt("workflow_position", 1);
-						b.putString("product_id", current_product_id);
-						b.putString("amount_warehouse", current_amount_warehouse);
-						b.putString("amount_shop", current_amount_shop);
-						b.putString("product_name", current_product_name);
-						b.putString("unit_id", current_unit_id);
-						b.putString("started", "search");
-						intent.putExtras(b);
-;
-						startActivity(intent);
-						finish();
+						startInsertProductActivity();
 					}
 				})
 				.setNegativeButton(getResources().getString(R.string.ad_bt_no),new DialogInterface.OnClickListener() {
@@ -133,26 +123,37 @@ public class SearchProduct extends Activity {
     
     
     @Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data)
-	// after read barcode
-	// check it. 
-	// then, start getting product based information
-	{    
-    	Log.d(logTag, "Got Result. Result code: " + String.valueOf(resultCode) + "; Barcode: " + data.getStringExtra("BARCODE"));
-    	if(resultCode == Activity.RESULT_OK && !data.getStringExtra("BARCODE").equals("NULL")) {
-	    	String resultBarcode = data.getStringExtra("BARCODE");
-	    	Log.d(logTag, "Start searching for product: " + resultBarcode);
-	    	if(!resultBarcode.equals("")){
-	    		Log.d("Started", "Starte Produktsuche");
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// after read barcode
+		// check it. 
+		// then, start getting product based information
+    	if(requestCode == ActivityCodeHelper.ACTIVITY_BARCODE_REQUEST) {
+	    	Log.d(logTag, "Got Result. Result code: " + String.valueOf(resultCode) + "; Barcode: " + data.getStringExtra("BARCODE"));
+	    	if(resultCode == Activity.RESULT_OK && !data.getStringExtra("BARCODE").equals("NULL") && data.getStringExtra("BARCODE").length() > 0) {
+		    	String resultBarcode = data.getStringExtra("BARCODE");
+		    	Log.d(logTag, "Start searching for product: " + resultBarcode);
 	    		searchProductInformation(resultBarcode);
-	    	}
-	    } else {
-	    	Log.d(logTag, "Cancelled. Back to MainActivity");
-	    	Intent intent = this.getIntent();
-			this.setResult(RESULT_OK, intent);
-			finish();
-    	} 
-
+		    } else {
+		    	Log.d(logTag, "Cancelled. Back to MainActivity");
+		    	Intent intent = this.getIntent();
+				this.setResult(RESULT_OK, intent);
+				finish();
+	    	} 
+    	}
+    	if(requestCode == ActivityCodeHelper.ACTIVITY_INSERTPRODUCT_REQUEST) {
+    		if(resultCode == Activity.RESULT_OK) {
+    			startSearchProductWorkflow();
+    		} else if(resultCode == Activity.RESULT_CANCELED) {
+    			if(data.getBooleanExtra(ActivityCodeHelper.ACTIVITY_INSERTPRODUCT_DESTROY, false)) {
+    				cancelApp();
+    			} else {
+	    			Log.d(logTag, "Cancelled. Back to MainActivity");
+			    	Intent intent = this.getIntent();
+					this.setResult(RESULT_OK, intent);
+					finish();
+    			}
+    		}
+    	}
 	}
     
     private void searchProductInformation(final String barcode) {
@@ -162,8 +163,8 @@ public class SearchProduct extends Activity {
     	// retrieve data from server
     	// display the information
     	pDialog = ProgressDialog.show(context, getResources().getString(R.string.pd_title_wait), getResources().getString(R.string.pd_content_receiving_product_infos), true, false);
-		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/getProduct/" + barcode;
-		Log.d("Start connectinting to: ", "server url: " + url);
+		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/product/" + barcode;
+		Log.d(logTag, "server url: " + url);
 		hch = new HttpConnectionHelper(url);
 		new ASyncHttpConnection() {
 			@Override
@@ -175,28 +176,42 @@ public class SearchProduct extends Activity {
 					try {
 						Log.d(logTag, "Start decoding json array");
 						JSONArray jArray = new JSONArray(result);
-						if (jArray.length() > 0) {
+						if(jArray.length() > 0) {
 							JSONObject json = jArray.getJSONObject(0);
 							current_product_id = json.getString("product_id");
 							current_product_name = json.getString("name");
-							current_amount_warehouse = json.getString("amount_warehouse");
-							current_amount_shop = json.getString("amount_shop");
-							current_unit_id = json.getString("unit_id");
-							current_shelf_id = json.getInt("shelf_id");
-							current_section_id = json.getInt("section_id");
-							setLayout();
-
-							//Create the Picture to display
-							onback_pressed_event = 1;
-							showPicture();
+							
+							JSONObject jsonStock = new JSONObject(json.getString("stock"));
+							current_amount_warehouse = jsonStock.getInt("amount_warehouse");
+							current_amount_shop = jsonStock.getInt("amount_shop");
+							current_unit_id = json.getString("unit");
+							
+							if(json.getString("shelf").equals("0")) {
+								showAlertDialog(ERROR_NOSHELF);
+							} else {
+								JSONObject jsonShelf = new JSONObject(json.getString("shelf"));
+								current_shelf_id = jsonShelf.getInt("shelf_id");
+								current_section_id = jsonShelf.getInt("section_id");
+								current_shelf_capacity = jsonShelf.getInt("capacity");
+								if(startedInsertProduct) {
+									startInsertProductActivity();
+								} else {
+									setLayout();
+		
+									//Create the Picture to display
+									showPicture();
+								}
+							}
 						} else {
 							showAlertDialog(404);
 						}						
 					} catch (Exception e) {
+						Log.e(logTag, "Exception while decoding json array");
+						e.printStackTrace();
 						showAlertDialog(ERROR_UNKNOWN);
 					}
 						
-				} else if(hch.getResponseCode() == 404 && hch.getResponseMessage().equals("[{}]")){
+				} else if(hch.getResponseCode() == 404 && hch.getResponseMessage().equals("[]")){
 					showAlertDialog(hch.getResponseCode());
 				} else {
 					showAlertDialog(ERROR_UNKNOWN);
@@ -204,6 +219,23 @@ public class SearchProduct extends Activity {
 				
 			}
 		}.execute(hch);
+    }
+    
+    private void startInsertProductActivity() {
+    	Intent intent = new Intent(SearchProduct.this, InsertProduct.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+		Bundle b = new Bundle();
+		b.putString("product_id", current_product_id);
+		b.putInt("amount_warehouse", current_amount_warehouse);
+		b.putInt("amount_shop", current_amount_shop);
+		b.putString("product_name", current_product_name);
+		b.putString("unit", current_unit_id);
+		b.putInt("shelf_id", current_shelf_id);
+		b.putInt("section_id", current_section_id);
+		b.putInt("shelf_capacity", current_shelf_capacity);
+		intent.putExtras(b);
+
+		startActivityForResult(intent, ActivityCodeHelper.ACTIVITY_INSERTPRODUCT_REQUEST);
     }
     
     private void showAlertDialog(int errorCode) {
@@ -237,6 +269,17 @@ public class SearchProduct extends Activity {
     			public void onClick(DialogInterface dialog, int id) {
     				dialog.dismiss();
     				cancelApp();
+    			}
+    		});
+    		alert.create().show();
+    	} else if(errorCode == ERROR_NOSHELF) {
+    		AlertDialog.Builder alert = new AlertDialog.Builder(context);
+    		alert.setTitle(getResources().getString(R.string.ad_title_noshelf));
+    		alert.setMessage(getResources().getString(R.string.ad_content_noshelf))
+    			 .setPositiveButton(getResources().getString(R.string.ad_bt_ok), new DialogInterface.OnClickListener() {
+    			public void onClick(DialogInterface dialog, int id) {
+    				dialog.dismiss();
+    				startSearchProductWorkflow();
     			}
     		});
     		alert.create().show();
@@ -278,20 +321,21 @@ public class SearchProduct extends Activity {
     private void clean_current_store() {
     	current_product_id = "";
     	current_product_name = "";
-    	current_amount_shop = "";
-    	current_amount_warehouse = "";
+    	current_amount_shop = 0;
+    	current_amount_warehouse = 0;
     	current_unit_id = "";
     	current_shelf_id = 0;
     	current_section_id = 0;
-    	onback_pressed_event = 0;
-    	
+    	current_shelf_capacity = 0;    	
     }
     
     private void setLayout() {
     	TextView tv_product = (TextView)findViewById(R.id.tv_searchproduct_product);
 		TextView tv_warehouse = (TextView)findViewById(R.id.tv_searchproduct_sales_area);
 		TextView tv_shop = (TextView)findViewById(R.id.tv_searchproduct_stock);
+		TextView tv_shelf = (TextView)findViewById(R.id.tv_searchproduct_shelfid);
 		
+		tv_shelf.setText(getResources().getString(R.string.tv_product_shelfid) + current_shelf_id);
 		tv_product.setText(getResources().getString(R.string.tv_product_product) + current_product_name);
 		tv_warehouse.setText(getResources().getString(R.string.tv_product_stock) + current_amount_warehouse);
 		tv_shop.setText(getResources().getString(R.string.tv_product_sales_area) + current_amount_shop);

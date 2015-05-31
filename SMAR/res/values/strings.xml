@@ -40,8 +40,9 @@
     <!-- Insert and Search Product and Receive Product -->
     <string name="tv_product_product">Product: </string>
     <string name="tv_product_stock">Stock: </string>
+    <string name="tv_product_shelfid">Shelf: </string>
     <string name="tv_product_current_unit">Unit: </string>
-    <string name="tv_product_sales_area">Sales Area: </string>
+    <string name="tv_product_sales_area">Shop: </string>
     <string name="iv_product_shelf_descr">Shows the shelf and the product position</string>
     <string name="bt_scan">Scan</string>
     <string name="bt_finish_receiving">Finish</string>
@@ -50,6 +51,9 @@
     <string name="tv_unit">Unit</string>
     <string name="tv_new_amount">Entered amount</string>
     <string name="tv_new_unit">Entered unit</string>
+    <string name="bt_insertproduct">Insert</string>
+    <string name="tv_insertproduct_amount">Amount: </string>
+    <string name="var_unit_single">Single</string>
     
     <!-- Settings -->
     <string name="tv_settings_title">Settings</string>
@@ -70,7 +74,7 @@
     <string name="pd_content_checkconnection">Checking server connection&#8230;</string>
     <string name="pd_content_receiving_product_infos">Receiving product information</string>
     <string name="pd_content_available_units">Receiving available units.</string>
-    <string name="pd_content_receiving_receive_infos">Receiving recieve information</string>
+    <string name="pd_content_receiving_receive_infos">Receiving receive information</string>
     
 
     <!-- AlertDialogs -->
@@ -98,6 +102,24 @@
     <string name="ad_title_connectionerror">Could not establish server connection&#8230;</string>
     <string name="ad_content_connectionerror">Is this device connected?\n Are the settings correct?\n Is the server online and ready?\n\n Please choose an action&#8230;</string>
     
+    <string name="ad_title_query">Query failed</string>
+    <string name="ad_content_query">Updating database failed.\nPlease try again later&#8320;</string>
+    
+    <string name="ad_title_permission">Insufficient permission</string>
+    <string name="ad_content_permission">You don\'t have the permission to update the database.\nPlease contact your system administrator.</string>
+    
+    <string name="ad_title_unknown">Update failed</string>
+    <string name="ad_content_unknown">Unknown error&#8230;\n\n Please try again later or contact system administrator&#8230;</string>
+    
+    <string name="ad_title_parameters">Missing parameters</string>
+    <string name="ad_content_parameters">Server response: missing parameters&#8230;\n\n Please try again later or contact system administrator&#8230;</string>
+    
+    <string name="ad_title_capacity">Section is full</string>
+    <string name="ad_content_capacity">Not enough space to add so much products.</string>
+    
+    <string name="ad_title_outofstock">Out of stock</string>
+    <string name="ad_content_outofstock">Not enough stock in warehouse for this operation.</string>
+    
     <string name="ad_bt_exitapp">Exit App</string>
     <string name="ad_bt_tryagain">Try Again</string>
     <string name="ad_bt_ignore">Ignore</string>
@@ -115,6 +137,8 @@
     <string name="ad_content_json">Failed loading product.\nPlease try again later or contact system administrator&#8230;</string>
 	<string name="ad_title_svg_error">Error while loading shelf graphic&#8230;</string>
     <string name="ad_content_svg_error">Could not load shelf graphic. Maybe there are new information on the server.\nPlease restart the app&#8230;</string>
+    <string name="ad_title_noshelf">No shelf for product</string>
+    <string name="ad_content_noshelf">This product is not in a shelf yet&#8230;\nPlease scan another product.</string>
 	<string name="ad_title_successful_update">Successful update</string>
 	<string name="ad_content_successful_update">You have updated successfully. Click \"ok\" to scan next.</string>
     <string name="pd_content_updating">Updating</string>
@@ -131,5 +155,6 @@
     <string name="toast_got_receiving_note">Got Receiving Note</string>
     <string name="toast_finished_scanning">Finished scanning</string>
     <string name="toast_starting_update">Starting update</string>
+    <string name="t_dbupdated">Database successfully updated.</string>
 
 </resources>
