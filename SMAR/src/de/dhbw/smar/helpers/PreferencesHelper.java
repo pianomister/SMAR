@@ -44,6 +44,7 @@ public class PreferencesHelper {
 	public static String PREFKEY_LOCALE = "pref_locale";
 	
 	// Some variables
+	public boolean configLoaded = false; 
 	private String pref_server_ip = null;
 	private int pref_storage = 0; // Default: Use internal storage
 	private int pref_barcode_scanner = 0; // Default: Use camera

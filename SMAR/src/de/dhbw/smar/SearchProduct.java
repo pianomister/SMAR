@@ -25,6 +25,10 @@ import de.dhbw.smar.helpers.PreferencesHelper;
 import de.dhbw.smar.svg.SVGObject;
 
 public class SearchProduct extends Activity {
+	private final String logTag = "SearchProduct";
+	
+	private int ERROR_SVG = 0;
+	private int ERROR_UNKNOWN = 1;
 
 	final Context context = this;
 	private ProgressDialog pDialog;
@@ -134,23 +138,19 @@ public class SearchProduct extends Activity {
 	// check it. 
 	// then, start getting product based information
 	{    
-    	Log.d("Taaag", String.valueOf(resultCode));
-    	Log.d("Result: ", data.getStringExtra("BARCODE"));
-    	if (resultCode == Activity.RESULT_OK && !data.getStringExtra("BARCODE").equals("NULL")) 
-	    {
-    		Log.d("Barcode", data.getStringExtra("BARCODE"));
+    	Log.d(logTag, "Got Result. Result code: " + String.valueOf(resultCode) + "; Barcode: " + data.getStringExtra("BARCODE"));
+    	if(resultCode == Activity.RESULT_OK && !data.getStringExtra("BARCODE").equals("NULL")) {
 	    	String resultBarcode = data.getStringExtra("BARCODE");
-	    	Log.d("Barcode2" , resultBarcode);
+	    	Log.d(logTag, "Start searching for product: " + resultBarcode);
 	    	if(!resultBarcode.equals("")){
 	    		Log.d("Started", "Starte Produktsuche");
 	    		searchProductInformation(resultBarcode);
 	    	}
-	    	
-	    }
-    	else {
-	   		 Intent intent = new Intent(this, MainActivity.class);
-	   		 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-	   		 startActivity(intent);
+	    } else {
+	    	Log.d(logTag, "Cancelled. Back to MainActivity");
+	    	Intent intent = this.getIntent();
+			this.setResult(RESULT_OK, intent);
+			finish();
     	} 
 
 	}
@@ -170,15 +170,11 @@ public class SearchProduct extends Activity {
 			public void onPostExecute(String result) {
 				pDialog.dismiss();
 				// Result ist das JSON Objekt
-				Log.d("onPostExecute", result);
+				Log.d(logTag, "Response code: " + hch.getResponseCode() + "; Response message: " + hch.getResponseMessage());
 				if(!hch.getError() && hch.getResponseCode() == 200) { 
 					try {
-						Log.d("start json", result);
-						//JSONArray jArray = new JSONArray(hch.getResponseMessage());
-//						result = result.substring(1, result.length() -1);
-//						JSONObject json = new JSONObject(result);
+						Log.d(logTag, "Start decoding json array");
 						JSONArray jArray = new JSONArray(result);
-						int i = 0;
 						if (jArray.length() > 0) {
 							JSONObject json = jArray.getJSONObject(0);
 							current_product_id = json.getString("product_id");
@@ -189,76 +185,94 @@ public class SearchProduct extends Activity {
 							current_shelf_id = json.getInt("shelf_id");
 							current_section_id = json.getInt("section_id");
 							setLayout();
-							Log.d("onpostexecute", "bis vor das show");
-							
+
 							//Create the Picture to display
 							onback_pressed_event = 1;
 							showPicture();
-							//Ask if you want to put this item into shelf
-							//Start then the InsertProduct Activity
-							//showQuestionProductPutIntoShelf();
-						}
-						else {
-							AlertDialog.Builder alert = new AlertDialog.Builder(context);
-				    		alert.setTitle(getResources().getString(R.string.ad_title_no_information));
-				    		alert.setMessage(getResources().getString(R.string.ad_content_no_information))
-				    			 .setPositiveButton(getResources().getString(R.string.ad_bt_ok), new DialogInterface.OnClickListener() {
-				    			public void onClick(DialogInterface dialog, int id) {
-				    				dialog.dismiss();
-				    				startSearchProductWorkflow();
-				    			}
-				    		});
-				    		alert.create().show();
+						} else {
+							showAlertDialog(404);
 						}						
-					}
-					catch (Exception e)
-					{
-						AlertDialog.Builder alert = new AlertDialog.Builder(context);
-			    		alert.setTitle(getResources().getString(R.string.ad_title_unfortunely_closed));
-			    		alert.setMessage(getResources().getString(R.string.ad_content_json))
-			    			 .setPositiveButton(getResources().getString(R.string.ad_bt_ok), new DialogInterface.OnClickListener() {
-			    			public void onClick(DialogInterface dialog, int id) {
-			    				dialog.dismiss();
-			    				startSearchProductWorkflow();
-			    			}
-			    		});
-			    		alert.create().show();
-						e.getStackTrace();
+					} catch (Exception e) {
+						showAlertDialog(ERROR_UNKNOWN);
 					}
 						
-				}
-				else {
-					AlertDialog.Builder alert = new AlertDialog.Builder(context);
-		    		alert.setTitle(hch.getResponseCode());
-		    		alert.setMessage(getResources().getString(R.string.ad_content_no_information))
-		    			 .setPositiveButton(getResources().getString(R.string.ad_bt_ok), new DialogInterface.OnClickListener() {
-		    			public void onClick(DialogInterface dialog, int id) {
-		    				dialog.dismiss();
-		    				startSearchProductWorkflow();
-		    			}
-		    		});
-		    		alert.create().show();
+				} else if(hch.getResponseCode() == 404 && hch.getResponseMessage().equals("[{}]")){
+					showAlertDialog(hch.getResponseCode());
+				} else {
+					showAlertDialog(ERROR_UNKNOWN);
 				}
 				
 			}
 		}.execute(hch);
     }
     
+    private void showAlertDialog(int errorCode) {
+    	if(errorCode == 404) {
+    		AlertDialog.Builder alert = new AlertDialog.Builder(context);
+    		alert.setTitle("Product not found (" + hch.getResponseCode() + ")");
+    		alert.setMessage(getResources().getString(R.string.ad_content_no_information))
+    			 .setPositiveButton(getResources().getString(R.string.ad_bt_ok), new DialogInterface.OnClickListener() {
+    			public void onClick(DialogInterface dialog, int id) {
+    				dialog.dismiss();
+    				startSearchProductWorkflow();
+    			}
+    		});
+    		alert.create().show();
+    	} else if(errorCode == ERROR_SVG) {
+    		AlertDialog.Builder alert = new AlertDialog.Builder(context);
+    		alert.setTitle("Error while showing shelf&#8230;");
+    		alert.setMessage("Could not show shelf picture. Maybe there are new information on the server.\nPlease restart the app&#8230;")
+    			 .setPositiveButton(getResources().getString(R.string.ad_bt_exitapp), new DialogInterface.OnClickListener() {
+    			public void onClick(DialogInterface dialog, int id) {
+    				dialog.dismiss();
+    				cancelApp();
+    			}
+    		});
+    		alert.create().show();
+    	} else if(errorCode == ERROR_UNKNOWN) {
+    		AlertDialog.Builder alert = new AlertDialog.Builder(context);
+    		alert.setTitle(getResources().getString(R.string.ad_title_unfortunely_closed));
+    		alert.setMessage(getResources().getString(R.string.ad_content_json))
+    			 .setPositiveButton(getResources().getString(R.string.ad_bt_ok), new DialogInterface.OnClickListener() {
+    			public void onClick(DialogInterface dialog, int id) {
+    				dialog.dismiss();
+    				cancelApp();
+    			}
+    		});
+    		alert.create().show();
+    	} else {
+    		AlertDialog.Builder alert = new AlertDialog.Builder(context);
+    		alert.setTitle(getResources().getString(R.string.ad_title_unfortunely_closed));
+    		alert.setMessage(getResources().getString(R.string.ad_content_json))
+    			 .setPositiveButton(getResources().getString(R.string.ad_bt_ok), new DialogInterface.OnClickListener() {
+    			public void onClick(DialogInterface dialog, int id) {
+    				dialog.dismiss();
+    				cancelApp();
+    			}
+    		});
+    		alert.create().show();
+    	}
+    }
+    
     private void showPicture() {
     	String path = PreferencesHelper.getInstance().getSVGObjectContainer().getSVGObjectPath(current_shelf_id);
     	SVGObject svg = (SVGObject) FileHelper.readSerializable(this, path);
-
-    	
-    	ImageView iv = (ImageView)findViewById(R.id.iv_searchproduct_product_shelf);
-    	iv.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-    	Drawable d = svg.getDrawable(current_section_id);
-        if(d != null)
-        	iv.setImageDrawable(d);
+    	if(svg == null) {
+    		showAlertDialog(ERROR_SVG);
+    	} else {
+	    	ImageView iv = (ImageView)findViewById(R.id.iv_searchproduct_product_shelf);
+	    	iv.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+	    	Drawable d = svg.getDrawable(current_section_id);
+	        if(d != null)
+	        	iv.setImageDrawable(d);
+	        else
+	        	showAlertDialog(ERROR_SVG);
+    	}
     }
     
     @Override
     public void onBackPressed() {
-    		showQuestionProductPutIntoShelf();
+    	showQuestionProductPutIntoShelf();
     }
     
     private void clean_current_store() {
@@ -281,5 +295,11 @@ public class SearchProduct extends Activity {
 		tv_product.setText(getResources().getString(R.string.tv_product_product) + current_product_name);
 		tv_warehouse.setText(getResources().getString(R.string.tv_product_stock) + current_amount_warehouse);
 		tv_shop.setText(getResources().getString(R.string.tv_product_sales_area) + current_amount_shop);
+    }
+    
+    public void cancelApp() {
+    	Intent intent = this.getIntent();
+		this.setResult(RESULT_CANCELED, intent);
+		finish();
     }
 }

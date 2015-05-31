@@ -67,7 +67,7 @@ public class MainActivity extends Activity {
     	Log.d(logTag, "Saving hwaddress (" + hwaddress + ") in LoginHelper.");
     	LoginHelper.getInstance().setHwaddress(hwaddress);
         
-        Log.d(logTag, "Check for initial configuration");
+        Log.d(logTag, "Check for initial configuration - configuration loaded: " + PreferencesHelper.getInstance().configLoaded);
         // check for initial configuration, if not set start activity
         if(PreferencesHelper.getPreferenceInt(this, PreferencesHelper.PREFKEY_INIT_CONFIG) != 1) {
         	Log.d(logTag, "No initial configuration found - create InitConfActivity");
@@ -82,17 +82,21 @@ public class MainActivity extends Activity {
             conf.locale = new Locale("en");
             res.updateConfiguration(conf, dm);
         } else {
-        	Log.d(logTag, "Initial configuration found - load preferences");
-        	PreferencesHelper.getInstance().loadPreferences(context);
-        	// set Locale as in configuration
-        	Resources res = getResources();
-            DisplayMetrics dm = res.getDisplayMetrics();
-            Configuration conf = res.getConfiguration();
-            conf.locale = new Locale(PreferencesHelper.getInstance().getLocale());
-            res.updateConfiguration(conf, dm);
-            
-            // set flag
-        	initConfig = true;
+        	if(!PreferencesHelper.getInstance().configLoaded) {
+	        	Log.d(logTag, "Initial configuration found - load preferences");
+	        	PreferencesHelper.getInstance().loadPreferences(context);
+	        	// set Locale as in configuration
+	        	Resources res = getResources();
+	            DisplayMetrics dm = res.getDisplayMetrics();
+	            Configuration conf = res.getConfiguration();
+	            conf.locale = new Locale(PreferencesHelper.getInstance().getLocale());
+	            res.updateConfiguration(conf, dm);
+	            
+	            // set flag
+	        	initConfig = true;
+	        	
+	        	PreferencesHelper.getInstance().configLoaded = true;
+        	}
         }
         
         Log.d(logTag, "Finish onCreate");
@@ -107,7 +111,9 @@ public class MainActivity extends Activity {
     	
     	if(initConfig) {
     		Log.d(logTag, "loading initial configuration");
-    		PreferencesHelper.getInstance().loadPreferences(context);
+    		if(!PreferencesHelper.getInstance().configLoaded) {
+	    		PreferencesHelper.getInstance().loadPreferences(context);
+    		}
     		initConfigLoaded = true;
     	} else {
     		Log.e(logTag, "could not load initial configuration");
@@ -169,6 +175,9 @@ public class MainActivity extends Activity {
 	    	PreferencesHelper.getInstance().savePreferences(this);
     	}
     	
+    	Log.d(logTag, "Set config loaded: false");
+    	PreferencesHelper.getInstance().configLoaded = false;
+    	
     	Log.d(logTag, "Start super.onDestroy");
     	super.onDestroy();
     }
@@ -207,7 +216,7 @@ public class MainActivity extends Activity {
     public void onProductSearchClicked(View view) {
     	Intent searchProduct = new Intent(this, SearchProduct.class);
     	searchProduct.putExtra("started", "main");
-    	startActivity(searchProduct);
+    	startActivityForResult(searchProduct, ActivityCodeHelper.ACTIVITY_SEARCHPRODUCT_REQUEST);
     }
     
     public void onProductLoadClicked(View view) {
@@ -237,7 +246,8 @@ public class MainActivity extends Activity {
         // If cancelled initial configuration or login -> get out of here
     	if(resultCode == Activity.RESULT_CANCELED && 
     			(requestCode == ActivityCodeHelper.ACTIVITY_INITCONFIG_REQUEST || 
-    			 requestCode == ActivityCodeHelper.ACTIVITY_LOGIN_REQUEST)) {
+    			 requestCode == ActivityCodeHelper.ACTIVITY_LOGIN_REQUEST ||
+    			 requestCode == ActivityCodeHelper.ACTIVITY_SEARCHPRODUCT_REQUEST)) {
     		Log.d(logTag, "Login or initial configuration canceled. Exec onBackPressed()");
     		onBackPressed();
     	}
