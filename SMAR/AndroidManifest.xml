@@ -47,12 +47,8 @@
             android:name=".BarcodeScannerActivity"
             android:label="@string/title_activity_barcode_scanner" >
         </activity>
-        <activity
-            android:name=".SettingsActivity"
+        <activity android:name="de.dhbw.smar.SettingsActivity"
             android:label="@string/title_activity_settings" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.dhbw.smar.MainActivity" />
         </activity>
         <activity
             android:name=".InitConfActivity"
