@@ -264,7 +264,7 @@ public class SearchProduct extends Activity {
     	SVGObject svg = (SVGObject) FileHelper.readSerializable(this, path);
 
     	
-    	ImageView iv = (ImageView)findViewById(R.id.iv_product_shelf);
+    	ImageView iv = (ImageView)findViewById(R.id.iv_searchproduct_product_shelf);
     	iv.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
     	Drawable d = svg.getDrawable(current_section_id);
         if(d != null)
@@ -289,12 +289,12 @@ public class SearchProduct extends Activity {
     }
     
     private void setLayout() {
-    	TextView tv_product = (TextView)findViewById(R.id.tv_product);
-		TextView tv_warehouse = (TextView)findViewById(R.id.tv_sales_area);
-		TextView tv_shop = (TextView)findViewById(R.id.tv_stock);
+    	TextView tv_product = (TextView)findViewById(R.id.tv_searchproduct_product);
+		TextView tv_warehouse = (TextView)findViewById(R.id.tv_searchproduct_sales_area);
+		TextView tv_shop = (TextView)findViewById(R.id.tv_searchproduct_stock);
 		
-		tv_product.setText(getResources().getString(R.string.tv_product) + current_product_name);
-		tv_warehouse.setText(getResources().getString(R.string.tv_stock) + current_amount_warehouse);
-		tv_shop.setText(getResources().getString(R.string.tv_sales_area) + current_amount_shop);
+		tv_product.setText(getResources().getString(R.string.tv_product_product) + current_product_name);
+		tv_warehouse.setText(getResources().getString(R.string.tv_product_stock) + current_amount_warehouse);
+		tv_shop.setText(getResources().getString(R.string.tv_product_sales_area) + current_amount_shop);
     }
 }

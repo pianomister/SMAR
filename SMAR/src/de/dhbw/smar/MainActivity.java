@@ -88,13 +88,15 @@ public class MainActivity extends Activity {
     	} else {
     		Log.e(logTag, "could not load initial configuration");
     		Toast.makeText(context, 
-	    	        "Could not load initial configuration!",
+    				getResources().getString(R.string.t_initconfigerror),
 	    	        Toast.LENGTH_LONG).show();
     	}
     	
     	if(initConfigLoaded) {
 	    	Log.d(logTag, "checking server connection");
-	    	pDialog = ProgressDialog.show(context, "Please wait", "Checking server connection...", true, false);
+	    	pDialog = ProgressDialog.show(context, 
+	    			getResources().getString(R.string.pd_title_wait), 
+	    			getResources().getString(R.string.pd_content_checkconnection), true, false);
 			String url = "http://" + PreferencesHelper.getInstance().getServer() + "/connection/check";
 			Log.d(logTag, "server url: " + url);
 			hch = new HttpConnectionHelper(url);
@@ -231,21 +233,20 @@ public class MainActivity extends Activity {
 				context);
  
 		// set title
-		alertDialogBuilder.setTitle("Could not establish server connection...");
+		alertDialogBuilder.setTitle(getResources().getString(R.string.ad_title_connectionerror));
 
 		// set dialog message
 		alertDialogBuilder
-			.setMessage("Is this device connected?\n"
-					+ "Are the settings correct?\n"
-					+ "Is the server online and ready?\n\n"
-					+ "Please choose an action...")
+			.setMessage(getResources().getString(R.string.ad_content_connectionerror))
 			.setCancelable(false)
-			.setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
+			.setNegativeButton(getResources().getString(R.string.ad_bt_exitapp), 
+					new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog,int id) {
 					onBackPressed();
 				}
 			})
-			.setPositiveButton("Initial Configuration", new DialogInterface.OnClickListener() {
+			.setPositiveButton(getResources().getString(R.string.ad_bt_initconfig), 
+					new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog,int id) {
 					Intent startNewActivityOpen = new Intent(context, InitConfActivity.class);
 		        	startActivityForResult(startNewActivityOpen, ActivityCodeHelper.ACTIVITY_INITCONFIG_REQUEST);

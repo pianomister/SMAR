@@ -56,7 +56,10 @@ public class LoginActivity extends Activity {
 		setContentView(R.layout.activity_login);
 
 		Log.d(logTag, "receiving device users");
-    	pDialog = ProgressDialog.show(context, "Please wait", "Receiving user list...", true, false);
+    	pDialog = ProgressDialog.show(context, 
+    			getResources().getString(R.string.pd_title_wait), 
+    			getResources().getString(R.string.pd_content_recuser), 
+    			true, false);
 		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/users/device";
 		Log.d(logTag, "server url: " + url);
 		hch = new HttpConnectionHelper(url);
@@ -67,7 +70,7 @@ public class LoginActivity extends Activity {
 				if(!hch.getError() && hch.getResponseCode() == 200) {
 					Log.d(logTag, "Response (" + hch.getResponseCode() + "): " + hch.getResponseMessage());
 					List<String> spinnerArray = new ArrayList<String>(); 
-					spinnerArray.add("Choose user...");
+					spinnerArray.add(getResources().getString(R.string.spinner_login_chooseuser));
 					try {
 						JSONArray jArray = new JSONArray(hch.getResponseMessage());
 						for(int i = 0; i < jArray.length(); i++) {
@@ -133,19 +136,21 @@ public class LoginActivity extends Activity {
 				context);
  
 		// set title
-		alertDialogBuilder.setTitle("Exit Application?");
+		alertDialogBuilder.setTitle(getResources().getString(R.string.ad_title_exitapp));
  
 			// set dialog message
 		alertDialogBuilder
-			.setMessage("Are you sure you want to exit SMAR?")
+			.setMessage(getResources().getString(R.string.ad_content_exitapp))
 			.setCancelable(false)
-			.setPositiveButton("Yes",new DialogInterface.OnClickListener() {
+			.setPositiveButton(getResources().getString(R.string.ad_bt_yes),
+					new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					cancelLogin();
 				}
 			})
-			.setNegativeButton("No",new DialogInterface.OnClickListener() {
+			.setNegativeButton(getResources().getString(R.string.ad_bt_no),
+					new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog,int id) {
 					// if this button is clicked, just close
 					// the dialog box and do nothing
@@ -170,7 +175,9 @@ public class LoginActivity extends Activity {
 	    		Toast.makeText(this, "No barcode/QR-code scanned", Toast.LENGTH_LONG).show();
 	    	else {
 	    		LoginHelper.getInstance().setPassword(resultBarcode);
-	    		pDialog = ProgressDialog.show(context, "Please wait", "Logging in...", true, false);
+	    		pDialog = ProgressDialog.show(context, 
+	    				getResources().getString(R.string.pd_title_wait), 
+	    				getResources().getString(R.string.pd_content_login), true, false);
 	    		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/authentication";
 	    		Log.d(logTag, "server url: " + url);
 	    		hch = new HttpConnectionHelper(url, HttpConnectionHelper.REQUEST_TYPE_POST);
@@ -230,75 +237,76 @@ public class LoginActivity extends Activity {
 
 		if(error == ERROR_CAMERA) {
 			// set title
-			alertDialogBuilder.setTitle("Could not load camera...");
+			alertDialogBuilder.setTitle(getResources().getString(R.string.ad_title_cameraerror));
 			
 			// set dialog message
 			alertDialogBuilder
-				.setMessage("Camera error...\n\n"
-						+ "Please restart your device and try again.")
+				.setMessage(getResources().getString(R.string.ad_content_cameraerror))
 				.setCancelable(false)
-				.setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
+				.setNegativeButton(getResources().getString(R.string.ad_bt_exitapp), 
+						new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog,int id) {
 						cancelLogin();
 					}
 				});
 		} else if(error == ERROR_PERMISSION) { 
 			// set title
-			alertDialogBuilder.setTitle("Insufficient Permission...");
+			alertDialogBuilder.setTitle(getResources().getString(R.string.ad_title_permissionerror));
 			
 			// set dialog message
 			alertDialogBuilder
-				.setMessage("You don't have the permission to enter the SMAR app...")
+				.setMessage(getResources().getString(R.string.ad_content_permissionerror))
 				.setCancelable(false)
-				.setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
+				.setNegativeButton(getResources().getString(R.string.ad_bt_exitapp), 
+						new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog,int id) {
 						cancelLogin();
 					}
 				});
 		} else if(error == ERROR_CRED_DEVICE) { 
 			// set title
-			alertDialogBuilder.setTitle("Device not active...");
+			alertDialogBuilder.setTitle(getResources().getString(R.string.ad_title_creddeviceerror));
 			
 			// set dialog message
 			alertDialogBuilder
-				.setMessage("This device is not registered/activated...\n"
-						+ "Please contact your system administrator.\n\n"
-						+ "Hardware address: '" + LoginHelper.getInstance().getHwaddress() + "'")
+				.setMessage(getResources().getString(R.string.ad_content_creddeviceerror) + " '" + LoginHelper.getInstance().getHwaddress() + "'")
 				.setCancelable(false)
-				.setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
+				.setNegativeButton(getResources().getString(R.string.ad_bt_exitapp), 
+						new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog,int id) {
 						cancelLogin();
 					}
 				});
 		} else if(error == ERROR_CRED_PASSWORD) { 
 			// set title
-			alertDialogBuilder.setTitle("Wrong credentials...");
+			alertDialogBuilder.setTitle(getResources().getString(R.string.ad_title_crederror));
 			
 			// set dialog message
 			alertDialogBuilder
-				.setMessage("Wrong QR-code.\n\n"
-						+ "Please try again with correct QR-code.")
+				.setMessage(getResources().getString(R.string.ad_content_crederror))
 				.setCancelable(false)
-				.setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
+				.setNegativeButton(getResources().getString(R.string.ad_bt_exitapp), 
+						new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog,int id) {
 						cancelLogin();
 					}
 				})
-				.setPositiveButton("Try again", new DialogInterface.OnClickListener() {
+				.setPositiveButton(getResources().getString(R.string.ad_bt_tryagain), 
+						new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog,int id) {
 						dialog.cancel();
 					}
 				});
 		} else {
 			// set title
-			alertDialogBuilder.setTitle("Could not load users...");
+			alertDialogBuilder.setTitle(getResources().getString(R.string.ad_title_unknownerror));
 			
 			// set dialog message
 			alertDialogBuilder
-				.setMessage("Unknown error...\n\n"
-						+ "Please try again later or contact system administrator...")
+				.setMessage(getResources().getString(R.string.ad_content_unknownerror))
 				.setCancelable(false)
-				.setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
+				.setNegativeButton(getResources().getString(R.string.ad_bt_exitapp), 
+						new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog,int id) {
 						cancelLogin();
 					}

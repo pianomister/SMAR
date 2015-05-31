@@ -10,37 +10,38 @@
     tools:context="de.dhbw.smar.SearchProduct" >
 
     <TextView
-        android:id="@+id/tv_product"
+        android:id="@+id/tv_searchproduct_product"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:text="@string/tv_product"
+        android:text="@string/tv_product_product"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
-        android:id="@+id/tv_stock"
+        android:id="@+id/tv_searchproduct_stock"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:text="@string/tv_stock"
+        android:text="@string/tv_product_stock"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
-        android:id="@+id/tv_sales_area"
+        android:id="@+id/tv_searchproduct_sales_area"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:text="@string/tv_sales_area"
+        android:text="@string/tv_product_sales_area"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <ImageView
-        android:id="@+id/iv_product_shelf"
+        android:id="@+id/iv_searchproduct_product_shelf"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true" />
+        android:layout_centerVertical="true"
+        android:contentDescription="@string/iv_product_shelf_descr" />
 
 </RelativeLayout>
