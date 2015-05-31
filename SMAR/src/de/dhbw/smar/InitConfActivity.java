@@ -26,6 +26,12 @@ public class InitConfActivity extends Activity {
 	public void onSaveConfigurationPressed(View view) {
 		Log.d(logTag, "Save Configuration Button pressed");
 		String serverIP = ((EditText) findViewById(R.id.initConfig_serverIP)).getText().toString();
+		Log.d(logTag, "serverIP: " + serverIP);
+		// Workaround for Vuzix M100 - Missing dot in keyboard...
+		if(serverIP.contains("*")){
+			serverIP = serverIP.replace("*", ".");
+			Log.d(logTag, "Modified serverIP: " + serverIP);
+		}
 		int useInternalStorage = 1;
 		if(((CheckBox) findViewById(R.id.initConfig_storage)).isChecked()) {
 			useInternalStorage = 0;
