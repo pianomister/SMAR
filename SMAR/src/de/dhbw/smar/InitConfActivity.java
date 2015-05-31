@@ -31,7 +31,7 @@ public class InitConfActivity extends Activity {
 			useInternalStorage = 0;
 		}
 		Log.d(logTag, "serverIP: " + serverIP);
-		PreferencesHelper.setPreference(this, PreferencesHelper.PREFKEY_SERVER_IP, serverIP);
+		PreferencesHelper.setPreference(this, PreferencesHelper.PREFKEY_SERVER_IP, serverIP + "/index.php");
 		Log.d(logTag, "use internal storage: " + useInternalStorage);
 		PreferencesHelper.setPreferenceInt(this, PreferencesHelper.PREFKEY_USE_INTERNAL_STORAGE, useInternalStorage);
 		PreferencesHelper.setPreferenceInt(this, PreferencesHelper.PREFKEY_INIT_CONFIG, 1);

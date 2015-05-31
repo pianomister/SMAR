@@ -26,7 +26,7 @@
     <string name="tv_initconf_title">Initial Configuration</string>
     <string name="tv_initconf_serverip">Path to SMAR REST Server (excluding index.php):</string>
     <string name="hint_initconf_serverip">Please enter an IP address or domain name</string>
-    <string name="et_initconf_serverip">192.168.178.54/Smar-web-administration/smar-web-administration/api/index.php</string>
+    <string name="et_initconf_serverip">rest.example.com</string>
     <string name="tv_initconf_storage">Storage:</string>
     <string name="cb_initconf_storage">Save app data on external storage (like SD card)?</string>
     <string name="bt_initconf_save">Save configuration</string>
@@ -47,6 +47,8 @@
     
     <!-- Settings -->
     <string name="tv_settings_title">Settings</string>
+    <string name="tv_settings_serverip">Path to SMAR REST Server (including index.php):</string>
+    <string name="et_settings_serverip">rest.example.com/index.php</string>
     <string name="tv_settings_localization">Choose language:</string>
     <string name="bt_settings_reset">Reset to default and exit app</string>
 

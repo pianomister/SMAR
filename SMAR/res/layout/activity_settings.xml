@@ -38,7 +38,7 @@
 	        android:layout_height="wrap_content"
 	        android:layout_alignParentLeft="true"
 	        android:layout_below="@+id/tv_settings_title"
-	        android:text="@string/tv_initconf_serverip"
+	        android:text="@string/tv_settings_serverip"
 	        android:textAppearance="?android:attr/textAppearanceMedium" />
 	
 	    <TextView
