@@ -50,19 +50,21 @@ public class InitConfActivity extends Activity {
 				context);
  
 		// set title
-		alertDialogBuilder.setTitle("Exit Application?");
+		alertDialogBuilder.setTitle(getResources().getString(R.string.ad_title_exitapp));
  
 			// set dialog message
 		alertDialogBuilder
-			.setMessage("Are you sure you want to exit SMAR?")
+			.setMessage(getResources().getString(R.string.ad_content_exitapp))
 			.setCancelable(false)
-			.setPositiveButton("Yes",new DialogInterface.OnClickListener() {
+			.setPositiveButton(getResources().getString(R.string.ad_bt_yes),
+					new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					cancelInitConfig();
 				}
 			})
-			.setNegativeButton("No",new DialogInterface.OnClickListener() {
+			.setNegativeButton(getResources().getString(R.string.ad_bt_no),
+					new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog,int id) {
 					// if this button is clicked, just close
 					// the dialog box and do nothing

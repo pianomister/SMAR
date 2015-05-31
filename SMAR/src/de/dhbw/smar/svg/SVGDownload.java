@@ -9,6 +9,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.util.Log;
+import de.dhbw.smar.R;
 import de.dhbw.smar.asynctasks.ASyncHttpConnection;
 import de.dhbw.smar.container.SVGObjectContainer;
 import de.dhbw.smar.container.SVGObjectContainerElement;
@@ -29,7 +30,9 @@ public class SVGDownload {
 	}
 	
 	public void checkSVGRepository() {
-		pDialog = ProgressDialog.show(context, "Please wait", "Downloading shelf graphics...", true, false);
+		pDialog = ProgressDialog.show(context, 
+				context.getResources().getString(R.string.pd_title_wait), 
+				context.getResources().getString(R.string.pd_content_shelfdownload), true, false);
 		
 		svgContainer = PreferencesHelper.getInstance().getSVGObjectContainer();
 		long lastUpdate = svgContainer.getLastDownload();
@@ -67,7 +70,8 @@ public class SVGDownload {
 				FileHelper.writeSerializable(context, 
 						FileHelper.SVGOBJECTS_PATH_PREFIX + json.getString("shelf_id"), 
 						new SVGObject(json.getString("graphic")));
-				svgObjectContainer.addSVGObject(new SVGObjectContainerElement(FileHelper.SVGOBJECTS_PATH_PREFIX + json.getString("shelf_id"),
+				svgObjectContainer.addSVGObject(
+						new SVGObjectContainerElement(FileHelper.SVGOBJECTS_PATH_PREFIX + json.getString("shelf_id"),
 						Integer.parseInt(json.getString("shelf_id"))));
 			}
 			
@@ -91,19 +95,20 @@ public class SVGDownload {
 				context);
  
 		// set title
-		alertDialogBuilder.setTitle("Could not download shelf graphics...");
+		alertDialogBuilder.setTitle(context.getResources().getString(R.string.ad_title_shelfdownloaderror));
 
 		// set dialog message
 		alertDialogBuilder
-			.setMessage("This could cause SMAR stop working.\n"
-					+ "Please restart the app or your device.")
+			.setMessage(context.getResources().getString(R.string.ad_content_shelfdownloaderror))
 			.setCancelable(false)
-			.setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
+			.setNegativeButton(context.getResources().getString(R.string.ad_bt_exitapp), 
+					new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog,int id) {
 					context.onBackPressed();
 				}
 			})
-			.setPositiveButton("Ignore", new DialogInterface.OnClickListener() {
+			.setPositiveButton(context.getResources().getString(R.string.ad_bt_ignore), 
+					new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog,int id) {
 					dialog.cancel();
 				}

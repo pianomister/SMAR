@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SMAR</string>
+    
+    <!-- Activity Menu (not Main Menu!) -->
+    <string name="action_settings">Einstellungen</string>
+
+    <!-- Activity Title -->
+    <string name="title_activity_barcode_scanner">BarcodeScannerActivity</string>
+    <string name="title_activity_init_conf">Set initial configuration</string>
+    <string name="title_activity_search_product">SearchProduct</string>
+    <string name="title_activity_insert_product">InsertProduct</string>
+    <string name="title_activity_product_stock">ProductStock</string>
+    <string name="title_activity_svgtest">SVGTestActivity</string>
+    <string name="title_activity_receiving_products">ReceivingProducts</string>
+
+    <!-- Main menu -->
+    <string name="bt_main_search_product">Produkt finden</string>
+    <string name="bt_main_load_product">Produkt einräumen</string>
+    <string name="bt_main_receive_product">Warenannahme</string>
+    <string name="bt_main_settings">Einstellungen</string>
+    <string name="bt_main_logout">Logout</string>
+    
+    <!-- Initial Configuration -->
+    <string name="tv_initconf_title">Initiale Konfiguration</string>
+    <string name="tv_initconf_serverip">Pfad zum SMAR REST Server (ohne index.php):</string>
+    <string name="hint_initconf_serverip">Geben Sie eine IP-Adresse oder eine URL ein.</string>
+    <string name="et_initconf_serverip">rest.example.com/api</string>
+    <string name="tv_initconf_storage">Speichermedium:</string>
+    <string name="cb_initconf_storage">Daten auf externem Speichermedium (z.B. SD Karte) ablegen?</string>
+    <string name="bt_initconf_save">Speichern</string>
+    
+    <!-- Login -->
+    <string name="tv_login_descr">Bitte wählen Sie Ihren Benutzernamen aus und scannen Sie anschließend Ihren persönlichen QR-Code ein:</string>
+    <string name="spinner_login_chooseuser">Benutzer wählen&#8230;</string>
+    
+    <!-- Barcode Scanner -->
+    <string name="tv_barcode_note">Zum Scannen die Kamera auf einen QR- oder Barcode fokussieren.</string>
+    
+    <!-- Insert and Search Product -->
+    <string name="tv_product_product">Produkt: </string>
+    <string name="tv_product_stock">Lager: </string>
+    <string name="tv_product_current_unit">Einheit: </string>
+    <string name="tv_product_sales_area">Verkaufsbereich: </string>
+    <string name="iv_product_shelf_descr">Shows the shelf and the product position</string>
+    
+    <!-- Dialog: Choosing unit and amount -->
+    <string name="tv_product_unit">Bitte eine Einheit auswählen:</string>
+    <string name="tv_product_amount">Anzahl:</string>
+    
+    <!-- ProgressDialogs -->
+    <string name="pd_title_wait">Bitte warten</string>
+    <string name="pd_content_shelfdownload">Lade Regalgrafiken&#8230;</string>
+    <string name="pd_content_recuser">Lade Benutzer&#8230;</string>
+    <string name="pd_content_login">Einloggvorgang&#8230;</string>
+    <string name="pd_content_checkconnection">Prüfe Verbindung zum Server&#8230;</string>
+    
+    <!-- AlertDialogs -->
+    <string name="ad_title_shelfdownloaderror">Laden der Regalgrafiken fehlgeschlagen&#8230;</string>
+    <string name="ad_content_shelfdownloaderror">Dies kann die SMAR App zum Absturz bringen.\n Bitte starten Sie die App oder Ihr Gerät neu.</string>
+    
+    <string name="ad_title_exitapp">App schließen?</string>
+    <string name="ad_content_exitapp">Sind Sie sich sicher, dass Sie SMAR schließen möchten?</string>
+    
+    <string name="ad_title_cameraerror">Kamera konnte nicht gestartet werden&#8230;</string>
+    <string name="ad_content_cameraerror">Kamerafehler&#8230;\n\n Bitte starten Sie Ihr Gerät neu und versuchen Sie es erneut.</string>
+    
+    <string name="ad_title_permissionerror">Keine Berechtigung&#8230;</string>
+    <string name="ad_content_permissionerror">Sie haben nicht ausreichen Berechtigungen um die SMAR App zu benutzen&#8230;</string>
+    
+    <string name="ad_title_creddeviceerror">Gerät nicht in der Datenbank&#8230;</string>
+    <string name="ad_content_creddeviceerror">Dieses Gerät ist in der Server Datenbank nicht aktiviert.&#8230;\n Bitte kontaktieren Sie Ihren Serveradministrator.\n\n Hardware address:</string>
+    
+    <string name="ad_title_crederror">Falsches Passwort&#8230;</string>
+    <string name="ad_content_crederror">Falscher QR-code.\n\n Bitte versuchen Sie es erneut mit dem korrekten QR-code.</string>
+    
+    <string name="ad_title_unknownerror">Benutzer konnten nicht geladen werden&#8230;</string>
+    <string name="ad_content_unknownerror">Unbekannter Fehler&#8230;\n\n Bitte versuchen Sie es später erneut oder kontaktieren Sie Ihren Systemadministrator&#8230;</string>
+    
+    <string name="ad_title_connectionerror">Verbindung konnte nicht hergestellt werden&#8230;</string>
+    <string name="ad_content_connectionerror">Ist das Gerät verbunden?\n Sind die Einstellungen korrekt?\n Ist der Server online?\n\n Bitte wählen Sie eine Aktion&#8230;</string>
+    
+    <string name="ad_bt_exitapp">App Schließen</string>
+    <string name="ad_bt_tryagain">Erneut versuchen</string>
+    <string name="ad_bt_ignore">Ignorieren</string>
+    <string name="ad_bt_initconfig">Initiale Konfiguration</string>
+    <string name="ad_bt_yes">Ja</string>
+    <string name="ad_bt_no">Nein</string>
+    
+    <!-- Toast -->
+    <string name="t_initconfigerror">Initiale Konfiguration konnte nicht geladen werden!</string>
+</resources>
