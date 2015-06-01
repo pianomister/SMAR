@@ -139,6 +139,7 @@
     <string name="ad_title_put_into_shelf">Produkt einräumen</string>
     <string name="ad_content_put_into_shelf">Möchten Sie dieses Produkt einräumen?</string>
 	<string name="ad_content_no_information">Konnte keine Informationen zu diesem Produkt finden. Drücke OK, um weiter zu scannen.</string>
+	<string name="ad_content_no_order">Bestellung konnte nicht gefunden werden.\nBitte kontaktieren Sie den Filialleiter.</string>
 	<string name="ad_title_unfortunely_closed">Unbekannter Fehler</string>
     <string name="ad_content_json">Fehler beim Laden der Produktinformationen.\nBitte probieren Sie es später erneut oder kontaktieren Sie den Systemadministrator&#8230;</string>
     <string name="ad_title_svg_error">Fehler beim Laden der Regalgrafik</string>

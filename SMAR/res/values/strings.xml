@@ -139,6 +139,7 @@
     <string name="ad_title_put_into_shelf">Product into shelf</string>
     <string name="ad_content_put_into_shelf">Do you want to put this article into the shelf?</string>
 	<string name="ad_content_no_information">Could not find information to this product. Check code and talk to admin. Click \"ok\" to scan next prodcut.</string>
+	<string name="ad_content_no_order">Order with scanned barcode not in the database.</string>
 	<string name="ad_title_unfortunely_closed">Unknown Error</string>
     <string name="ad_content_json">Failed loading product.\nPlease try again later or contact system administrator&#8230;</string>
 	<string name="ad_title_svg_error">Error while loading shelf graphic&#8230;</string>

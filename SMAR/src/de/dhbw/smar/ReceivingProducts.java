@@ -539,7 +539,7 @@ public class ReceivingProducts extends Activity {
     	if(errorCode == 404) {
     		AlertDialog.Builder alert = new AlertDialog.Builder(context);
     		alert.setTitle("Order not found (" + hch.getResponseCode() + ")");
-    		alert.setMessage(getResources().getString(R.string.ad_content_no_information))
+    		alert.setMessage(getResources().getString(R.string.ad_content_no_order))
     			 .setPositiveButton(getResources().getString(R.string.ad_bt_ok), new DialogInterface.OnClickListener() {
     			public void onClick(DialogInterface dialog, int id) {
     				dialog.dismiss();
