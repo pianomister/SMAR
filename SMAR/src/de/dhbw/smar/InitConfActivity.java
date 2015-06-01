@@ -55,6 +55,9 @@ public class InitConfActivity extends Activity {
 		PreferencesHelper.setPreferenceInt(this, PreferencesHelper.PREFKEY_USE_INTERNAL_STORAGE, useInternalStorage);
 		PreferencesHelper.setPreferenceInt(this, PreferencesHelper.PREFKEY_INIT_CONFIG, 1);
 		
+		Log.d(logTag, "Load new settings");
+		PreferencesHelper.getInstance().loadPreferences(context);
+		
 		Log.d(logTag, "ByeBye!");
 		Intent intent = this.getIntent();
 		this.setResult(RESULT_OK, intent);

@@ -227,9 +227,9 @@ public class MainActivity extends Activity {
     }
     
     public void onProductStockClicked(View view) {
-    	Intent ReceivingProducts = new Intent(this, ReceivingProducts.class);
-    	ReceivingProducts.putExtra("started", "main");
-    	startActivity(ReceivingProducts);
+    	Intent receivingProducts = new Intent(this, ReceivingProducts.class);
+    	receivingProducts.putExtra("started", "main");
+    	startActivityForResult(receivingProducts, ActivityCodeHelper.ACTIVITY_RECEIVINGPRODUCT_REQUEST);
     }
     
     public void onSettingsClicked(View view) {
@@ -248,8 +248,9 @@ public class MainActivity extends Activity {
     	if(resultCode == Activity.RESULT_CANCELED && 
     			(requestCode == ActivityCodeHelper.ACTIVITY_INITCONFIG_REQUEST || 
     			 requestCode == ActivityCodeHelper.ACTIVITY_LOGIN_REQUEST ||
-    			 requestCode == ActivityCodeHelper.ACTIVITY_SEARCHPRODUCT_REQUEST)) {
-    		Log.d(logTag, "Login or initial configuration canceled. Exec onBackPressed()");
+    			 requestCode == ActivityCodeHelper.ACTIVITY_SEARCHPRODUCT_REQUEST ||
+    			 requestCode == ActivityCodeHelper.ACTIVITY_RECEIVINGPRODUCT_REQUEST)) {
+    		Log.d(logTag, "Login, initial configuration canceled or error in another activity. Exec onBackPressed()");
     		onBackPressed();
     	}
     	

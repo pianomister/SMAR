@@ -5,33 +5,32 @@
     android:orientation="vertical" >
 
     <TextView
-        android:id="@+id/tv_product_productstock"
-        android:layout_width="wrap_content"
+        android:id="@+id/tv_ad_product"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/tv_product_unit"
+        android:text="@string/tv_product_product"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <Spinner
-        android:id="@+id/spinner_unit"
-        android:layout_width="221dp"
-        android:layout_height="46dp" />
+    <TextView
+        android:id="@+id/tv_ad_unit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/tv_product_current_unit"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
-        android:id="@+id/tv_stock_productstock"
-        android:layout_width="wrap_content"
+        android:id="@+id/tv_ad_amount"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/tv_product_amount"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <EditText
-        android:id="@+id/txt_amount_unit"
-        android:layout_width="114dp"
+        android:id="@+id/et_ad_amount"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="number|text"
-        android:maxLines="1" >
-
-        <requestFocus />
-    </EditText>
+        android:ems="3"
+        android:inputType="number"
+        android:maxLines="1" />
 
 </LinearLayout>

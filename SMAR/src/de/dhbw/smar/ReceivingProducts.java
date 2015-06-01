@@ -2,16 +2,13 @@ package de.dhbw.smar;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -19,36 +16,35 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 import de.dhbw.smar.asynctasks.ASyncHttpConnection;
+import de.dhbw.smar.container.OrderContainer;
+import de.dhbw.smar.container.OrderItem;
 import de.dhbw.smar.helpers.ActivityCodeHelper;
-import de.dhbw.smar.helpers.DialogHelper;
 import de.dhbw.smar.helpers.HttpConnectionHelper;
 import de.dhbw.smar.helpers.PreferencesHelper;
-import de.dhbw.smar.helpers.ReceivingListHelper;
-import de.dhbw.smar.helpers.product;
 
-public class ReceivingProducts extends Activity implements DialogHelper.ShareDialogListener{
+@SuppressLint("InflateParams")
+public class ReceivingProducts extends Activity {
+	//  implements DialogHelper.ShareDialogListener
+	private final String logTag = "ReceivingProductActivity";
+	
+	private final int ERROR_UNKNOWN = 0;
+	private final int ERROR_PRODUCT = 1;
+	
+	private OrderContainer orderContainer;
+	private OrderItem tempOrderItem;
 
 	private int process_pos; // 0 = scan Lieferschein, 1 = scan products, 2 = finished work
-	private String current_barcode_receiving_note;
 	private HttpConnectionHelper hch;
 	final Context context = this;
 	private ProgressDialog pDialog;
-	private String current_product_barcode;
-	private String current_product_id;
-	private ArrayList<product> ListOfReceivingUnits = ReceivingListHelper.getInstance().get();
-	private ArrayList<product> ListOfScannedProducts = new ArrayList<product>();
-	private ArrayList<String> available_units = new ArrayList<String>();
-	private String current_product_amount_warehouse;
-	private int current_order_id = 0;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -64,33 +60,13 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 				if (data.equals("main")) {
 					intent.removeExtra("started");
 					process_pos = 0;
-					searchAvailableUnits();
-					this.startProductStore();
+					this.lookUpOrder();
 				}
 			}
 		}
 	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.receiving_products, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
 	
-	public void startProductStore() {
+	public void lookUpOrder() {
 		// start barcode scanner
 		// setze flag, damit nicht immer wieder Lieferschein gescanned werden
     	Intent startNewActivityOpen = new Intent(getBaseContext(), BarcodeScannerActivity.class);
@@ -100,317 +76,407 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		
-    	//read barcode 
-		//get information to this product
-		if (resultCode == RESULT_OK && !data.getStringExtra("BARCODE").equals("NULL")) 
-	    {
-			String resultBarcode = data.getStringExtra("BARCODE");
-			
-			if(this.process_pos == 1) {
-				// scan here products
-				this.current_product_barcode = resultBarcode;
-				Log.d("API CALL", "Start getting product infos after setlayout");
-				startGetProductInfos();
-			}
-			else if(this.process_pos == 0) {
-				this.process_pos = 1;
-				this.current_barcode_receiving_note = resultBarcode;
-				//start rest api to get the infos about receiving note 
-				Log.d("API CALL", "Start getting infos to Lieferschein");
-				startGetReceivingInfos();
-			}
-	    	
-	    }
-    	else {
-	   		 Intent intent = new Intent(this, MainActivity.class);
-	   		 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-	   		 startActivity(intent);
-    		/*
-    		AlertDialog.Builder alert = new AlertDialog.Builder(context);
-    		alert.setTitle("Failure");
-    		alert.setMessage("Couldn't read this code. Check code and try again")
-    			 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-    			public void onClick(DialogInterface dialog, int id) {
-    				dialog.dismiss();
-    				
-    			}
-    		});
-    		alert.create().show(); */
+		if(requestCode == ActivityCodeHelper.ACTIVITY_BARCODE_REQUEST) {
+	    	Log.d(logTag, "Got Result. Result code: " + String.valueOf(resultCode) + "; Barcode: " + data.getStringExtra("BARCODE"));
+	    	if(resultCode == Activity.RESULT_OK && !data.getStringExtra("BARCODE").equals("NULL") && data.getStringExtra("BARCODE").length() > 0) {
+		    	String resultBarcode = data.getStringExtra("BARCODE");
+		    	if(this.process_pos == 0) {
+			    	Log.d(logTag, "Start searching for order: " + resultBarcode);
+			    	getOrder(resultBarcode);
+		    	} else if(this.process_pos == 1) {
+		    		Log.d(logTag, "Start searching for product: " + resultBarcode);
+		    		getProductInformation(resultBarcode);
+		    	}
+		    } else {
+		    	Log.d(logTag, "Cancelled. Back to MainActivity");
+		    	Intent intent = this.getIntent();
+				this.setResult(RESULT_OK, intent);
+				finish();
+	    	} 
     	}
 		
 	}
 
 	
-	protected void startGetReceivingInfos() {
+	protected void getOrder(String orderBarcode) {
 		pDialog = ProgressDialog.show(context, getResources().getString(R.string.pd_title_wait), getResources().getString(R.string.pd_content_receiving_receive_infos), true, false);
-		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/order/" + current_barcode_receiving_note;
-		Log.d("Start connectinting to: ", "server url: " + url);
+		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/order/" + orderBarcode;
+		Log.d(logTag, "server url: " + url);
 		hch = new HttpConnectionHelper(url);
 		new ASyncHttpConnection() {
 			@Override
 			public void onPostExecute(String result) {
 				pDialog.dismiss();
 				// Result ist das JSON Objekt
-				Log.d("API CALL", result);
+				Log.d(logTag, "Response code: " + hch.getResponseCode() + "; Response message: " + hch.getResponseMessage());
 				if(!hch.getError() && hch.getResponseCode() == 200) { 
 					try {
+						int order_id;
+						String order_name;
+						String order_date;
+						String order_barcode;
+						JSONArray jsonOrderItems;
 						
-						JSONArray jArray = new JSONArray(hch.getResponseMessage());
-						if(jArray.length() > 0) {
-							for(int i = 0; i < jArray.length(); i++) {
-								JSONObject json = jArray.getJSONObject(i);
-								product p = new product();
-								p.setName(json.getString("product_name"));
-								p.setReceiving_name(json.getString("receiving_name"));
-								p.setAmount(json.getString("amount"));
-								p.setUnit(json.getString("unit"));
-								p.setReceiving_date(json.getString("receiving_date"));
-								p.setId(json.getInt("product_id"));
-								current_order_id = json.getInt("order_id");
-								ReceivingListHelper.getInstance().get().add(p);
-							}
-							
-							
-							CharSequence text = getResources().getString(R.string.toast_got_receiving_note);
-							int duration = Toast.LENGTH_LONG;
-	
-							Toast toast = Toast.makeText(context, text, duration);
-							toast.show();
-							Log.d("read json", "reading json...");
-							
-	
-							//layout names setzen
-							Log.d("setLayout", "layout wird jetzt im nächsten schritt gesetzt");
-							setLayout();
-							scanProduct();
+						JSONObject jsonOrder = new JSONObject(hch.getResponseMessage());
+						order_id = jsonOrder.getInt("order_id");
+						order_name = jsonOrder.getString("name");
+						order_date = jsonOrder.getString("date");
+						order_barcode = jsonOrder.getString("barcode");
+						
+						orderContainer = new OrderContainer(order_id, order_name, order_date, order_barcode);
+						
+						jsonOrderItems = jsonOrder.getJSONArray("items");
+						for(int i = 0; i < jsonOrderItems.length(); i++) {
+							JSONObject jsonOrderItem = jsonOrderItems.getJSONObject(i);
+							OrderItem oi = new OrderItem(
+									jsonOrderItem.getInt("product_id"), 
+									jsonOrderItem.getString("product_name"),
+									jsonOrderItem.getInt("unit_id"), 
+									jsonOrderItem.getString("unit_name"), 
+									jsonOrderItem.getInt("unit_capacity"), 
+									jsonOrderItem.getInt("amount"));
+							orderContainer.addItem(oi);
 						}
-						else {
-							// show alert, that nothing found to this barcode
-							AlertDialog.Builder p = new AlertDialog.Builder(context);
-							p.setTitle(getResources().getString(R.string.ad_title_no_information));
-							p.setMessage(getResources().getString(R.string.ad_content_no_information));
-							p.setNeutralButton(getResources().getString(R.string.ad_bt_ok), new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,int id) {
-									process_pos = 0;
-									startProductStore();
-								}
-							});
-							p.create().show();
-						}
-					}
-					catch (JSONException e)
-					{
-						e.getStackTrace();
+							
+						Log.d(logTag, "Show OrderTable");
+						setLayout();
+						
+					} catch (Exception e) {
+						Log.e(logTag, "Exception while decoding json array");
+						e.printStackTrace();
+						showAlertDialog(ERROR_UNKNOWN);
 					}
 						
-				}
-				else {
-					// wrong barcode 
-					// show alert, that wrong barcode and return to scanning
-					AlertDialog.Builder p = new AlertDialog.Builder(context);
-					p.setTitle(getResources().getString(R.string.ad_title_no_information));
-					p.setMessage(getResources().getString(R.string.ad_content_no_information));
-					p.setNeutralButton(getResources().getString(R.string.ad_bt_ok), new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog,int id) {
-							process_pos = 0;
-							startProductStore();
-						}
-					});
-					p.create().show();
+				} else if(hch.getResponseCode() == 404){
+					try{
+						JSONObject jsonError = new JSONObject(hch.getResponseMessage());
+						if(jsonError.getString("reason").equals("no_order"))
+							showAlertDialog(hch.getResponseCode());
+						else
+							showAlertDialog(ERROR_UNKNOWN);
+					} catch(Exception e) {
+						showAlertDialog(ERROR_UNKNOWN);
+					}
+				} else {
+					showAlertDialog(ERROR_UNKNOWN);
 				}
 				
 			}
 		}.execute(hch);
 	}
-	
+
 	private void setLayout() {
-		Log.d("API CALL", "starting setting layout");
-//		Log.d("API CALL", String.valueOf(ListOfReceivingUnits.size()));
+		Log.d(logTag, "Set headline");
+		((TextView)findViewById(R.id.tv_receiveproduct_ordername)).setText(getResources().getString(R.string.tv_receiveproduct_ordername) + orderContainer.getName());
+		((TextView)findViewById(R.id.tv_receiveproduct_orderbarcode)).setText(orderContainer.getBarcode());
+		((TextView)findViewById(R.id.tv_receiveproduct_orderdate)).setText(getResources().getString(R.string.tv_receiveproduct_orderdate) + orderContainer.getDate());
 		
+		Log.d(logTag, "Set table");
 		TableLayout tl = (TableLayout)findViewById(R.id.table_receiving_products);
 		tl.removeAllViews();
+		Log.d(logTag, "Set table heading");
+		TableRow tr = new TableRow(this);
+		tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT / 5, TableRow.LayoutParams.WRAP_CONTENT));
 		
-		int flag = 1;
-		try {
-		Log.d("API CALL", "starting setting layout");
-		for(int i = 0; i < ReceivingListHelper.getInstance().get().size(); i++) {
-			Log.d("API CALL", "inside loop");
-
-			
-			Log.d("API CALL", "before first item");
-			// set headings
-			if(flag == 1) {
-				TableRow tr = new TableRow(this);
-				tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT / 5, TableRow.LayoutParams.WRAP_CONTENT));
-				
-				TextView tv1 = new TextView(this);
-				tv1.setText(getResources().getString(R.string.tv_name));
-				tv1.setTextSize(15);
-				tr.addView(tv1);
-				
-				TextView tv2 = new TextView(this);
-				
-				tv2.setText(getResources().getString(R.string.tv_unit));
-				tv2.setTextSize(15);
-				tr.addView(tv2);
-				
-				TextView tv3 = new TextView(this);
-				tv3.setText(getResources().getString(R.string.tv_amount));
-				tv3.setTextSize(15);
-				tr.addView(tv3);
-				
-				/*
-				if(process_pos == 2) {
-				TextView tv4 = new TextView(this);
-					tv4.setText("(" + getResources().getString(R.string.tv_new_unit) + ",  " + getResources().getString(R.string.tv_new_amount) + ")");
-					tv4.setTextSize(15);
-					tv4.setTextColor(Color.GREEN);
-					tr.addView(tv4);
-					
-					
-					TextView tv5 = new TextView(this);
-					tv5.setText(getResources().getString(R.string.tv_new_amount));
-					tv5.setTextSize(15);
-					tv5.setTextColor(Color.GREEN);
-					tr.addView(tv5); 
-				}*/
-				Log.d("API CALL", "after last item in heading");
-				
-				tl.addView(tr, new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-                flag=0;
-			}
-			
-			// set values
-			Log.d("API CALL", "outside if statement");
-			String current_name = ReceivingListHelper.getInstance().get().get(i).getName();
-			Log.d("API CALL", "try get first name " + current_name );
-			String current_unit = ReceivingListHelper.getInstance().get().get(i).getUnit();
-			String current_amount = ReceivingListHelper.getInstance().get().get(i).getAmount();
-			String scanned_unit = "";
-			String scanned_amount = "";
-			
-			
-			if(process_pos == 2) {
-				scanned_unit = ReceivingListHelper.getInstance().get().get(i).getUnit_to_add();
-				scanned_amount= String.valueOf(ReceivingListHelper.getInstance().get().get(i).getAmount_to_add());
-			}
-			
-			TableRow tr = new TableRow(this);
+		TextView tv1 = new TextView(this);
+		tv1.setText(getResources().getString(R.string.tv_name));
+		tv1.setTextSize(22);
+		tr.addView(tv1);
+		
+		TextView tv2 = new TextView(this);
+		tv2.setText(getResources().getString(R.string.tv_unit));
+		tv2.setTextSize(22);
+		tr.addView(tv2);
+		
+		TextView tv3 = new TextView(this);
+		tv3.setText(getResources().getString(R.string.tv_amount));
+		tv3.setTextSize(22);
+		tr.addView(tv3);
+		
+		tl.addView(tr, new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+		
+		Log.d(logTag, "Set table body");
+		Log.d(logTag, "Get Items from OrderContainer as array list and add items to table");
+		ArrayList<OrderItem> orderItems = orderContainer.getItems();
+		for(OrderItem oi: orderItems) {
+			tr = new TableRow(this);
 			tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT / 3, TableRow.LayoutParams.WRAP_CONTENT));
 			
-			Log.d("API CALL", "got all values");
-			TextView tv1 = new TextView(this);
-			tv1.setText(current_name);
+			tv1 = new TextView(this);
+			tv1.setText(oi.getProduct_name());
 			tv1.setTextColor(Color.WHITE);
-			tv1.setTextSize(15);
+			tv1.setTextSize(22);
 			tr.addView(tv1);
 			
-			if(current_unit.equals(null) || current_unit.equals("")) 
-				current_unit = "0";
-			if(scanned_unit.equals(null) || scanned_unit.equals(""))
-				scanned_unit = "0";
-				TextView tv2 = new TextView(this);
-			tv2.setText("(" + current_unit + ", " +  scanned_unit + ")");
+			tv2 = new TextView(this);
+			tv2.setText(oi.getUnit_name());
 			tv2.setTextColor(Color.WHITE);
-			tv2.setTextSize(15);
+			tv2.setTextSize(22);
 			tr.addView(tv2);
 			
-			
-			if(current_amount.equals(null) || current_amount.equals("")) 
-				current_amount = "0";
-			if(scanned_unit.equals(null) || scanned_unit.equals(""))
-				scanned_amount = "0";
-			TextView tv3 = new TextView(this);
-			tv3.setText("(" + current_amount + ",  " + scanned_amount + ")");
+			tv3 = new TextView(this);
+			tv3.setText(oi.getAmount() + "(" + oi.getDelivered_amount() + ")");
 			tv3.setTextColor(Color.WHITE);
-			tv3.setTextSize(15);
+			tv3.setTextSize(22);
 			tr.addView(tv3);
-		
-			/*
-			if(process_pos == 2) {
-			TextView tv4 = new TextView(this);
-			if(scanned_unit.equals(null))
-				scanned_unit = "0";
-			tv4.setText("(" + scanned_unit + ",  " + scanned_amount + ")");
-			tv4.setTextColor(Color.GREEN);
-			tv4.setTextSize(15);
-			tr.addView(tv4);
 			
-			TextView tv5 = new TextView(this);
-			tv5.setText(scannd_amount);
-			tv5.setTextColor(Color.GREEN);
-			tv5.setTextSize(12);
-			tr.addView(tv5); 
-			}*/
 			tl.addView(tr, new TableLayout.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-			
-			Log.d("API CALL", "set all rows");
-
-            Log.d("API CALL", "end of first loop");
-           
 		}
-		}
-		catch (Exception e) 
-		{
-			Log.d("API CALL", e.getStackTrace().toString());
-			
-		}
-		Log.d("API CALL", "End of method");
-		
-		//now scan product to insert it into stock 
-		
-			
+		Log.d(logTag, "Table finished");
 	}
-
-	private void scanProduct() {
+	
+	public void go_on_scanning(View view) {
 		process_pos = 1;
-    	Intent startNewActivityOpen = new Intent(getBaseContext(), BarcodeScannerActivity.class);
+		Intent startNewActivityOpen = new Intent(getBaseContext(), BarcodeScannerActivity.class);
     	startActivityForResult(startNewActivityOpen, ActivityCodeHelper.ACTIVITY_BARCODE_REQUEST);
 	}
 	
-	private void startGetProductInfos() {
-		pDialog = ProgressDialog.show(context, getResources().getString(R.string.pd_title_wait), getResources().getString(R.string.pd_content_receiving_product_infos), true, false);
-		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/getProduct/" + current_product_barcode + "/receiving";
-		Log.d("Start connectinting to: ", "server url: " + url);
-		hch = new HttpConnectionHelper(url);
-		new ASyncHttpConnection() {
-			@Override
-			public void onPostExecute(String result) {
-				pDialog.dismiss();
-				// Result ist das JSON Objekt
-				Log.d("API CALL", result);
-				Log.d("start json", result + "teeest");
-				if(!hch.getError() && hch.getResponseCode() == 200) { 
-				try { 
-						JSONArray jArray = new JSONArray(hch.getResponseMessage());
-						
-						for(int i = 0; i < jArray.length(); i++) {
-							JSONObject json = jArray.getJSONObject(i);
-							product p = new product();
-							p.setId(json.getInt("product_id"));
-							current_product_id = json.getString("product_id");
-							p.setAmount(json.getString("amount_warehouse"));
-							current_product_amount_warehouse = json.getString("amount_warehouse");
-							ListOfScannedProducts.add(p);
-						}
-						
-	
-	//					open dialog to let the user enter his amounts
-						DialogHelper dialog = newInstance("0", available_units);
-						dialog.show(getFragmentManager(), "tag");
-					}
-					catch (Exception e) {
-						e.getStackTrace();
-					}
-				}
-				else {
-					
-				}
-			}
-		}.execute(hch);
+	public void finish_scanning(View view) {
+		updateDatabase();
 	}
 	
+	 private void getProductInformation(final String barcode) {
+	    	// get information of the product
+	    	// set up asynchronous task 
+	    	// set up connection to the server 
+	    	// retrieve data from server
+	    	// display the information
+	    	pDialog = ProgressDialog.show(context, getResources().getString(R.string.pd_title_wait), getResources().getString(R.string.pd_content_receiving_product_infos), true, false);
+			String url = "http://" + PreferencesHelper.getInstance().getServer() + "/product/" + barcode;
+			Log.d(logTag, "server url: " + url);
+			hch = new HttpConnectionHelper(url);
+			new ASyncHttpConnection() {
+				@Override
+				public void onPostExecute(String result) {
+					pDialog.dismiss();
+					// Result ist das JSON Objekt
+					Log.d(logTag, "Response code: " + hch.getResponseCode() + "; Response message: " + hch.getResponseMessage());
+					if(!hch.getError() && hch.getResponseCode() == 200) { 
+						try {
+							int product_id;
+							String product_name;
+							int unit_id;
+							String unit_name;
+							int unit_capacity;
+							int amount = 0;
+							
+							Log.d(logTag, "Start decoding json array");
+							JSONArray jArray = new JSONArray(result);
+							if(jArray.length() > 0) {
+								JSONObject json = jArray.getJSONObject(0);
+								product_id = json.getInt("product_id");
+								product_name = json.getString("name");
+								if(json.getString("unit").equals("0")) {
+									unit_id = 1;
+									unit_name = getResources().getString(R.string.var_unit_single);
+									unit_capacity = 1;
+								} else {
+									JSONObject jsonUnit = json.getJSONObject("unit");
+									unit_id = jsonUnit.getInt("unit_id");
+									unit_name = jsonUnit.getString("name");
+									unit_capacity = jsonUnit.getInt("capacity");
+								}
+								
+								tempOrderItem = new OrderItem(product_id, product_name, unit_id, unit_name, unit_capacity, amount);
+								showAmountChooser();
+							} else {
+								showAlertDialog(ERROR_PRODUCT);
+							}						
+						} catch (Exception e) {
+							Log.e(logTag, "Exception while decoding json array");
+							e.printStackTrace();
+							showAlertDialog(ERROR_UNKNOWN);
+						}
+							
+					} else if(hch.getResponseCode() == 404 && hch.getResponseMessage().equals("[]")){
+						showAlertDialog(ERROR_PRODUCT);
+					} else {
+						showAlertDialog(ERROR_UNKNOWN);
+					}
+					
+				}
+			}.execute(hch);
+	    }
+	 
+	private void showAmountChooser() {
+    	AlertDialog.Builder builder = new AlertDialog.Builder(context);
+    	LayoutInflater inflater = this.getLayoutInflater();
+        View v = inflater.inflate(R.layout.unit_amount_layout, null); 
+        
+    	builder.setTitle(v.getResources().getString(R.string.ad_title_amountchooser));
+        
+        //get textviews and amount field
+        final EditText etAmount = (EditText)v.findViewById(R.id.et_ad_amount);
+        final TextView tvProduct = (TextView)v.findViewById(R.id.tv_ad_product);
+        final TextView tvUnit = (TextView)v.findViewById(R.id.tv_ad_unit);
+        
+        tvProduct.setText(v.getResources().getString(R.string.tv_product_product) + tempOrderItem.getProduct_name());
+        tvUnit.setText(v.getResources().getString(R.string.tv_product_current_unit) + tempOrderItem.getUnit_name() + " (" + tempOrderItem.getUnit_capacity() + ")");
+        
+        builder.setView(v)
+               .setPositiveButton(v.getResources().getString(R.string.ad_bt_add), new DialogInterface.OnClickListener() {
+                   @Override
+                   public void onClick(DialogInterface dialog, int id) {
+                	  dialog.dismiss();
+                	  tempOrderItem.setDelivered_amount(Integer.valueOf(etAmount.getText().toString()));
+                	  checkDelivery();
+                   }
+               })
+               .setNegativeButton(v.getResources().getString(R.string.ad_bt_cancel), new DialogInterface.OnClickListener() {
+                   public void onClick(DialogInterface dialog, int id) {
+                       dialog.dismiss();
+                   }
+               });      
+         builder.create().show();
+	}
 	
+	private void checkDelivery() {
+		int product_id = tempOrderItem.getProduct_id();
+		int unit_id = tempOrderItem.getUnit_id();
+		if(orderContainer.isInOrder(product_id, unit_id)) {
+			Log.d(logTag, "Product is already in Order!");
+			if(orderContainer.getDeliveredAmount(product_id, unit_id) != 0) {
+				Log.d(logTag, "Product is already in order and has been received... show dialog!");
+				AlertDialog.Builder alert = new AlertDialog.Builder(context);
+	    		alert.setTitle(getResources().getString(R.string.ad_title_overwrite));
+	    		alert.setMessage(getResources().getString(R.string.ad_content_overwrite))
+	    			 .setPositiveButton(getResources().getString(R.string.ad_bt_add), new DialogInterface.OnClickListener() {
+		    			public void onClick(DialogInterface dialog, int id) {
+		    				dialog.dismiss();
+		    				addDelivery(false);
+		    			}
+	    			 })
+	    			 .setNeutralButton(getResources().getString(R.string.ad_bt_cancel), new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+							tempOrderItem = null;
+						}
+					})
+	    			 .setNegativeButton(getResources().getString(R.string.ad_bt_overwrite), new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+							addDelivery(true);
+						}
+					});
+	    		alert.create().show();
+			} else {
+				Log.d(logTag, "Product delivey amount is zero");
+				addDelivery(true);
+			}
+		} else {
+			Log.d(logTag, "Product is not in order");
+			addDelivery(true);
+		}
+	}
+	
+	private void addDelivery(boolean overwrite) {
+		int product_id = tempOrderItem.getProduct_id();
+		int unit_id = tempOrderItem.getUnit_id();
+		int delivered_amount = tempOrderItem.getDelivered_amount();
+		if(overwrite) {
+			if(orderContainer.isInOrder(product_id, unit_id)) {
+				orderContainer.setDeliveredAmount(delivered_amount, product_id, unit_id);
+			} else {
+				orderContainer.addItem(tempOrderItem);
+			}
+		} else {
+			int old_delivered_amount = orderContainer.getDeliveredAmount(product_id, unit_id);
+			int new_delivered_amount = old_delivered_amount + delivered_amount;
+			orderContainer.setDeliveredAmount(new_delivered_amount, product_id, unit_id);
+		}
+		
+		tempOrderItem = null;
+		Toast.makeText(context, getResources().getString(R.string.toast_delivery_product_added), Toast.LENGTH_LONG).show();
+		setLayout();
+	}
+	
+	private void updateDatabase() {
+		try {
+			pDialog = ProgressDialog.show(context, getResources().getString(R.string.pd_title_wait), getResources().getString(R.string.pd_content_updating), true, false);
+			String url = "http://" + PreferencesHelper.getInstance().getServer() + "/delivery/create";
+			hch = new HttpConnectionHelper(url,  HttpConnectionHelper.REQUEST_TYPE_POST);
+			
+			// First basic stuff
+			JSONObject jsonDelivery = new JSONObject();
+			jsonDelivery.put("order_id", orderContainer.getOrder_id());
+			
+			// Delivery items to JSONArray
+			JSONArray jsonItems = new JSONArray();
+			ArrayList<OrderItem> orderItemsDelivery = orderContainer.getItems();
+			for(OrderItem oiDelivery: orderItemsDelivery) {
+				JSONObject jsonOIDelivery = new JSONObject();
+				jsonOIDelivery.put("product_id", oiDelivery.getProduct_id());
+				jsonOIDelivery.put("unit_id", oiDelivery.getUnit_id());
+				jsonOIDelivery.put("amount", oiDelivery.getDelivered_amount());
+				jsonItems.put(jsonOIDelivery);
+				jsonOIDelivery = null;
+			}
+			jsonDelivery.put("delivery_items", jsonItems);
+			
+			Log.d(logTag, "delivery json: " + jsonDelivery.toString());
+			
+	
+	//		Put data into $_POST variable
+			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+			nameValuePairs.add(new BasicNameValuePair("json_delivery", jsonDelivery.toString()));
+			hch.setPostPair(nameValuePairs);
+	//		inform user and start
+			
+			new ASyncHttpConnection() {
+				@Override
+				public void onPostExecute(String result) {
+					Log.d(logTag, "Response code: " + hch.getResponseCode() + "; Response message: " + hch.getResponseMessage());
+					if(!hch.getError() && hch.getResponseCode() == 200) { 
+						pDialog.dismiss();
+						Toast toast = Toast.makeText(context, getResources().getString(R.string.toast_delivery_successfully), Toast.LENGTH_LONG);
+						toast.show();
+						
+						closeActivity();
+					} else {
+						showAlertDialog(ERROR_UNKNOWN);
+					}
+				}
+			}.execute(hch);
+		} catch(Exception e) {
+			Log.e(logTag, "Exception while encoding json array");
+			e.printStackTrace();
+			showAlertDialog(ERROR_UNKNOWN);
+		}
+	}
+	
+	private void closeActivity() {
+		orderContainer = null;
+		process_pos = 0;
+		tempOrderItem = null;
+		
+		Intent intent = this.getIntent();
+		this.setResult(RESULT_OK, intent);
+		finish();
+	}
+	
+	@Override
+	public void onBackPressed() {
+		AlertDialog.Builder alert = new AlertDialog.Builder(context);
+		alert.setTitle(getResources().getString(R.string.ad_title_receiving_cancel));
+		alert.setMessage(getResources().getString(R.string.ad_content_receiving_cancel))
+			 .setPositiveButton(getResources().getString(R.string.ad_bt_yes), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.dismiss();
+					closeActivity();
+				}
+			 })
+			 .setNegativeButton(getResources().getString(R.string.ad_bt_no), new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.dismiss();
+				}
+			});
+		alert.create().show();
+	}
+
+	/* 	
 	private void searchAvailableUnits() {
 		 //get all available Units to this product
 		 pDialog = ProgressDialog.show(context, getResources().getString(R.string.pd_title_wait), getResources().getString(R.string.pd_content_available_units), true, false);
@@ -466,166 +532,61 @@ public class ReceivingProducts extends Activity implements DialogHelper.ShareDia
 				}
 			}.execute(hch);					
 	 }
+	 
+	 */
 	
-	static DialogHelper newInstance(String current_unit, ArrayList<String> all_units) {
-		 // need this, to pass some informationn to the dialog 
-		 Log.d("DialogHelper", "started");
-		 DialogHelper f = new DialogHelper();
-		 	
-		    Bundle args = new Bundle();
-		    args.putStringArrayList("all_units", all_units);
-		    f.setArguments(args);
-		    
-		    return f;
-		}
+	private void showAlertDialog(int errorCode) {
+    	if(errorCode == 404) {
+    		AlertDialog.Builder alert = new AlertDialog.Builder(context);
+    		alert.setTitle("Order not found (" + hch.getResponseCode() + ")");
+    		alert.setMessage(getResources().getString(R.string.ad_content_no_information))
+    			 .setPositiveButton(getResources().getString(R.string.ad_bt_ok), new DialogInterface.OnClickListener() {
+    			public void onClick(DialogInterface dialog, int id) {
+    				dialog.dismiss();
+    				lookUpOrder();
+    			}
+    		});
+    		alert.create().show();
+    	} else if(errorCode == ERROR_PRODUCT) {
+    		AlertDialog.Builder alert = new AlertDialog.Builder(context);
+    		alert.setTitle("Product not found (" + hch.getResponseCode() + ")");
+    		alert.setMessage(getResources().getString(R.string.ad_content_no_information))
+    			 .setPositiveButton(getResources().getString(R.string.ad_bt_ok), new DialogInterface.OnClickListener() {
+    			public void onClick(DialogInterface dialog, int id) {
+    				dialog.dismiss();
+    			}
+    		});
+    		alert.create().show(); 
+    	} else if(errorCode == ERROR_UNKNOWN) {
+    		AlertDialog.Builder alert = new AlertDialog.Builder(context);
+    		alert.setTitle(getResources().getString(R.string.ad_title_unfortunely_closed));
+    		alert.setMessage(getResources().getString(R.string.ad_content_json))
+    			 .setPositiveButton(getResources().getString(R.string.ad_bt_exitapp), new DialogInterface.OnClickListener() {
+    			public void onClick(DialogInterface dialog, int id) {
+    				dialog.dismiss();
+    				cancelApp();
+    			}
+    		});
+    		alert.create().show();
+    	} else {
+    		AlertDialog.Builder alert = new AlertDialog.Builder(context);
+    		alert.setTitle(getResources().getString(R.string.ad_title_unfortunely_closed));
+    		alert.setMessage(getResources().getString(R.string.ad_content_json))
+    			 .setPositiveButton(getResources().getString(R.string.ad_bt_exitapp), new DialogInterface.OnClickListener() {
+    			public void onClick(DialogInterface dialog, int id) {
+    				dialog.dismiss();
+    				cancelApp();
+    			}
+    		});
+    		alert.create().show();
+    	}
+    }
 	
-	private void updateDatabase() throws JSONException {
-		// erhöhe den Amount of Warehouse
-		// ToDo: Update Setzliste
-		// Question: update Lieferschein?
-		pDialog = ProgressDialog.show(context, getResources().getString(R.string.pd_title_wait), getResources().getString(R.string.pd_content_updating), true, false);
-		String url = "http://" + PreferencesHelper.getInstance().getServer() + "/delivery/create";
-		hch = new HttpConnectionHelper(url,  HttpConnectionHelper.REQUEST_TYPE_POST);
-//		data to post to server
-		JSONArray post_data = new JSONArray();
-		for(int i = 0; i < ListOfReceivingUnits.size(); i++) {
-			JSONObject jobj = new JSONObject();
-			jobj.put("product_id", ReceivingListHelper.getInstance().get().get(i).getId());
-			jobj.put("unit_id", ReceivingListHelper.getInstance().get().get(i).getUnit_to_add());
-			jobj.put("amount",ReceivingListHelper.getInstance().get().get(i).getAmount_to_add());
-			post_data.put(jobj);
-		}
-//		Put data into $_POST variable
-		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-		nameValuePairs.add(new BasicNameValuePair("order_id", String.valueOf(current_order_id)));
-		Log.d("ReceivingProducts", "post_data: " + post_data.toString());
-		nameValuePairs.add(new BasicNameValuePair("array", post_data.toString()));
-		hch.setPostPair(nameValuePairs);
-//		inform user and start
-		
-		new ASyncHttpConnection() {
-			@Override
-			public void onPostExecute(String result) {
-				pDialog.dismiss();
-				Toast toast = Toast.makeText(context, result, Toast.LENGTH_LONG);
-				toast.show();
-				
-				Log.d("database", result);
-				}
-		}.execute(hch);
-		
-	}
-	
-
-	@Override
-	public void onDialogPositiveClick(DialogFragment dialog, String amount, int index, String valueOfString) {
-		// TODO Auto-generated method stub
-		Log.d("DialogHelper", "Amount: " + amount + " Index: " + index + " Value: " + valueOfString);
-		// use REST API to update amount_warehouse in SMAR_stock
-		if(index == 0) {
-			valueOfString = "1";
-		} else 
-			valueOfString = valueOfString.split(":")[0];
-		
-		Log.d("DialogHelper", "amount: " + amount + " unit: " + valueOfString);
-//		updateDatabase(Integer.parseInt(amount), Integer.parseInt(valueOfString));
-//		put this value in extra list --> ListOfScannedProducts
-		int last_index = ListOfScannedProducts.size() - 1;
-		Log.d("DialogHelper", "Der letzte index ist: " + last_index);
-		product p = ListOfScannedProducts.get(last_index);
-		p.setAmount_to_add(Integer.parseInt(amount));
-		p.setUnit_to_add(valueOfString);
-		
-		Log.d("DialogHelper", "added new product to intern list");
-		
-		
-		//		scan next product
-		
-		AlertDialog.Builder alert = new AlertDialog.Builder(context);
-		alert.setTitle(getResources().getString(R.string.ad_title_next_product));
-		alert.setMessage(getResources().getString(R.string.ad_title_next_product));
-		alert.setPositiveButton(getResources().getString(R.string.ad_bt_yes), new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog,int id) {
-				process_pos = 1;
-				scanProduct();
-			}
-		})
-			.setNegativeButton(getResources().getString(R.string.ad_bt_no), new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog,int id) {
-					Toast t = Toast.makeText(context, getResources().getString(R.string.toast_finished_scanning), Toast.LENGTH_SHORT);
-					t.show();
-					process_pos = 2;
-					createDiffList();
-					setLayout();
-				}
-			});
-		alert.create().show();
-		
-	}
-
-	public void go_on_scanning(View view) {
-		process_pos = 1;
-		scanProduct();
-	}
-	
-	public void finish_scanning(View view) {
-		Toast t = Toast.makeText(context, getResources().getString(R.string.toast_starting_update), Toast.LENGTH_SHORT);
-		t.show();
-		process_pos = 2; 
-		createDiffList();
-		setLayout();
-		try {
-			updateDatabase();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	
-	@Override
-	public void onDialogNegativeClick(DialogFragment dialog) {
-		// TODO Auto-generated method stub
-//		createDiffList();
-	}
-	
-	private void createDiffList() {
-		for(int i = 0; i < ReceivingListHelper.getInstance().get().size(); i++) {
-			for(int j = 0; j < ListOfScannedProducts.size(); j++) {
-				product a = ReceivingListHelper.getInstance().get().get(i);
-				product b = ListOfScannedProducts.get(j);
-				
-				//compare them 
-				if(a.getId() == b.getId()) {
-					// put them in one big list 
-					a.setAmount_to_add(b.getAmount_to_add());
-					a.setUnit_to_add(b.getUnit_to_add());
-				}
-			}
-		}
-		
-		// add those product, that are scanned but not expected
-		int flag = 0;
-		for(int i = 0; i < ListOfScannedProducts.size(); i++) {
-			for(int j = 0; j < ReceivingListHelper.getInstance().get().size(); j++) {
-				product a = ListOfScannedProducts.get(i);
-				product b = ReceivingListHelper.getInstance().get().get(j);
-				
-				if(a.getId() != b.getId()) {
-					flag++;
-				}
-				// if flag = the size, then there is a product which is not in the list
-				if (flag >= ReceivingListHelper.getInstance().get().size()) {
-					ReceivingListHelper.getInstance().get().add(ListOfScannedProducts.get(i));
-				}
-			}
-			flag = 0;
-		}
-		
-		
-//		display the list of differences
-		
-	}
+	public void cancelApp() {
+    	Intent intent = this.getIntent();
+		this.setResult(RESULT_CANCELED, intent);
+		finish();
+    }
 }
 
 
